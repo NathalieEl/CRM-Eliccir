@@ -287,6 +287,10 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .auth-form label { display: grid; gap: 7px; color: #4e5b52; font-size: 12px; font-weight: 700; }
 .auth-form input { width: 100%; border: 1px solid #dfe4dc; background: #fafbf9; padding: 13px 14px; color: var(--foreground); font: inherit; outline: none; }
 .auth-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(35, 99, 71, .12); }
+.password-input-wrap { position: relative; display: block; }
+.password-input-wrap input { padding-right: 82px; }
+.password-toggle { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); border: 0; background: transparent; color: var(--green); cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; padding: 5px; }
+.password-toggle:hover { text-decoration: underline; text-underline-offset: 3px; }
 .auth-form button { margin-top: 8px; width: 100%; }
 .auth-error { margin: 0 0 18px; padding: 12px 14px; border-left: 3px solid var(--coral); background: #fff3ef; color: #9a4333; font-size: 13px; }
 .auth-form select, .contact-form select { width: 100%; border: 1px solid #dfe4dc; background: #fafbf9; padding: 13px 14px; color: var(--foreground); font: inherit; }

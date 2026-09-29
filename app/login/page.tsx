@@ -1,4 +1,5 @@
 import { login } from "@/app/login/actions";
+import { PasswordField } from "@/app/components/password-field";
 
 const messages = {
   invalid: "Identifiants ou code de double authentification incorrects.",
@@ -22,7 +23,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         {error && messages[error] ? <p className="auth-error" role="alert">{messages[error]}</p> : null}
         <form action={login} className="auth-form">
           <label>Nom d’utilisateur<input name="username" autoComplete="username" required /></label>
-          <label>Mot de passe<input name="password" type="password" autoComplete="current-password" required /></label>
+          <PasswordField name="password" label="Mot de passe" autoComplete="current-password" />
           <label>Code 2FA<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" required /></label>
           <button className="contact-primary-button" type="submit">Se connecter <span>↗</span></button>
         </form>

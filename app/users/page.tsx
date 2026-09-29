@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createUser, deleteUser } from "@/app/users/actions";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PasswordField } from "@/app/components/password-field";
 
 export default async function UsersPage({ searchParams }: { searchParams: Promise<{ created?: string; username?: string; error?: string }> }) {
   await requireAdmin();
@@ -28,7 +29,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           <div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Créer un accès</h2></div></div>
           <form action={createUser} className="contact-form">
             <label>Nom d’utilisateur<input name="username" required minLength={3} maxLength={40} pattern="[A-Za-z0-9._-]+" placeholder="ex. sophie.laurent" /></label>
-            <label>Mot de passe temporaire<input name="password" type="password" minLength={8} required autoComplete="new-password" placeholder="8 caractères minimum" /></label>
+            <PasswordField name="password" label="Mot de passe temporaire" minLength={8} autoComplete="new-password" placeholder="8 caractères minimum" />
             <label>Rôle<select name="role" defaultValue="member"><option value="member">Membre</option><option value="admin">Administrateur</option></select></label>
             <button className="contact-primary-button" type="submit">Créer le compte <span>+</span></button>
           </form>
