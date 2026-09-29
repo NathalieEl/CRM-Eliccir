@@ -3,7 +3,7 @@ import { createContact, deleteContact, updateContact } from "@/app/contacts/acti
 import { prisma } from "@/lib/prisma";
 
 type ContactsPageProps = {
-  searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
+  searchParams: Promise<{ error?: string; notice?: string; q?: string; statut?: string; secteur?: string; ville?: string; source?: string }>;
 };
 
 const notices: Record<string, string> = {
@@ -22,6 +22,7 @@ const errors: Record<string, string> = {
 export default async function ContactsPage({ searchParams }: ContactsPageProps) {
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
+  const filters = { statut: params.statut ?? "", secteur: params.secteur ?? "", ville: params.ville ?? "", source: params.source ?? "" };
   let databaseAvailable = true;
   let contacts: Awaited<ReturnType<typeof prisma.contact.findMany>> = [];
 
@@ -31,6 +32,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     databaseAvailable = false;
   }
 
+  const filterOptions = {
+    statut: [...new Set(contacts.map((contact) => contact.statut).filter(Boolean))].sort(),
+    secteur: [...new Set(contacts.map((contact) => contact.secteur).filter(Boolean))].sort(),
+    ville: [...new Set(contacts.map((contact) => contact.ville).filter(Boolean))].sort(),
+    source: [...new Set(contacts.map((contact) => contact.sourceAcquisition).filter(Boolean))].sort(),
+  };
+
   const filteredContacts = searchQuery
     ? contacts.filter((contact) => {
         const haystack = [
@@ -38,6 +46,11 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           contact.email ?? "",
           contact.telephone ?? "",
           contact.entreprise ?? "",
+          contact.poste ?? "",
+          contact.secteur ?? "",
+          contact.ville ?? "",
+          contact.statut ?? "",
+          contact.sourceAcquisition ?? "",
         ]
           .join(" ")
           .toLowerCase();
@@ -45,6 +58,12 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         return haystack.includes(searchQuery.toLowerCase());
       })
     : contacts;
+  const visibleContacts = filteredContacts.filter((contact) =>
+    (!filters.statut || contact.statut === filters.statut) &&
+    (!filters.secteur || contact.secteur === filters.secteur) &&
+    (!filters.ville || contact.ville === filters.ville) &&
+    (!filters.source || contact.sourceAcquisition === filters.source)
+  );
 
   return (
     <main className="contacts-screen">
@@ -67,7 +86,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         </section>
 
         <section className="contacts-toolbar">
-          <form className="contacts-search" action="/contacts" method="get">
+          <form className="contacts-search contacts-filter-form" action="/contacts" method="get">
             <label htmlFor="contacts-search" className="sr-only">Rechercher un contact</label>
             <input
               id="contacts-search"
@@ -78,14 +97,18 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               autoComplete="off"
             />
             <button type="submit">Rechercher</button>
+            <select name="statut" defaultValue={filters.statut}><option value="">Tous les statuts</option>{filterOptions.statut.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
+            <select name="secteur" defaultValue={filters.secteur}><option value="">Tous les secteurs</option>{filterOptions.secteur.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
+            <select name="ville" defaultValue={filters.ville}><option value="">Toutes les villes</option>{filterOptions.ville.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
+            <select name="source" defaultValue={filters.source}><option value="">Toutes les sources</option>{filterOptions.source.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
           </form>
-          {searchQuery ? (
+          {searchQuery || Object.values(filters).some(Boolean) ? (
             <a className="contacts-search-reset" href="/contacts">Réinitialiser</a>
           ) : null}
         </section>
 
         {searchQuery ? (
-          <p className="contacts-search-results">Résultats pour “{searchQuery}” : {filteredContacts.length} contact{filteredContacts.length > 1 ? "s" : ""}</p>
+          <p className="contacts-search-results">{searchQuery ? `Résultats pour “${searchQuery}” : ` : "Résultats filtrés : "}{visibleContacts.length} contact{visibleContacts.length > 1 ? "s" : ""}</p>
         ) : null}
 
         {params.notice && notices[params.notice] && <p className="contacts-message" role="status">{notices[params.notice]}</p>}
@@ -107,6 +130,10 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 <label>E-mail<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
                 <label>Téléphone<input name="telephone" type="tel" autoComplete="tel" maxLength={40} placeholder="+33 6 12 34 56 78" /></label>
                 <label>Entreprise<input name="entreprise" autoComplete="organization" maxLength={120} placeholder="Nom de l’entreprise" /></label>
+                <label>Poste<input name="poste" maxLength={120} placeholder="Fonction" /></label>
+                <label>Secteur<input name="secteur" maxLength={80} placeholder="Secteur" /></label>
+                <label>Ville<input name="ville" maxLength={80} placeholder="Ville" /></label>
+                <label>Statut<input name="statut" maxLength={80} placeholder="Prospect" /></label>
                 <button className="contact-primary-button" type="submit">Ajouter le contact <span>+</span></button>
               </form>
             </section>
@@ -114,10 +141,10 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             <section className="contacts-list-section">
               <div className="contacts-section-heading">
                 <div><p className="section-index">02 <i>·</i> PORTEFEUILLE</p><h2>Contacts enregistrés</h2></div>
-                <span className="contacts-list-count">{filteredContacts.length}</span>
+                <span className="contacts-list-count">{visibleContacts.length}</span>
               </div>
 
-              {filteredContacts.length === 0 ? (
+              {visibleContacts.length === 0 ? (
                 <p className="contacts-empty">
                   {searchQuery
                     ? `Aucun résultat pour “${searchQuery}”. Essayez une autre recherche.`
@@ -126,16 +153,24 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               ) : (
                 <div className="contacts-records-wrap">
                   <table className="contacts-records">
-                    <thead><tr><th>CONTACT</th><th>TÉLÉPHONE</th><th>ENTREPRISE</th><th>MODIFIÉ</th><th>GESTION</th></tr></thead>
+                    <thead><tr><th>CONTACT</th><th>TÉLÉPHONE</th><th>ENTREPRISE / POSTE</th><th>SECTEUR</th><th>VILLE</th><th>STATUT</th><th>SOURCE</th><th>MODIFIÉ</th><th>GESTION</th></tr></thead>
                     <tbody>
-                      {filteredContacts.map((contact) => (
+                      {visibleContacts.map((contact) => (
                         <tr key={contact.id}>
                           <td><b>{contact.nom}</b><small>{contact.email || "Aucun e-mail"}</small></td>
                           <td>{contact.telephone || "—"}</td>
-                          <td>{contact.entreprise || "—"}</td>
+                          <td><b>{contact.entreprise || "—"}</b><small>{contact.poste || "Poste non renseigné"}</small></td>
+                          <td>{contact.secteur || "—"}</td>
+                          <td>{[contact.ville, contact.departement].filter(Boolean).join(" · ") || "—"}</td>
+                          <td><span className="contact-status-label">{contact.statut || "Non défini"}</span></td>
+                          <td>{contact.sourceAcquisition || "—"}</td>
                           <td><time dateTime={contact.updatedAt.toISOString()}>{contact.updatedAt.toLocaleDateString("fr-FR")}</time></td>
                           <td>
                             <div className="contact-row-actions">
+                              <details className="contact-view-details">
+                                <summary>Fiche</summary>
+                                <div className="contact-detail-card"><h3>{contact.nom}</h3><dl><dt>E-mail</dt><dd>{contact.email || "—"}</dd><dt>Téléphone</dt><dd>{contact.telephone || "—"}</dd><dt>Entreprise</dt><dd>{contact.entreprise || "—"}</dd><dt>Poste</dt><dd>{contact.poste || "—"}</dd><dt>Secteur</dt><dd>{contact.secteur || "—"}</dd><dt>Ville</dt><dd>{[contact.ville, contact.departement, contact.pays].filter(Boolean).join(" · ") || "—"}</dd><dt>Source</dt><dd>{contact.sourceAcquisition || "—"}</dd><dt>Statut</dt><dd>{contact.statut || "—"}</dd><dt>LinkedIn</dt><dd>{contact.linkedin ? <a href={contact.linkedin.startsWith("http") ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noreferrer">Voir le profil</a> : "—"}</dd></dl></div>
+                              </details>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
                                 <form action={updateContact} className="contact-edit-form">
@@ -144,6 +179,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                                   <label>E-mail<input name="email" type="email" defaultValue={contact.email ?? ""} maxLength={254} /></label>
                                   <label>Téléphone<input name="telephone" type="tel" defaultValue={contact.telephone ?? ""} maxLength={40} /></label>
                                   <label>Entreprise<input name="entreprise" defaultValue={contact.entreprise ?? ""} maxLength={120} /></label>
+                                  <label>Poste<input name="poste" defaultValue={contact.poste ?? ""} maxLength={120} /></label>
+                                  <label>Secteur<input name="secteur" defaultValue={contact.secteur ?? ""} maxLength={80} /></label>
+                                  <label>Ville<input name="ville" defaultValue={contact.ville ?? ""} maxLength={80} /></label>
+                                  <label>Département<input name="departement" defaultValue={contact.departement ?? ""} maxLength={20} /></label>
+                                  <label>Pays<input name="pays" defaultValue={contact.pays ?? ""} maxLength={80} /></label>
+                                  <label>Source<input name="sourceAcquisition" defaultValue={contact.sourceAcquisition ?? ""} maxLength={120} /></label>
+                                  <label>Statut<input name="statut" defaultValue={contact.statut ?? ""} maxLength={80} /></label>
+                                  <label>LinkedIn<input name="linkedin" type="url" defaultValue={contact.linkedin ?? ""} maxLength={254} /></label>
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
                                 </form>
                               </details>

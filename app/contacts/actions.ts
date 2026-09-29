@@ -14,6 +14,14 @@ function parseContact(formData: FormData) {
   const email = field(formData, "email").toLowerCase();
   const telephone = field(formData, "telephone");
   const entreprise = field(formData, "entreprise");
+  const poste = field(formData, "poste");
+  const secteur = field(formData, "secteur");
+  const ville = field(formData, "ville");
+  const departement = field(formData, "departement");
+  const pays = field(formData, "pays");
+  const sourceAcquisition = field(formData, "sourceAcquisition");
+  const statut = field(formData, "statut");
+  const linkedin = field(formData, "linkedin");
 
   if (
     nom.length < 2 ||
@@ -21,7 +29,15 @@ function parseContact(formData: FormData) {
     email.length > 254 ||
     (email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
     telephone.length > 40 ||
-    entreprise.length > 120
+    entreprise.length > 120 ||
+    poste.length > 120 ||
+    secteur.length > 80 ||
+    ville.length > 80 ||
+    departement.length > 20 ||
+    pays.length > 80 ||
+    sourceAcquisition.length > 120 ||
+    statut.length > 80 ||
+    linkedin.length > 254
   ) {
     return null;
   }
@@ -31,6 +47,14 @@ function parseContact(formData: FormData) {
     email: email || null,
     telephone: telephone || null,
     entreprise: entreprise || null,
+    poste: poste || null,
+    secteur: secteur || null,
+    ville: ville || null,
+    departement: departement || null,
+    pays: pays || null,
+    sourceAcquisition: sourceAcquisition || null,
+    statut: statut || null,
+    linkedin: linkedin || null,
   };
 }
 
