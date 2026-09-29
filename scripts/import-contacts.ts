@@ -22,7 +22,7 @@ type ContactRow = {
 
 const args = process.argv.slice(2);
 const apply = args.includes("--apply");
-const filePath = args.find((argument) => argument !== "--apply") ?? "/Users/nanou/Desktop/contacts_fictifs.csv";
+const filePath = args.find((argument) => argument !== "--apply") ?? "contacts_fictifs.csv";
 
 function optional(value?: string) {
   const normalized = value?.trim();
