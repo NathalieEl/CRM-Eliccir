@@ -35,6 +35,7 @@ export async function createUser(formData: FormData) {
 export async function deleteUser(formData: FormData) {
   const currentUser = await requireAdmin();
   const id = String(formData.get("id") ?? "");
+  if (formData.get("confirmed") !== "yes") redirect("/users?error=confirm-delete");
   if (id && id !== currentUser.id) await prisma.user.delete({ where: { id } });
   redirect("/users");
 }
