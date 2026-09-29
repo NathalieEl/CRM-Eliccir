@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/login/actions";
 
-const navigation = ["Vue d’ensemble", "Contacts", "Activités", "Actions", "Projets"];
+const navigation = ["Vue d’ensemble", "Contacts", "Activités", "Actions", "Projets", "Utilisateurs"];
 
 const defaultActivities = [
   { time: "09:30", kind: "RENDEZ-VOUS", title: "Visite du terrain avec Marc Delatour", detail: "Projet Lombok · Kuta Selatan", initials: "MD", color: "coral" },
@@ -139,7 +139,7 @@ export default async function Home() {
             <p className="workspace-label">ESPACE DE TRAVAIL</p>
             <nav className="main-nav" aria-label="Navigation principale">
               {navigation.map((label, index) => {
-                const href = index === 1 ? "/contacts" : index === 2 ? "/activities" : index === 3 ? "/actions" : index === 4 ? "/projects" : `#${["overview", "contacts", "activities", "actions", "projects"][index]}`;
+                const href = index === 1 ? "/contacts" : index === 2 ? "/activities" : index === 3 ? "/actions" : index === 4 ? "/projects" : index === 5 ? "/users" : "#overview";
                 return <a className={`nav-link${index === 0 ? " nav-link-active" : ""}`} href={href} key={label}><span>{String(index + 1).padStart(2, "0")}</span>{label}</a>;
               })}
             </nav>

@@ -60,6 +60,8 @@ model User {
   username        String    @unique
   passwordHash    String
   twoFactorSecret String
+  role            String    @default("member")
+  active          Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }

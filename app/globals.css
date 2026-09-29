@@ -289,6 +289,13 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .auth-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(35, 99, 71, .12); }
 .auth-form button { margin-top: 8px; width: 100%; }
 .auth-error { margin: 0 0 18px; padding: 12px 14px; border-left: 3px solid var(--coral); background: #fff3ef; color: #9a4333; font-size: 13px; }
+.auth-form select, .contact-form select { width: 100%; border: 1px solid #dfe4dc; background: #fafbf9; padding: 13px 14px; color: var(--foreground); font: inherit; }
+.users-setup-note { margin: 0 0 28px; padding: 18px; border-left: 3px solid var(--green); background: #edf7f0; }
+.users-setup-note h2 { margin: 0 0 8px; font-size: 17px; }
+.users-setup-note p { margin: 0 0 12px; color: #536359; font-size: 13px; }
+.users-setup-note code { display: block; overflow-wrap: anywhere; padding: 10px; background: #fff; color: var(--green); font-size: 12px; }
+.users-table-wrap { overflow-x: auto; }
+.user-delete-button { border: 0; background: transparent; color: var(--coral); cursor: pointer; font: inherit; font-size: 12px; }
 .profile-row form { margin-left: auto; }
 .profile-logout { border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; padding: 4px; }
 
