@@ -25,9 +25,11 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const filters = { statut: params.statut ?? "", secteur: params.secteur ?? "", ville: params.ville ?? "", source: params.source ?? "" };
   let databaseAvailable = true;
   let contacts: Awaited<ReturnType<typeof prisma.contact.findMany>> = [];
+  let titleOptions: { value: string; label: string }[] = [];
 
   try {
     contacts = await prisma.contact.findMany({ orderBy: { updatedAt: "desc" } });
+    titleOptions = await prisma.lookupOption.findMany({ where: { category: "contact_title", active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }], select: { value: true, label: true } });
   } catch {
     databaseAvailable = false;
   }
@@ -126,6 +128,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 <div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Ajouter un contact</h2></div>
               </div>
               <form action={createContact} className="contact-form">
+                <label>Titre<select name="titre" defaultValue=""><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
                 <label>Nom complet<input name="nom" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ex. Camille Martin" /></label>
                 <label>E-mail<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
                 <label>Téléphone<input name="telephone" type="tel" autoComplete="tel" maxLength={40} placeholder="+33 6 12 34 56 78" /></label>
@@ -157,7 +160,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                     <tbody>
                       {visibleContacts.map((contact) => (
                         <tr key={contact.id}>
-                          <td><b>{contact.nom}</b><small>{contact.email || "Aucun e-mail"}</small></td>
+                          <td><b>{[contact.titre, contact.nom].filter(Boolean).join(" ")}</b><small>{contact.email || "Aucun e-mail"}</small></td>
                           <td>{contact.telephone || "—"}</td>
                           <td><b>{contact.entreprise || "—"}</b><small>{contact.poste || "Poste non renseigné"}</small></td>
                           <td>{contact.secteur || "—"}</td>
@@ -175,6 +178,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                                 <summary>Modifier</summary>
                                 <form action={updateContact} className="contact-edit-form">
                                   <input type="hidden" name="id" value={contact.id} />
+                                  <label>Titre<select name="titre" defaultValue={contact.titre ?? ""}><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
                                   <label>Nom complet<input name="nom" defaultValue={contact.nom} required minLength={2} maxLength={120} /></label>
                                   <label>E-mail<input name="email" type="email" defaultValue={contact.email ?? ""} maxLength={254} /></label>
                                   <label>Téléphone<input name="telephone" type="tel" defaultValue={contact.telephone ?? ""} maxLength={40} /></label>

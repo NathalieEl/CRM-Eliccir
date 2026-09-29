@@ -11,6 +11,7 @@ function field(formData: FormData, name: string) {
 
 function parseContact(formData: FormData) {
   const nom = field(formData, "nom");
+  const titre = field(formData, "titre");
   const email = field(formData, "email").toLowerCase();
   const telephone = field(formData, "telephone");
   const entreprise = field(formData, "entreprise");
@@ -21,11 +22,13 @@ function parseContact(formData: FormData) {
   const pays = field(formData, "pays");
   const sourceAcquisition = field(formData, "sourceAcquisition");
   const statut = field(formData, "statut");
-  const linkedin = field(formData, "linkedin");
+  const linkedinInput = field(formData, "linkedin");
+  const linkedin = linkedinInput && !/^https?:\/\//i.test(linkedinInput) ? `https://${linkedinInput}` : linkedinInput;
 
   if (
     nom.length < 2 ||
     nom.length > 120 ||
+    titre.length > 30 ||
     email.length > 254 ||
     (email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
     telephone.length > 40 ||
@@ -37,13 +40,15 @@ function parseContact(formData: FormData) {
     pays.length > 80 ||
     sourceAcquisition.length > 120 ||
     statut.length > 80 ||
-    linkedin.length > 254
+    linkedin.length > 254 ||
+    (linkedin !== "" && !/^https?:\/\/[^\s]+$/i.test(linkedin))
   ) {
     return null;
   }
 
   return {
     nom,
+    titre: titre || null,
     email: email || null,
     telephone: telephone || null,
     entreprise: entreprise || null,
