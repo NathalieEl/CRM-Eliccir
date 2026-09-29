@@ -152,7 +152,7 @@ export default async function Home() {
               <a className="sidebar-search-link" href="/search">Recherche globale</a>
             </div>
             <section className="sidebar-project" id="projects"><p>PROJET EN COURS</p><strong>Lombok</strong><span>Kuta Selatan, Indonésie</span><div className="project-progress"><i /></div><small>Parcelles suivies <b>08 / 12</b></small></section>
-            <div className="sidebar-bottom"><span className="online-dot" /> Session sécurisée<div className="profile-row"><span className="profile-avatar">AD</span><span><b>Administrateur</b><small>Accès complet</small></span><form action={logout}><button className="profile-logout" type="submit" aria-label="Se déconnecter">↗</button></form></div></div>
+            <div className="sidebar-bottom"><span className="online-dot" /> Session sécurisée<div className="profile-row"><span className="profile-avatar">AD</span><span><b>Administrateur</b><small>Accès complet</small></span><form action={logout}><button className="profile-logout" type="submit">Se déconnecter</button></form></div></div>
           </aside>
 
           <header className="topbar"><div className="breadcrumb"><span>ESPACE</span><i>/</i><b>Vue d’ensemble</b></div><div className="topbar-right"><time>Lundi 28 septembre 2026</time><span className="top-avatar">AD</span></div></header>

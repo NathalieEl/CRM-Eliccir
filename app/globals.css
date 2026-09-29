@@ -297,7 +297,7 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .users-table-wrap { overflow-x: auto; }
 .user-delete-button { border: 0; background: transparent; color: var(--coral); cursor: pointer; font: inherit; font-size: 12px; }
 .profile-row form { margin-left: auto; }
-.profile-logout { border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; padding: 4px; }
+.profile-logout { border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; font-size: 11px; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 520px) {
   .auth-panel { padding: 28px 22px; }
