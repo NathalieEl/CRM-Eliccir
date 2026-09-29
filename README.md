@@ -1,4 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Eliccir CRM est une application Next.js avec PostgreSQL et authentification administrateur par mot de passe et code TOTP.
+
+## Configuration d’authentification
+
+Dans Railway, ajoutez ces variables au service `CRM-Eliccir` :
+
+```text
+AUTH_SECRET
+ADMIN_USERNAME
+ADMIN_PASSWORD
+ADMIN_TOTP_SECRET
+```
+
+`AUTH_SECRET` doit contenir au moins 32 caractères. `ADMIN_TOTP_SECRET` doit être un secret Base32 ajouté dans une application d’authentification. Le premier accès crée automatiquement le compte administrateur et exige le code TOTP.
 
 ## Getting Started
 

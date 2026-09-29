@@ -54,3 +54,12 @@ model ActionItem {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+model User {
+  id              String    @id @default(cuid())
+  username        String    @unique
+  passwordHash    String
+  twoFactorSecret String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
