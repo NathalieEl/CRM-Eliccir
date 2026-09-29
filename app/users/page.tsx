@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { createUser, deleteUser } from "@/app/users/actions";
+import { createUser, deleteUser, updateUser } from "@/app/users/actions";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PasswordField } from "@/app/components/password-field";
 
-export default async function UsersPage({ searchParams }: { searchParams: Promise<{ created?: string; username?: string; error?: string }> }) {
+export default async function UsersPage({ searchParams }: { searchParams: Promise<{ created?: string; username?: string; error?: string; notice?: string }> }) {
   await requireAdmin();
   const params = await searchParams;
   const users = await prisma.user.findMany({ orderBy: { createdAt: "asc" } });
@@ -23,6 +23,8 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
 
         {params.error === "invalid" && <p className="auth-error" role="alert">Le nom doit contenir 3 à 40 caractères et le mot de passe au moins 8 caractères.</p>}
         {params.error === "exists" && <p className="auth-error" role="alert">Ce nom d’utilisateur existe déjà.</p>}
+        {params.error === "self" && <p className="auth-error" role="alert">Tu ne peux pas désactiver ou rétrograder ton propre compte.</p>}
+        {params.notice === "updated" && <p className="contacts-message" role="status">Le compte a été mis à jour.</p>}
         {params.created && params.username && <section className="users-setup-note"><h2>Compte créé pour {params.username}</h2><p>Ajoutez ce secret dans l’application d’authentification de l’utilisateur. Il ne sera plus affiché après cette page.</p><code>{params.created}</code></section>}
 
         <section className="contacts-create-section">
@@ -37,7 +39,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
 
         <section className="contacts-list-section">
           <div className="contacts-section-heading"><div><p className="section-index">02 <i>·</i> ACCÈS ACTIFS</p><h2>Comptes existants</h2></div></div>
-          <div className="users-table-wrap"><table className="contacts-records"><thead><tr><th>UTILISATEUR</th><th>RÔLE</th><th>ÉTAT</th><th>GESTION</th></tr></thead><tbody>{users.map((user) => <tr key={user.id}><td><b>{user.username}</b><small>2FA activée</small></td><td>{user.role === "admin" ? "Administrateur" : "Membre"}</td><td>{user.active ? "Actif" : "Désactivé"}</td><td><form action={deleteUser}><input type="hidden" name="id" value={user.id} /><button className="user-delete-button" type="submit">Supprimer</button></form></td></tr>)}</tbody></table></div>
+          <div className="users-table-wrap"><table className="contacts-records"><thead><tr><th>UTILISATEUR</th><th>RÔLE</th><th>ÉTAT</th><th>GESTION</th></tr></thead><tbody>{users.map((user) => <tr key={user.id}><td><b>{user.username}</b><small>2FA activée</small></td><td>{user.role === "admin" ? "Administrateur" : "Membre"}</td><td>{user.active ? "Actif" : "Désactivé"}</td><td><div className="user-row-actions"><details><summary>Modifier</summary><form action={updateUser} className="user-edit-form"><input type="hidden" name="id" value={user.id} /><label>Rôle<select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="admin">Administrateur</option></select></label><label>Nouveau mot de passe<input name="password" type="password" minLength={8} placeholder="Laisser vide pour conserver" /></label><label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /> Compte actif</label><button className="contact-primary-button" type="submit">Enregistrer</button></form></details><form action={deleteUser}><input type="hidden" name="id" value={user.id} /><button className="user-delete-button" type="submit">Supprimer</button></form></div></td></tr>)}</tbody></table></div>
         </section>
       </div>
     </main>

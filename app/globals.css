@@ -299,6 +299,14 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .users-setup-note p { margin: 0 0 12px; color: #536359; font-size: 13px; }
 .users-setup-note code { display: block; overflow-wrap: anywhere; padding: 10px; background: #fff; color: var(--green); font-size: 12px; }
 .users-table-wrap { overflow-x: auto; }
+.user-row-actions { display: flex; align-items: center; gap: 12px; }
+.user-row-actions details { position: relative; }
+.user-row-actions summary { cursor: pointer; color: var(--green); font-size: 12px; }
+.user-edit-form { position: absolute; z-index: 2; right: 0; top: 28px; display: grid; gap: 10px; width: 220px; padding: 14px; background: #fff; border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(32, 41, 35, .14); }
+.user-edit-form label { display: grid; gap: 5px; color: #4e5b52; font-size: 11px; font-weight: 700; }
+.user-edit-form input:not([type="checkbox"]), .user-edit-form select { width: 100%; border: 1px solid #dfe4dc; background: #fafbf9; padding: 8px; font: inherit; font-size: 12px; }
+.user-edit-form .contact-primary-button { padding: 9px 10px; font-size: 11px; }
+.user-active-toggle { display: flex !important; grid-template-columns: auto 1fr; align-items: center; }
 .user-delete-button { border: 0; background: transparent; color: var(--coral); cursor: pointer; font: inherit; font-size: 12px; }
 .profile-row form { margin-left: auto; }
 .profile-logout { border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; font-size: 11px; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }

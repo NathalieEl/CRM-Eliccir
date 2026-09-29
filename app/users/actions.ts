@@ -38,3 +38,25 @@ export async function deleteUser(formData: FormData) {
   if (id && id !== currentUser.id) await prisma.user.delete({ where: { id } });
   redirect("/users");
 }
+
+export async function updateUser(formData: FormData) {
+  const currentUser = await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const password = String(formData.get("password") ?? "");
+  const role = formData.get("role") === "admin" ? "admin" : "member";
+  const active = formData.get("active") === "on";
+
+  if (!id || (password && password.length < 8)) redirect("/users?error=invalid");
+  if (id === currentUser.id && (!active || role !== "admin")) redirect("/users?error=self");
+
+  await prisma.user.update({
+    where: { id },
+    data: {
+      role,
+      active,
+      ...(password ? { passwordHash: await bcrypt.hash(password, 12) } : {}),
+    },
+  });
+
+  redirect("/users?notice=updated");
+}
