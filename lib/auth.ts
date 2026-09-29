@@ -37,10 +37,10 @@ export async function getCurrentUser() {
 }
 
 export async function authenticate(username: string, password: string, code: string) {
-  let user = await prisma.user.findUnique({ where: { username } });
-  if (!user) {
-    user = await provisionAdmin();
-  }
+  const configuredUsername = process.env.ADMIN_USERNAME?.trim();
+  const user = username === configuredUsername
+    ? await provisionAdmin()
+    : await prisma.user.findUnique({ where: { username } });
 
   if (!user || !user.active || user.username !== username || !(await bcrypt.compare(password, user.passwordHash))) return false;
   try {
@@ -58,10 +58,15 @@ async function provisionAdmin() {
 
   const existing = await prisma.user.findUnique({ where: { username } });
   if (existing) {
-    if (existing.role !== "admin" || !existing.active) {
-      return prisma.user.update({ where: { id: existing.id }, data: { role: "admin", active: true } });
-    }
-    return existing;
+    return prisma.user.update({
+      where: { id: existing.id },
+      data: {
+        passwordHash: await bcrypt.hash(password, 12),
+        twoFactorSecret,
+        role: "admin",
+        active: true,
+      },
+    });
   }
 
   return prisma.user.create({
