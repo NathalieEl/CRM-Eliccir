@@ -43,7 +43,11 @@ export async function authenticate(username: string, password: string, code: str
   }
 
   if (!user || !user.active || user.username !== username || !(await bcrypt.compare(password, user.passwordHash))) return false;
-  return verifySync({ token: code.replace(/\s/g, ""), secret: user.twoFactorSecret }).valid;
+  try {
+    return verifySync({ token: code.replace(/\s/g, ""), secret: user.twoFactorSecret }).valid;
+  } catch {
+    return false;
+  }
 }
 
 async function provisionAdmin() {
