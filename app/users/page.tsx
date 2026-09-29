@@ -20,7 +20,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           <span className="contacts-total">{users.length}<small>COMPTES</small></span>
         </section>
 
-        {params.error === "invalid" && <p className="auth-error" role="alert">Le nom doit contenir 3 à 40 caractères et le mot de passe au moins 12 caractères.</p>}
+        {params.error === "invalid" && <p className="auth-error" role="alert">Le nom doit contenir 3 à 40 caractères et le mot de passe au moins 8 caractères.</p>}
         {params.error === "exists" && <p className="auth-error" role="alert">Ce nom d’utilisateur existe déjà.</p>}
         {params.created && params.username && <section className="users-setup-note"><h2>Compte créé pour {params.username}</h2><p>Ajoutez ce secret dans l’application d’authentification de l’utilisateur. Il ne sera plus affiché après cette page.</p><code>{params.created}</code></section>}
 
@@ -28,7 +28,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           <div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Créer un accès</h2></div></div>
           <form action={createUser} className="contact-form">
             <label>Nom d’utilisateur<input name="username" required minLength={3} maxLength={40} pattern="[A-Za-z0-9._-]+" placeholder="ex. sophie.laurent" /></label>
-            <label>Mot de passe temporaire<input name="password" type="password" minLength={12} required autoComplete="new-password" placeholder="12 caractères minimum" /></label>
+            <label>Mot de passe temporaire<input name="password" type="password" minLength={8} required autoComplete="new-password" placeholder="8 caractères minimum" /></label>
             <label>Rôle<select name="role" defaultValue="member"><option value="member">Membre</option><option value="admin">Administrateur</option></select></label>
             <button className="contact-primary-button" type="submit">Créer le compte <span>+</span></button>
           </form>

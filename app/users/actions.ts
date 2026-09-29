@@ -12,7 +12,7 @@ export async function createUser(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const role = formData.get("role") === "admin" ? "admin" : "member";
 
-  if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username) || password.length < 12) {
+  if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username) || password.length < 8) {
     redirect("/users?error=invalid");
   }
 
