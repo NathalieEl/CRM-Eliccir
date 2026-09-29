@@ -61,3 +61,13 @@ export async function updateUser(formData: FormData) {
 
   redirect("/users?notice=updated");
 }
+
+export async function resetTwoFactor(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  if (!id || formData.get("confirmed") !== "yes") redirect("/users?error=confirm-2fa");
+
+  const twoFactorSecret = generateSecret();
+  const user = await prisma.user.update({ where: { id }, data: { twoFactorSecret } });
+  redirect(`/users?reset2fa=${encodeURIComponent(twoFactorSecret)}&username=${encodeURIComponent(user.username)}`);
+}
