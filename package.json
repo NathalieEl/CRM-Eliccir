@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
-    "start": "prisma migrate deploy && if [ \"$SEED_CONTACTS\" = \"true\" ]; then npm run import:contacts -- --apply contacts_fictifs.csv; fi && HOSTNAME=0.0.0.0 node .next/standalone/server.js",
+    "start": "prisma migrate resolve --rolled-back 20260929200000_add_lookup_options || true && prisma migrate deploy && if [ \"$SEED_CONTACTS\" = \"true\" ]; then npm run import:contacts -- --apply contacts_fictifs.csv; fi && HOSTNAME=0.0.0.0 node .next/standalone/server.js",
     "lint": "eslint",
     "import:contacts": "tsx scripts/import-contacts.ts",
     "postinstall": "prisma generate"
