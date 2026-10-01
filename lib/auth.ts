@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { verifySync } from "otplib";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { sessionCookie, sessionDuration, signSession, verifySession } from "@/lib/session-token";
+import { requirePermission } from "@/lib/permissions";
 
 export async function createSession(userId: string) {
   const token = await signSession(userId);
@@ -80,9 +80,7 @@ async function provisionAdmin() {
 }
 
 export async function requireAdmin() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin" || !user.active) redirect("/");
-  return user;
+  return requirePermission("users.manage");
 }
 
 export { sessionCookie };

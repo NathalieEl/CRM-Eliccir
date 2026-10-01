@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requirePermission } from "@/lib/permissions";
 
 function field(formData: FormData, name: string) {
   const value = formData.get(name);
@@ -44,6 +45,7 @@ function parseProject(formData: FormData) {
 }
 
 export async function createProject(formData: FormData) {
+  await requirePermission("crm.write");
   const project = parseProject(formData);
   if (!project) redirect("/projects?error=invalid");
 
@@ -59,6 +61,7 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(formData: FormData) {
+  await requirePermission("crm.write");
   const id = field(formData, "id");
   const project = parseProject(formData);
 
@@ -84,6 +87,7 @@ export async function updateProject(formData: FormData) {
 }
 
 export async function deleteProject(formData: FormData) {
+  await requirePermission("crm.write");
   const id = field(formData, "id");
   if (!id) redirect("/projects?error=not-found");
   if (field(formData, "confirmed") !== "yes") redirect("/projects?error=confirm-delete");

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requirePermission } from "@/lib/permissions";
 
 function field(formData: FormData, name: string) {
   const value = formData.get(name);
@@ -68,6 +69,7 @@ function hasPrismaCode(error: unknown, code: string) {
 }
 
 export async function createContact(formData: FormData) {
+  await requirePermission("crm.write");
   const contact = parseContact(formData);
   if (!contact) redirect("/contacts?error=invalid");
 
@@ -83,6 +85,7 @@ export async function createContact(formData: FormData) {
 }
 
 export async function updateContact(formData: FormData) {
+  await requirePermission("crm.write");
   const id = field(formData, "id");
   const contact = parseContact(formData);
   if (!id) redirect("/contacts?error=not-found");
@@ -101,6 +104,7 @@ export async function updateContact(formData: FormData) {
 }
 
 export async function deleteContact(formData: FormData) {
+  await requirePermission("crm.write");
   const id = field(formData, "id");
   if (!id) redirect("/contacts?error=not-found");
   if (field(formData, "confirmed") !== "yes") redirect("/contacts?error=confirm-delete");

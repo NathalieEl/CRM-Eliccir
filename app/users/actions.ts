@@ -5,12 +5,20 @@ import { generateSecret } from "otplib";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import type { UserRole } from "@/lib/permissions";
+
+const editableRoles: UserRole[] = ["admin", "management", "sales", "member"];
+
+function readRole(value: FormDataEntryValue | null): UserRole {
+  const role = String(value ?? "");
+  return editableRoles.includes(role as UserRole) ? role as UserRole : "member";
+}
 
 export async function createUser(formData: FormData) {
   await requireAdmin();
   const username = String(formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const role = formData.get("role") === "admin" ? "admin" : "member";
+  const role = readRole(formData.get("role"));
 
   if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username) || password.length < 8) {
     redirect("/users?error=invalid");
@@ -44,7 +52,7 @@ export async function updateUser(formData: FormData) {
   const currentUser = await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const password = String(formData.get("password") ?? "");
-  const role = formData.get("role") === "admin" ? "admin" : "member";
+  const role = readRole(formData.get("role"));
   const active = formData.get("active") === "on";
 
   if (!id || (password && password.length < 8)) redirect("/users?error=invalid");

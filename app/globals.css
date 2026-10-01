@@ -182,6 +182,7 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contacts-search-reset { color: var(--green); font-size: 11px; font-weight: 600; white-space: nowrap; }
 .contacts-search-results { color: #5d6d65; font-size: 11px; margin: 0 0 16px; }
 .sr-only { border: 0; clip: rect(0, 0, 0, 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
+.permission-hidden { display: none; }
 .contacts-message, .contacts-database-error { background: #eaf2e7; border-left: 3px solid #6da264; color: #405d3d; font-size: 12px; margin: 0 0 18px; padding: 12px 15px; }
 .contacts-message-error, .contacts-database-error { background: #f9eae5; border-color: var(--coral); color: #8e4536; }
 .contacts-database-error { margin-top: 20px; padding: 21px 23px; }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createProject, deleteProject, updateProject } from "@/app/projects/actions";
 import { prisma } from "@/lib/prisma";
+import { hasPermission, requirePermission } from "@/lib/permissions";
 
 type ProjectsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -19,6 +20,8 @@ const errors: Record<string, string> = {
 };
 
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
+  const currentUser = await requirePermission("crm.read");
+  const canWrite = hasPermission(currentUser.role, "crm.write");
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
   let databaseAvailable = true;
@@ -85,7 +88,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                 <div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Ajouter un projet</h2></div>
               </div>
 
-              <form action={createProject} className="contact-form">
+              <form action={createProject} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
                 <label>Nom du projet<input name="nom" required minLength={2} maxLength={120} placeholder="Ex. Lombok Residences" /></label>
                 <label>Pays<input name="pays" maxLength={80} placeholder="Indonésie" /></label>
                 <label>Ville<input name="ville" maxLength={80} placeholder="Kuta Selatan" /></label>
@@ -124,7 +127,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                           <td>{project.progression}%</td>
                           <td>{project.budget || "—"}</td>
                           <td>
-                            <div className="contact-row-actions">
+                            <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
                                 <form action={updateProject} className="contact-edit-form">

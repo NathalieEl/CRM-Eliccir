@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createActivity, deleteActivity, updateActivity } from "@/app/activities/actions";
 import { prisma } from "@/lib/prisma";
+import { hasPermission, requirePermission } from "@/lib/permissions";
 
 type ActivitiesPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -24,6 +25,8 @@ const formatDate = (date: Date | null) => {
 };
 
 export default async function ActivitiesPage({ searchParams }: ActivitiesPageProps) {
+  const currentUser = await requirePermission("crm.read");
+  const canWrite = hasPermission(currentUser.role, "crm.write");
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
   let databaseAvailable = true;
@@ -90,7 +93,7 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
                 <div><p className="section-index">01 <i>·</i> NOUVELLE</p><h2>Ajouter une activité</h2></div>
               </div>
 
-              <form action={createActivity} className="contact-form">
+              <form action={createActivity} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
                 <label>Titre<input name="titre" required minLength={2} maxLength={120} placeholder="Ex. Appel de suivi" /></label>
                 <label>Type<input name="type" required minLength={2} maxLength={40} placeholder="Rendez-vous" /></label>
                 <label>Contact<input name="contact" maxLength={120} placeholder="Sophie Laurent" /></label>
@@ -125,7 +128,7 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
                           <td>{formatDate(activity.date)}</td>
                           <td>{activity.details || "—"}</td>
                           <td>
-                            <div className="contact-row-actions">
+                            <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
                                 <form action={updateActivity} className="contact-edit-form">

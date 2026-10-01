@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requirePermission } from "@/lib/permissions";
 
 function field(formData: FormData, name: string) {
   const value = formData.get(name);
@@ -40,6 +41,7 @@ function parseAction(formData: FormData) {
 }
 
 export async function createAction(formData: FormData) {
+  await requirePermission("crm.write");
   const action = parseAction(formData);
   if (!action) redirect("/actions?error=invalid");
 
@@ -55,6 +57,7 @@ export async function createAction(formData: FormData) {
 }
 
 export async function updateAction(formData: FormData) {
+  await requirePermission("crm.write");
   const id = field(formData, "id");
   const action = parseAction(formData);
 
@@ -80,6 +83,7 @@ export async function updateAction(formData: FormData) {
 }
 
 export async function deleteAction(formData: FormData) {
+  await requirePermission("crm.write");
   const id = field(formData, "id");
   if (!id) redirect("/actions?error=not-found");
   if (field(formData, "confirmed") !== "yes") redirect("/actions?error=confirm-delete");

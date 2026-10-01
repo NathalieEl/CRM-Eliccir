@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createAction, deleteAction, updateAction } from "@/app/actions/actions";
 import { prisma } from "@/lib/prisma";
+import { hasPermission, requirePermission } from "@/lib/permissions";
 
 type ActionsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -30,6 +31,8 @@ const priorityClasses: Record<string, string> = {
 };
 
 export default async function ActionsPage({ searchParams }: ActionsPageProps) {
+  const currentUser = await requirePermission("crm.read");
+  const canWrite = hasPermission(currentUser.role, "crm.write");
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
   let databaseAvailable = true;
@@ -96,7 +99,7 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                 <div><p className="section-index">01 <i>·</i> NOUVELLE</p><h2>Ajouter une action</h2></div>
               </div>
 
-              <form action={createAction} className="contact-form">
+              <form action={createAction} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
                 <label>Titre<input name="titre" required minLength={2} maxLength={160} placeholder="Ex. Relancer Sophie Laurent" /></label>
                 <label>Priorité<select name="priorite" defaultValue="Normale">
                   <option value="Prioritaire">Prioritaire</option>
@@ -140,7 +143,7 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                           <td>{action.contact || "—"}</td>
                           <td>{formatDate(action.dateEcheance)}</td>
                           <td>
-                            <div className="contact-row-actions">
+                            <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
                                 <form action={updateAction} className="contact-edit-form">

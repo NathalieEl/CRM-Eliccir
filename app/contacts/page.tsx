@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createContact, deleteContact, updateContact } from "@/app/contacts/actions";
 import { prisma } from "@/lib/prisma";
+import { hasPermission, requirePermission } from "@/lib/permissions";
 
 type ContactsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string; statut?: string; secteur?: string; ville?: string; source?: string }>;
@@ -20,6 +21,8 @@ const errors: Record<string, string> = {
 };
 
 export default async function ContactsPage({ searchParams }: ContactsPageProps) {
+  const currentUser = await requirePermission("crm.read");
+  const canWrite = hasPermission(currentUser.role, "crm.write");
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
   const filters = { statut: params.statut ?? "", secteur: params.secteur ?? "", ville: params.ville ?? "", source: params.source ?? "" };
@@ -127,7 +130,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               <div className="contacts-section-heading">
                 <div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Ajouter un contact</h2></div>
               </div>
-              <form action={createContact} className="contact-form">
+              <form action={createContact} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
                 <label>Titre<select name="titre" defaultValue=""><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
                 <label>Nom complet<input name="nom" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ex. Camille Martin" /></label>
                 <label>E-mail<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
@@ -169,7 +172,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                           <td>{contact.sourceAcquisition || "—"}</td>
                           <td><time dateTime={contact.updatedAt.toISOString()}>{contact.updatedAt.toLocaleDateString("fr-FR")}</time></td>
                           <td>
-                            <div className="contact-row-actions">
+                            <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-view-details">
                                 <summary>Fiche</summary>
                                 <div className="contact-detail-card"><h3>{contact.nom}</h3><dl><dt>E-mail</dt><dd>{contact.email || "—"}</dd><dt>Téléphone</dt><dd>{contact.telephone || "—"}</dd><dt>Entreprise</dt><dd>{contact.entreprise || "—"}</dd><dt>Poste</dt><dd>{contact.poste || "—"}</dd><dt>Secteur</dt><dd>{contact.secteur || "—"}</dd><dt>Ville</dt><dd>{[contact.ville, contact.departement, contact.pays].filter(Boolean).join(" · ") || "—"}</dd><dt>Source</dt><dd>{contact.sourceAcquisition || "—"}</dd><dt>Statut</dt><dd>{contact.statut || "—"}</dd><dt>LinkedIn</dt><dd>{contact.linkedin ? <a href={contact.linkedin.startsWith("http") ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noreferrer">Voir le profil</a> : "—"}</dd></dl></div>

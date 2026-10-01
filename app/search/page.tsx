@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requirePermission } from "@/lib/permissions";
 
 type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
@@ -10,6 +11,7 @@ function normalise(value: string) {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
+  await requirePermission("crm.read");
   const params = await searchParams;
   const query = normalise(params.q ?? "");
 
