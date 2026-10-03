@@ -349,6 +349,50 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
   .company-manage-panel { min-width: min(84vw, 540px); }
   .company-link-form, .company-edit-form { grid-template-columns: minmax(0, 1fr); }
 }
+.contact-profile-page { max-width: 1320px; }
+.contact-profile-form { display: grid; gap: 18px; }
+.profile-section { display: grid; gap: 15px; }
+.profile-fields-grid { align-items: end; display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.profile-fields-grid label, .contact-note-form label { color: #56645a; display: grid; font-size: 13px; font-weight: 600; gap: 6px; }
+.profile-fields-grid input, .profile-fields-grid select, .profile-section textarea, .contact-note-form input, .contact-note-form select, .contact-note-form textarea { background: #fff; border: 1px solid #dfe4de; border-radius: 3px; color: #27362d; font: inherit; font-size: 15px; min-height: 42px; min-width: 0; padding: 8px 10px; }
+.profile-section textarea, .contact-note-form textarea { min-height: 96px; resize: vertical; }
+.profile-repeat-row { border-top: 1px solid #e9ece7; padding-top: 12px; }
+.profile-form-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; }
+.profile-save-button { min-width: 200px; }
+.contact-cancel-link { color: #536158; display: inline-flex; font-size: 14px; font-weight: 600; min-height: 40px; align-items: center; text-decoration: underline; text-underline-offset: 3px; }
+.contact-photo-row { align-items: center; display: flex; flex-wrap: wrap; gap: 20px; }
+.contact-profile-photo, .contact-profile-photo-placeholder { background: #e8eee5; border: 1px solid #dfe4de; border-radius: 50%; color: #236347; height: 144px; object-fit: cover; width: 144px; }
+.contact-profile-photo-placeholder { align-items: center; display: flex; font-size: 34px; justify-content: center; }
+.contact-photo-actions { display: grid; gap: 12px; }
+.contact-photo-actions form { align-items: end; display: flex; flex-wrap: wrap; gap: 12px; }
+.contact-photo-actions label { color: #56645a; display: grid; font-size: 13px; font-weight: 600; gap: 6px; }
+.contact-photo-actions input[type="file"] { font: inherit; font-size: 13px; max-width: 100%; }
+.company-photo-delete, .contact-note-item button { background: #a84938; border: 0; border-radius: 3px; color: #fff; cursor: pointer; font: inherit; font-size: 13px; min-height: 40px; padding: 0 12px; }
+.contact-note-form { display: grid; gap: 12px; grid-template-columns: 200px 200px minmax(0, 1fr) auto; }
+.contact-note-form .note-content-field { grid-column: 1 / 4; }
+.contact-note-form > button { align-self: end; }
+.contact-note-list { display: grid; gap: 12px; }
+.contact-note-item { border: 1px solid #e1e6e0; border-left: 3px solid var(--green); border-radius: 3px; padding: 15px 17px; }
+.contact-note-item header { align-items: start; display: flex; justify-content: space-between; gap: 16px; }
+.contact-note-item header div { display: flex; flex-wrap: wrap; gap: 14px; }
+.contact-note-item header b { color: #344138; font-size: 14px; }
+.contact-note-item time, .contact-note-item header small { color: #68756c; font-size: 13px; }
+.contact-note-item p { color: #354239; font-size: 15px; line-height: 1.65; margin: 12px 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.contact-note-item form { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; }
+.contact-note-item form label { color: #56645a; font-size: 12px; }
+.contact-profile-link { color: var(--green); display: inline-block; font-size: 13px; font-weight: 650; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .profile-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contact-note-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contact-note-form .note-content-field { grid-column: 1 / -1; }
+  .contact-note-form > button { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .profile-fields-grid, .contact-note-form { grid-template-columns: minmax(0, 1fr); }
+  .contact-note-form .note-content-field, .contact-note-form > button { grid-column: auto; }
+  .contact-photo-actions form { align-items: stretch; flex-direction: column; }
+}
 
 @media (max-width: 520px) {
   .auth-panel { padding: 28px 22px; }

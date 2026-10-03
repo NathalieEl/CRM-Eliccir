@@ -10,13 +10,35 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ContactNoteNature {
+  Telephonique
+  Email
+  WhatsApps
+  Presentiel
+  Autre
+}
+
 model Contact {
   id         String   @id @default(cuid())
   titre      String?
   prenom     String?
+  deuxiemePrenom String?
   nom        String
   email      String?  @unique
+  typeEmail  String?
+  libelleEmail String?
   telephone  String?
+  typeTelephone String?
+  libelleTelephone String?
+  surnom     String?
+  dateNaissance DateTime? @db.Date
+  genre      String?
+  biographie String? @db.Text
+  metier     String?
+  languePreferee String?
+  trancheAge String?
+  photoProfil Bytes? @db.ByteA
+  photoProfilType String?
   secteur    String?
   ville      String?
   departement String?
@@ -24,7 +46,22 @@ model Contact {
   sourceAcquisition String?
   statut     String?
   linkedin   String?
+  surnoms ContactNickname[]
+  emails ContactEmail[]
+  telephones ContactPhone[]
+  adresses ContactAddress[]
+  evenements ContactEvent[]
+  relations ContactRelation[] @relation("ContactRelationsOwner")
+  relationsRecues ContactRelation[] @relation("ContactRelationsTarget")
+  urls ContactUrl[]
+  messageries ContactImClient[]
+  groupes ContactGroupMembership[]
+  champsPersonnalises ContactUserDefined[]
+  centresInteret ContactInterest[]
+  competences ContactSkill[]
   entreprises EntrepriseContact[]
+  projets ContactProject[]
+  notes ContactNote[]
   activities Activity[]
   actionItems ActionItem[]
   createdAt  DateTime @default(now())
@@ -54,6 +91,10 @@ model EntrepriseContact {
   entrepriseId String
   contactId    String
   poste        String?
+  service      String?
+  dateDebut    DateTime? @db.Date
+  dateFin      DateTime? @db.Date
+  type         String    @default("work")
   createdAt    DateTime @default(now())
   entreprise   Entreprise @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
   contact      Contact    @relation(fields: [contactId], references: [id], onDelete: Cascade)
@@ -86,10 +127,181 @@ model Project {
   budget      String?
   progression Int      @default(0)
   entreprise  Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  contacts ContactProject[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([entrepriseId])
+}
+
+model ContactProject {
+  contactId String
+  projectId String
+  interesse Boolean  @default(true)
+  createdAt DateTime @default(now())
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, projectId])
+  @@index([projectId])
+}
+
+model ContactNickname {
+  id        String   @id @default(cuid())
+  contactId String
+  value     String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, value])
+}
+
+model ContactEmail {
+  id        String   @id @default(cuid())
+  contactId String
+  address   String
+  type      String   @default("other")
+  label     String?
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+}
+
+model ContactPhone {
+  id        String   @id @default(cuid())
+  contactId String
+  number    String
+  type      String   @default("mobile")
+  label     String?
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+}
+
+model ContactAddress {
+  id               String   @id @default(cuid())
+  contactId        String
+  street           String?
+  extendedAddress  String?
+  poBox            String?
+  locality         String?
+  region           String?
+  postalCode       String?
+  country          String?
+  type             String   @default("home")
+  label            String?
+  contact          Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+}
+
+model ContactEvent {
+  id        String   @id @default(cuid())
+  contactId String
+  label     String
+  date      DateTime @db.Date
+  type      String   @default("other")
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId, date])
+}
+
+model ContactRelation {
+  id               String   @id @default(cuid())
+  contactId        String
+  relatedContactId String?
+  relatedName      String?
+  type             String
+  contact          Contact  @relation("ContactRelationsOwner", fields: [contactId], references: [id], onDelete: Cascade)
+  relatedContact   Contact? @relation("ContactRelationsTarget", fields: [relatedContactId], references: [id], onDelete: SetNull)
+
+  @@index([contactId])
+  @@index([relatedContactId])
+}
+
+model ContactUrl {
+  id        String   @id @default(cuid())
+  contactId String
+  url       String
+  type      String   @default("other")
+  label     String?
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+}
+
+model ContactImClient {
+  id        String   @id @default(cuid())
+  contactId String
+  username String
+  protocol String?
+  type      String   @default("other")
+  label     String?
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+}
+
+model ContactGroup {
+  id        String   @id @default(cuid())
+  nom       String   @unique
+  membres   ContactGroupMembership[]
+  createdAt DateTime @default(now())
+}
+
+model ContactGroupMembership {
+  contactId String
+  groupId   String
+  contact   Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  group     ContactGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, groupId])
+  @@index([groupId])
+}
+
+model ContactUserDefined {
+  id        String   @id @default(cuid())
+  contactId String
+  key       String
+  value     String   @db.Text
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, key])
+}
+
+model ContactInterest {
+  id        String   @id @default(cuid())
+  contactId String
+  value     String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, value])
+}
+
+model ContactSkill {
+  id        String   @id @default(cuid())
+  contactId String
+  value     String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, value])
+}
+
+model ContactNote {
+  id             String            @id @default(cuid())
+  contactId      String
+  date           DateTime          @default(now()) @db.Date
+  nature         ContactNoteNature
+  contenu        String            @db.Text
+  authorId       String?
+  authorUsername String
+  searchVector   Unsupported("tsvector")?
+  contact        Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  author         User?             @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([contactId, date])
+  @@index([authorId, createdAt])
 }
 
 model Activity {
@@ -136,6 +348,7 @@ model User {
   twoFactorSecret String
   role            String    @default("member")
   active          Boolean   @default(true)
+  authoredContactNotes ContactNote[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }

@@ -3,10 +3,28 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
 import type { Prisma } from "@/app/generated/prisma/client";
 
-type ContactSearchRecord = Prisma.ContactGetPayload<{ include: { entreprises: { include: { entreprise: true } } } }>;
 type ProjectSearchRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true } }>;
 type ActivitySearchRecord = Prisma.ActivityGetPayload<{ include: { contact: true; entreprise: true } }>;
 type ActionSearchRecord = Prisma.ActionItemGetPayload<{ include: { contact: true; entreprise: true } }>;
+type ContactSearchRecord = Prisma.ContactGetPayload<{
+  include: {
+    entreprises: { include: { entreprise: true } };
+    surnoms: true;
+    emails: true;
+    telephones: true;
+    adresses: true;
+    evenements: true;
+    relations: { include: { relatedContact: true } };
+    urls: true;
+    messageries: true;
+    groupes: { include: { group: true } };
+    champsPersonnalises: true;
+    centresInteret: true;
+    competences: true;
+    projets: { include: { project: true } };
+  };
+}>;
+type NoteSearchRecord = Prisma.ContactNoteGetPayload<{ include: { contact: true } }>;
 
 type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
@@ -14,6 +32,17 @@ type SearchPageProps = {
 
 function normalise(value: string) {
   return value.toLowerCase().trim();
+}
+
+function noteNatureLabel(value: string) {
+  const labels: Record<string, string> = {
+    Telephonique: "Téléphonique",
+    Email: "Email",
+    WhatsApps: "WhatsApps",
+    Presentiel: "Présentiel",
+    Autre: "Autre",
+  };
+  return labels[value] ?? value;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -27,10 +56,29 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let projects: ProjectSearchRecord[] = [];
   let activities: ActivitySearchRecord[] = [];
   let actions: ActionSearchRecord[] = [];
+  let notes: NoteSearchRecord[] = [];
 
   try {
     const [contactsData, entreprisesData, projectsData, activitiesData, actionsData] = await Promise.all([
-      prisma.contact.findMany({ include: { entreprises: { include: { entreprise: true } } }, orderBy: { updatedAt: "desc" } }),
+      prisma.contact.findMany({
+        include: {
+          entreprises: { include: { entreprise: true } },
+          surnoms: true,
+          emails: true,
+          telephones: true,
+          adresses: true,
+          evenements: true,
+          relations: { include: { relatedContact: true } },
+          urls: true,
+          messageries: true,
+          groupes: { include: { group: true } },
+          champsPersonnalises: true,
+          centresInteret: true,
+          competences: true,
+          projets: { include: { project: true } },
+        },
+        orderBy: { updatedAt: "desc" },
+      }),
       prisma.entreprise.findMany({ orderBy: { nom: "asc" } }),
       prisma.project.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } }),
       prisma.activity.findMany({ include: { contact: true, entreprise: true }, orderBy: { date: "asc" } }),
@@ -42,13 +90,47 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     projects = projectsData;
     activities = activitiesData;
     actions = actionsData;
+    if (query) {
+      const matchedNotes = await prisma.$queryRaw<{ id: string }[]>`
+        SELECT "id"
+        FROM "ContactNote"
+        WHERE "searchVector" @@ websearch_to_tsquery('french', ${params.q ?? ""})
+        ORDER BY "date" DESC
+        LIMIT 100
+      `;
+      if (matchedNotes.length) {
+        notes = await prisma.contactNote.findMany({
+          where: { id: { in: matchedNotes.map(({ id }) => id) } },
+          include: { contact: true },
+          orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+        });
+      }
+    }
   } catch {
     databaseAvailable = false;
   }
 
   const filteredContacts = query
     ? contacts.filter((contact) => {
-        const haystack = [contact.prenom ?? "", contact.nom, contact.email ?? "", contact.telephone ?? "", ...contact.entreprises.map(({ entreprise }) => entreprise.nom)].join(" ").toLowerCase();
+        const haystack = [
+          contact.prenom ?? "", contact.deuxiemePrenom ?? "", contact.nom, contact.titre ?? "", contact.surnom ?? "",
+          contact.email ?? "", contact.telephone ?? "", contact.secteur ?? "", contact.ville ?? "", contact.departement ?? "", contact.pays ?? "",
+          contact.biographie ?? "", contact.genre ?? "", contact.metier ?? "", contact.languePreferee ?? "", contact.trancheAge ?? "",
+          ...contact.entreprises.map(({ entreprise }) => entreprise.nom),
+          ...contact.surnoms.map(({ value }) => value),
+          ...contact.emails.flatMap(({ address, type, label }) => [address, type, label ?? ""]),
+          ...contact.telephones.flatMap(({ number, type, label }) => [number, type, label ?? ""]),
+          ...contact.adresses.flatMap((address) => [address.street ?? "", address.extendedAddress ?? "", address.locality ?? "", address.region ?? "", address.postalCode ?? "", address.country ?? "", address.type, address.label ?? ""]),
+          ...contact.evenements.flatMap(({ label, type }) => [label, type]),
+          ...contact.relations.flatMap(({ type, relatedName, relatedContact }) => [type, relatedName ?? "", relatedContact?.prenom ?? "", relatedContact?.nom ?? ""]),
+          ...contact.urls.flatMap(({ url, type, label }) => [url, type, label ?? ""]),
+          ...contact.messageries.flatMap(({ username, protocol, label }) => [username, protocol ?? "", label ?? ""]),
+          ...contact.groupes.map(({ group }) => group.nom),
+          ...contact.champsPersonnalises.flatMap(({ key, value }) => [key, value]),
+          ...contact.centresInteret.map(({ value }) => value),
+          ...contact.competences.map(({ value }) => value),
+          ...contact.projets.map(({ project }) => project.nom),
+        ].join(" ").toLowerCase();
         return haystack.includes(query);
       })
     : contacts.slice(0, 4);
@@ -95,7 +177,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <h1>Recherche globale</h1>
             <p className="contacts-intro">Trouvez rapidement un contact, un projet, une activité ou une action.</p>
           </div>
-          <span className="contacts-total">{databaseAvailable ? (contacts.length + entreprises.length + projects.length + activities.length + actions.length) : "—"}<small>RÉSULTATS</small></span>
+          <span className="contacts-total">{databaseAvailable ? (contacts.length + entreprises.length + projects.length + activities.length + actions.length + notes.length) : "—"}<small>RÉSULTATS</small></span>
         </section>
 
         <section className="contacts-toolbar">
@@ -140,6 +222,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     ))}
                   </ul>
                 )}
+              </section>
+
+              <section className="search-results-section">
+                <h2>Notes de contact</h2>
+                {notes.length === 0 ? <p>Aucune note.</p> : <ul>{notes.map((note) => <li key={note.id}><strong>{[note.contact.prenom, note.contact.nom].filter(Boolean).join(" ")}</strong><span>{noteNatureLabel(note.nature)} · {new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(note.date)}</span><small>{note.contenu}</small></li>)}</ul>}
               </section>
 
               <section className="search-results-section">

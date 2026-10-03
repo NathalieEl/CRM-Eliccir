@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/login/actions";
+import Link from "next/link";
 
 const navigation = ["Vue d’ensemble", "Entreprises", "Contacts", "Activités", "Actions", "Projets", "Utilisateurs", "Maintenance", "Journal d’audit"];
 
@@ -158,7 +159,7 @@ export default async function Home() {
 
           <header className="topbar"><div className="breadcrumb"><span>ESPACE</span><i>/</i><b>Vue d’ensemble</b></div><div className="topbar-right"><time>Lundi 28 septembre 2026</time><span className="top-avatar">AD</span></div></header>
           <div className="dashboard-content">
-            <section className="welcome-row"><div><p className="eyebrow"><i /> VOTRE ACTIVITÉ, EN UN COUP D’ŒIL</p><h1>Bonjour, <em>bienvenue.</em></h1><p className="welcome-copy">Voici les contacts et les priorités de votre portefeuille aujourd’hui.</p></div><a className="text-link" href="/contacts">Explorer les contacts <span>↗</span></a></section>
+            <section className="welcome-row"><div><p className="eyebrow"><i /> VOTRE ACTIVITÉ, EN UN COUP D’ŒIL</p><h1>Bonjour, <em>bienvenue.</em></h1><p className="welcome-copy">Voici les contacts et les priorités de votre portefeuille aujourd’hui.</p></div><Link className="text-link" href="/contacts">Explorer les contacts <span>↗</span></Link></section>
 
             <section className="metric-grid" aria-label="Indicateurs du portefeuille">{metrics.map((metric) => <article className="metric" key={metric.number}><div className="metric-top"><span>{metric.label}</span><small>{metric.number}</small></div><strong>{metric.value}</strong><div className={`metric-foot${metric.alert ? " metric-alert" : ""}`}>{metric.change}</div></article>)}</section>
 
@@ -168,7 +169,7 @@ export default async function Home() {
               <section className="panel actions-panel" id="actions"><div className="section-heading"><div><p className="section-index">02 <i>·</i> À SUIVRE</p><h2>Vos prochaines actions</h2></div><span className="count-badge">{metrics[3].value}</span></div><div className="action-list">{actions.map((action, index) => <article className="action-row" key={action.title}><span className={`action-check${index === 0 ? " action-check-alert" : ""}`} /><div><h3>{action.title}</h3><time>{action.due}</time></div><small className={index === 0 ? "action-tag action-tag-alert" : "action-tag"}>{action.tag}</small></article>)}</div><a className="all-actions-link" href="#actions">Consulter toutes les actions <span>→</span></a></section>
             </div>
 
-              <section className="panel contacts-panel" id="contacts"><div className="section-heading"><div><p className="section-index">03 <i>·</i> PORTEFEUILLE</p><h2>Contacts récemment suivis</h2></div><a href="/contacts">Tous les contacts <span>→</span></a></div><div className="contact-table-wrap"><table><thead><tr><th>CONTACT</th><th>INTÉRÊT</th><th>STATUT</th><th>DERNIÈRE ACTIVITÉ</th><th /></tr></thead><tbody>{contacts.map((contact) => <tr key={contact.email}><td><div className="contact-identity"><span className={`avatar avatar-${contact.color}`}>{contact.initials}</span><span><b>{contact.name}</b><small>{contact.email}</small></span></div></td><td>{contact.interest}</td><td><span className={`status-pill status-${contact.tone}`}><i />{contact.status}</span></td><td>{contact.updated}</td><td className="row-arrow">↗</td></tr>)}</tbody></table></div></section>
+              <section className="panel contacts-panel" id="contacts"><div className="section-heading"><div><p className="section-index">03 <i>·</i> PORTEFEUILLE</p><h2>Contacts récemment suivis</h2></div><Link href="/contacts">Tous les contacts <span>→</span></Link></div><div className="contact-table-wrap"><table><thead><tr><th>CONTACT</th><th>INTÉRÊT</th><th>STATUT</th><th>DERNIÈRE ACTIVITÉ</th><th /></tr></thead><tbody>{contacts.map((contact) => <tr key={contact.email}><td><div className="contact-identity"><span className={`avatar avatar-${contact.color}`}>{contact.initials}</span><span><b>{contact.name}</b><small>{contact.email}</small></span></div></td><td>{contact.interest}</td><td><span className={`status-pill status-${contact.tone}`}><i />{contact.status}</span></td><td>{contact.updated}</td><td className="row-arrow">↗</td></tr>)}</tbody></table></div></section>
 
             <section className="panel projects-panel" id="projects"><div className="section-heading"><div><p className="section-index">04 <i>·</i> PROJETS</p><h2>Opportunités actives</h2></div><a href="/projects">Tous les projets <span>→</span></a></div><div className="project-summary-list">{projects.map((project) => <div className="project-summary-item" key={project.name}><strong>{project.name}</strong><span>{project.location}</span><em>{project.progress}%</em></div>)}</div></section>
           </div>

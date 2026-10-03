@@ -117,7 +117,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             <select name="source" defaultValue={filters.source}><option value="">Toutes les sources</option>{filterOptions.source.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
           </form>
           {searchQuery || Object.values(filters).some(Boolean) ? (
-            <a className="contacts-search-reset" href="/contacts">Réinitialiser</a>
+            <Link className="contacts-search-reset" href="/contacts">Réinitialiser</Link>
           ) : null}
         </section>
 
@@ -181,6 +181,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                           <td>{contact.sourceAcquisition || "—"}</td>
                           <td><time dateTime={contact.updatedAt.toISOString()}>{contact.updatedAt.toLocaleDateString("fr-FR")}</time></td>
                           <td>
+                            <Link className="contact-profile-link" href={`/contacts/${contact.id}`}>Profil complet</Link>
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-view-details">
                                 <summary>Fiche</summary>
@@ -203,6 +204,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                                   <label>Source<input name="sourceAcquisition" defaultValue={contact.sourceAcquisition ?? ""} maxLength={120} /></label>
                                   <label>Statut<input name="statut" defaultValue={contact.statut ?? ""} maxLength={80} /></label>
                                   <label>LinkedIn<input name="linkedin" type="url" defaultValue={contact.linkedin ?? ""} maxLength={254} /></label>
+                                  <Link className="contact-cancel-link" href="/contacts">Annuler</Link>
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
                                 </form>
                               </details>
