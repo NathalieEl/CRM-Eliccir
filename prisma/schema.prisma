@@ -363,6 +363,7 @@ model ActionItem {
 model User {
   id              String    @id @default(cuid())
   username        String    @unique
+  prenom          String?
   passwordHash    String
   twoFactorSecret String
   role            String    @default("member")

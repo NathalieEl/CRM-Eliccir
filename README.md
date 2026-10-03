@@ -8,10 +8,11 @@ Dans Railway, ajoutez ces variables au service `CRM-Eliccir` :
 AUTH_SECRET
 ADMIN_USERNAME
 ADMIN_PASSWORD
+ADMIN_FIRST_NAME (facultatif)
 TWO_FACTOR_STATUS=Inactive
 ```
 
-`AUTH_SECRET` doit contenir au moins 32 caractères. Le 2FA reste inactif tant que `TWO_FACTOR_STATUS` n’est pas défini sur `Active`. Pour le réactiver, définissez `TWO_FACTOR_STATUS=Active` et configurez `ADMIN_TOTP_SECRET` avec un secret Base32 dans une application d’authentification. Le premier accès crée automatiquement le compte administrateur; il exige un code TOTP uniquement lorsque le statut est `Active`.
+`AUTH_SECRET` doit contenir au moins 32 caractères. `ADMIN_FIRST_NAME` permet de renseigner le prénom affiché à l’accueil pour le compte administrateur provisionné. Le prénom de chaque compte peut aussi être modifié dans **Utilisateurs**. Le 2FA reste inactif tant que `TWO_FACTOR_STATUS` n’est pas défini sur `Active`. Pour le réactiver, définissez `TWO_FACTOR_STATUS=Active` et configurez `ADMIN_TOTP_SECRET` avec un secret Base32 dans une application d’authentification. Le premier accès crée automatiquement le compte administrateur; il exige un code TOTP uniquement lorsque le statut est `Active`.
 
 ## Getting Started
 

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/login/actions";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 
 const navigation = ["Vue d’ensemble", "Entreprises", "Contacts", "Activités", "Actions", "Projets", "Utilisateurs", "Maintenance", "Journal d’audit"];
 
@@ -130,7 +131,8 @@ async function getDashboardData() {
 }
 
 export default async function Home() {
-  const dashboard = await getDashboardData();
+  const [dashboard, currentUser] = await Promise.all([getDashboardData(), getCurrentUser()]);
+  const greetingName = currentUser?.prenom?.trim() || currentUser?.username || "bienvenue";
   const metrics = dashboard.metrics;
   const activities = dashboard.activities;
   const actions = dashboard.actions;
@@ -159,7 +161,7 @@ export default async function Home() {
 
           <header className="topbar"><div className="breadcrumb"><span>ESPACE</span><i>/</i><b>Vue d’ensemble</b></div><div className="topbar-right"><time>Lundi 28 septembre 2026</time><span className="top-avatar">AD</span></div></header>
           <div className="dashboard-content">
-            <section className="welcome-row"><div><p className="eyebrow"><i /> VOTRE ACTIVITÉ, EN UN COUP D’ŒIL</p><h1>Bonjour, <em>bienvenue.</em></h1><p className="welcome-copy">Voici les contacts et les priorités de votre portefeuille aujourd’hui.</p></div><Link className="text-link" href="/contacts">Explorer les contacts <span>↗</span></Link></section>
+            <section className="welcome-row"><div><p className="eyebrow"><i /> VOTRE ACTIVITÉ, EN UN COUP D’ŒIL</p><h1>Bonjour, <em>{greetingName}.</em></h1><p className="welcome-copy">Voici les contacts et les priorités de votre portefeuille aujourd’hui.</p></div><Link className="text-link" href="/contacts">Explorer les contacts <span>↗</span></Link></section>
 
             <section className="metric-grid" aria-label="Indicateurs du portefeuille">{metrics.map((metric) => <article className="metric" key={metric.number}><div className="metric-top"><span>{metric.label}</span><small>{metric.number}</small></div><strong>{metric.value}</strong><div className={`metric-foot${metric.alert ? " metric-alert" : ""}`}>{metric.change}</div></article>)}</section>
 

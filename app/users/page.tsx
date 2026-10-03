@@ -24,7 +24,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           <span className="contacts-total">{users.length}<small>COMPTES</small></span>
         </section>
 
-        {params.error === "invalid" && <p className="auth-error" role="alert">Le nom doit contenir 3 à 40 caractères et le mot de passe au moins 8 caractères.</p>}
+        {params.error === "invalid" && <p className="auth-error" role="alert">Renseignez le prénom, un nom d’utilisateur valide et un mot de passe d’au moins 8 caractères.</p>}
         {params.error === "exists" && <p className="auth-error" role="alert">Ce nom d’utilisateur existe déjà.</p>}
         {params.error === "self" && <p className="auth-error" role="alert">Tu ne peux pas désactiver ou rétrograder ton propre compte.</p>}
         {params.error === "confirm-delete" && <p className="auth-error" role="alert">Confirme la suppression du compte avant de continuer.</p>}
@@ -38,6 +38,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         <section className="contacts-create-section">
           <div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Créer un accès</h2></div></div>
           <form action={createUser} className="contact-form">
+            <label>Prénom<input name="prenom" required maxLength={80} autoComplete="given-name" placeholder="ex. Sophie" /></label>
             <label>Nom d’utilisateur<input name="username" required minLength={3} maxLength={40} pattern="[A-Za-z0-9._-]+" placeholder="ex. sophie.laurent" /></label>
             <PasswordField name="password" label="Mot de passe temporaire" minLength={8} autoComplete="new-password" placeholder="8 caractères minimum" />
             <label>Profil<select name="role" defaultValue="member"><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label>
@@ -52,7 +53,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
               <thead><tr><th>UTILISATEUR</th><th>PROFIL</th><th>ÉTAT</th><th>GESTION</th></tr></thead>
               <tbody>{users.map((user) => (
                 <tr key={user.id}>
-                  <td><b>{user.username}</b><small>{twoFactorActive ? "2FA active" : "2FA en sommeil"}</small></td>
+                  <td><b>{user.prenom || user.username}</b><small>{user.username} · {twoFactorActive ? "2FA active" : "2FA en sommeil"}</small></td>
                   <td>{roleLabels[user.role as UserRole] ?? roleLabels.member}</td>
                   <td>{user.active ? "Actif" : "Désactivé"}</td>
                   <td><div className="user-row-actions">
@@ -60,6 +61,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                       <summary>Modifier</summary>
                       <UnsavedChangesForm action={updateUser} className="user-edit-form">
                         <input type="hidden" name="id" value={user.id} />
+                        <label>Prénom<input name="prenom" defaultValue={user.prenom ?? ""} maxLength={80} autoComplete="given-name" /></label>
                         <label>Profil<select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label>
                         <label>Nouveau mot de passe<input name="password" type="password" minLength={8} placeholder="Laisser vide pour conserver" /></label>
                         <label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /> Compte actif</label>

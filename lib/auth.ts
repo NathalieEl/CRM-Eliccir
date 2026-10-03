@@ -60,6 +60,7 @@ async function provisionAdmin() {
   const username = process.env.ADMIN_USERNAME;
   const password = process.env.ADMIN_PASSWORD;
   const configuredTwoFactorSecret = process.env.ADMIN_TOTP_SECRET;
+  const configuredFirstName = process.env.ADMIN_FIRST_NAME?.trim();
   if (!username || !password || (isTwoFactorActive() && !configuredTwoFactorSecret)) return null;
 
   const existing = await prisma.user.findUnique({ where: { username } });
@@ -69,6 +70,7 @@ async function provisionAdmin() {
       where: { id: existing.id },
       data: {
         passwordHash: await bcrypt.hash(password, 12),
+        prenom: configuredFirstName || existing.prenom,
         twoFactorSecret,
         role: "admin",
         active: true,
@@ -79,6 +81,7 @@ async function provisionAdmin() {
   return prisma.user.create({
     data: {
       username,
+      prenom: configuredFirstName || null,
       passwordHash: await bcrypt.hash(password, 12),
       twoFactorSecret,
       role: "admin",

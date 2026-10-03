@@ -18,10 +18,11 @@ function readRole(value: FormDataEntryValue | null): UserRole {
 export async function createUser(formData: FormData) {
   const currentUser = await requireAdmin();
   const username = String(formData.get("username") ?? "").trim();
+  const prenom = String(formData.get("prenom") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const role = readRole(formData.get("role"));
 
-  if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username) || password.length < 8) {
+  if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username) || prenom.length < 1 || prenom.length > 80 || password.length < 8) {
     redirect("/users?error=invalid");
   }
 
@@ -32,6 +33,7 @@ export async function createUser(formData: FormData) {
   const user = await prisma.user.create({
     data: {
       username,
+      prenom,
       passwordHash: await bcrypt.hash(password, 12),
       twoFactorSecret,
       role,
@@ -44,7 +46,7 @@ export async function createUser(formData: FormData) {
     action: "created",
     entity: "user",
     entityId: user.id,
-    details: `username=${user.username};role=${user.role}`,
+    details: `username=${user.username};prenom=${user.prenom};role=${user.role}`,
   });
 
   if (isTwoFactorActive()) {
@@ -77,16 +79,18 @@ export async function deleteUser(formData: FormData) {
 export async function updateUser(formData: FormData) {
   const currentUser = await requireAdmin();
   const id = String(formData.get("id") ?? "");
+  const prenom = String(formData.get("prenom") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const role = readRole(formData.get("role"));
   const active = formData.get("active") === "on";
 
-  if (!id || (password && password.length < 8)) redirect("/users?error=invalid");
+  if (!id || prenom.length > 80 || (password && password.length < 8)) redirect("/users?error=invalid");
   if (id === currentUser.id && (!active || role !== "admin")) redirect("/users?error=self");
 
   await prisma.user.update({
     where: { id },
     data: {
+      prenom: prenom || null,
       role,
       active,
       ...(password ? { passwordHash: await bcrypt.hash(password, 12) } : {}),
@@ -99,7 +103,7 @@ export async function updateUser(formData: FormData) {
     action: "updated",
     entity: "user",
     entityId: id,
-    details: `role=${role};active=${active};passwordChanged=${Boolean(password)}`,
+    details: `prenom=${prenom};role=${role};active=${active};passwordChanged=${Boolean(password)}`,
   });
 
   redirect("/users?notice=updated");
