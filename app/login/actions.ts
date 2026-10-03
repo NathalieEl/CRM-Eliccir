@@ -9,7 +9,8 @@ export async function login(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const code = String(formData.get("code") ?? "");
 
-  if (!username || !password || !/^\d{6}$/.test(code.replace(/\s/g, ""))) {
+  const requiresTwoFactor = process.env.NODE_ENV !== "development";
+  if (!username || !password || (requiresTwoFactor && !/^\d{6}$/.test(code.replace(/\s/g, "")))) {
     redirect("/login?error=invalid");
   }
 

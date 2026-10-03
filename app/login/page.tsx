@@ -24,7 +24,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <form action={login} className="auth-form">
           <label>Nom d’utilisateur<input name="username" autoComplete="username" required /></label>
           <PasswordField name="password" label="Mot de passe" autoComplete="current-password" />
-          <label>Code 2FA<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" required /></label>
+          {process.env.NODE_ENV === "development" ? null : <label>Code 2FA<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" required /></label>}
           <button className="contact-primary-button" type="submit">Se connecter <span>↗</span></button>
         </form>
       </section>
