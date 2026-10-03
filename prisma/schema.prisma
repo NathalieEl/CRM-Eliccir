@@ -13,12 +13,10 @@ datasource db {
 model Contact {
   id         String   @id @default(cuid())
   titre      String?
-  nom        String
   prenom     String?
+  nom        String
   email      String?  @unique
   telephone  String?
-  entreprise String?
-  poste      String?
   secteur    String?
   ville      String?
   departement String?
@@ -26,8 +24,42 @@ model Contact {
   sourceAcquisition String?
   statut     String?
   linkedin   String?
+  entreprises EntrepriseContact[]
+  activities Activity[]
+  actionItems ActionItem[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Entreprise {
+  id          String   @id @default(cuid())
+  nom         String   @unique
+  email       String?
+  telephone   String?
+  siteWeb     String?
+  secteur     String?
+  adresse     String?
+  ville       String?
+  departement String?
+  pays        String?
+  contacts    EntrepriseContact[]
+  activities  Activity[]
+  actionItems ActionItem[]
+  projects    Project[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model EntrepriseContact {
+  entrepriseId String
+  contactId    String
+  poste        String?
+  createdAt    DateTime @default(now())
+  entreprise   Entreprise @relation(fields: [entrepriseId], references: [id], onDelete: Cascade)
+  contact      Contact    @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([entrepriseId, contactId])
+  @@index([contactId])
 }
 
 model LookupOption {
@@ -46,37 +78,55 @@ model LookupOption {
 
 model Project {
   id          String   @id @default(cuid())
+  entrepriseId String?
   nom         String
   pays        String?
   ville       String?
   statut      String   @default("En cours")
   budget      String?
   progression Int      @default(0)
+  entreprise  Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([entrepriseId])
 }
 
 model Activity {
-  id        String    @id @default(cuid())
-  titre     String
-  type      String
-  contact   String?
-  date      DateTime?
-  details   String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  titre          String
+  type           String
+  contactLabel   String?   @map("contact")
+  contactId      String?
+  entrepriseId   String?
+  date           DateTime?
+  details        String?
+  contact        Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  entreprise     Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([contactId])
+  @@index([entrepriseId])
 }
 
 model ActionItem {
-  id            String    @id @default(cuid())
-  titre         String
-  priorite      String    @default("Normale")
-  statut        String    @default("À faire")
-  contact       String?
-  dateEcheance  DateTime?
-  details       String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  titre          String
+  priorite       String    @default("Normale")
+  statut         String    @default("À faire")
+  contactLabel   String?   @map("contact")
+  contactId      String?
+  entrepriseId   String?
+  dateEcheance   DateTime?
+  details        String?
+  contact        Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  entreprise     Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([contactId])
+  @@index([entrepriseId])
 }
 
 model User {
@@ -88,4 +138,19 @@ model User {
   active          Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorId       String?
+  actorUsername String
+  action        String
+  entity        String
+  entityId      String?
+  details       String?
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
 }

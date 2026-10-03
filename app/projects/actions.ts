@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
+import { recordAudit } from "@/lib/audit";
 
 function field(formData: FormData, name: string) {
   const value = formData.get(name);
@@ -11,6 +12,7 @@ function field(formData: FormData, name: string) {
 }
 
 function parseProject(formData: FormData) {
+  const entrepriseId = field(formData, "entrepriseId");
   const nom = field(formData, "nom");
   const pays = field(formData, "pays");
   const ville = field(formData, "ville");
@@ -23,6 +25,7 @@ function parseProject(formData: FormData) {
   if (
     nom.length < 2 ||
     nom.length > 120 ||
+    entrepriseId.length > 64 ||
     pays.length > 80 ||
     ville.length > 80 ||
     statut.length > 40 ||
@@ -35,6 +38,7 @@ function parseProject(formData: FormData) {
   }
 
   return {
+    entrepriseId: entrepriseId || null,
     nom,
     pays: pays || null,
     ville: ville || null,
@@ -45,12 +49,13 @@ function parseProject(formData: FormData) {
 }
 
 export async function createProject(formData: FormData) {
-  await requirePermission("crm.write");
+  const currentUser = await requirePermission("crm.write");
   const project = parseProject(formData);
   if (!project) redirect("/projects?error=invalid");
 
   try {
-    await prisma.project.create({ data: project });
+    const created = await prisma.project.create({ data: project });
+    await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "created", entity: "project", entityId: created.id, details: `name=${created.nom}` });
   } catch (error) {
     console.error(error);
     throw error;
@@ -61,7 +66,7 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(formData: FormData) {
-  await requirePermission("crm.write");
+  const currentUser = await requirePermission("crm.write");
   const id = field(formData, "id");
   const project = parseProject(formData);
 
@@ -69,7 +74,8 @@ export async function updateProject(formData: FormData) {
   if (!project) redirect("/projects?error=invalid");
 
   try {
-    await prisma.project.update({ where: { id }, data: project });
+    const updated = await prisma.project.update({ where: { id }, data: project });
+    await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "updated", entity: "project", entityId: updated.id, details: `name=${updated.nom}` });
   } catch (error) {
     if (
       typeof error === "object" &&
@@ -87,13 +93,14 @@ export async function updateProject(formData: FormData) {
 }
 
 export async function deleteProject(formData: FormData) {
-  await requirePermission("crm.write");
+  const currentUser = await requirePermission("crm.write");
   const id = field(formData, "id");
   if (!id) redirect("/projects?error=not-found");
   if (field(formData, "confirmed") !== "yes") redirect("/projects?error=confirm-delete");
 
   try {
-    await prisma.project.delete({ where: { id } });
+    const deleted = await prisma.project.delete({ where: { id } });
+    await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "deleted", entity: "project", entityId: deleted.id, details: `name=${deleted.nom}` });
   } catch (error) {
     if (
       typeof error === "object" &&

@@ -44,7 +44,7 @@ async function main() {
       prenom: optional(row.prenom) ?? "",
       nom: optional(row.nom) ?? "",
       telephone: optional(row.telephone_mobile) ?? optional(row.telephone_fixe),
-      entreprise: optional(row.entreprise),
+      entrepriseNom: optional(row.entreprise),
       poste: optional(row.poste),
       secteur: optional(row.secteur),
       ville: optional(row.ville),
@@ -57,15 +57,16 @@ async function main() {
     }))
     .filter((contact) => contact.prenom && contact.nom && contact.email);
 
-  console.log(`${contacts.length} contacts valides détectés dans ${filePath}.`);
+  const entrepriseCount = new Set(contacts.map((contact) => contact.entrepriseNom?.toLocaleLowerCase("fr-FR")).filter(Boolean)).size;
+  console.log(`${contacts.length} contacts valides et ${entrepriseCount} entreprises détectés dans ${filePath}.`);
   if (!apply) {
     console.log("Simulation uniquement. Ajoute --apply pour écrire dans la base configurée par DATABASE_URL.");
     return;
   }
 
   for (const contact of contacts) {
-    const { email, createdAt: contactCreatedAt, ...data } = contact;
-    await prisma.contact.upsert({
+    const { email, createdAt: contactCreatedAt, entrepriseNom, poste, ...data } = contact;
+    const savedContact = await prisma.contact.upsert({
       where: { email: email as string },
       update: data,
       create: {
@@ -74,6 +75,20 @@ async function main() {
         ...(contactCreatedAt ? { createdAt: contactCreatedAt, updatedAt: contactCreatedAt } : {}),
       },
     });
+
+    await prisma.entrepriseContact.deleteMany({ where: { contactId: savedContact.id } });
+    if (entrepriseNom) {
+      const existingEntreprise = await prisma.entreprise.findFirst({
+        where: { nom: { equals: entrepriseNom, mode: "insensitive" } },
+        select: { id: true },
+      });
+      const entreprise = existingEntreprise ?? await prisma.entreprise.create({ data: { nom: entrepriseNom }, select: { id: true } });
+      await prisma.entrepriseContact.upsert({
+        where: { entrepriseId_contactId: { entrepriseId: entreprise.id, contactId: savedContact.id } },
+        update: { poste },
+        create: { entrepriseId: entreprise.id, contactId: savedContact.id, poste },
+      });
+    }
   }
 
   console.log(`${contacts.length} contacts importés ou mis à jour.`);

@@ -2,6 +2,9 @@ import Link from "next/link";
 import { createProject, deleteProject, updateProject } from "@/app/projects/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import type { Prisma } from "@/app/generated/prisma/client";
+
+type ProjectRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true } }>;
 
 type ProjectsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -25,17 +28,21 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
   let databaseAvailable = true;
-  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
+  let projects: ProjectRecord[] = [];
+  let entreprises: { id: string; nom: string }[] = [];
 
   try {
-    projects = await prisma.project.findMany({ orderBy: { updatedAt: "desc" } });
+    [projects, entreprises] = await Promise.all([
+      prisma.project.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } }),
+      prisma.entreprise.findMany({ select: { id: true, nom: true }, orderBy: { nom: "asc" } }),
+    ]);
   } catch {
     databaseAvailable = false;
   }
 
   const filteredProjects = searchQuery
     ? projects.filter((project) => {
-        const haystack = [project.nom, project.pays ?? "", project.ville ?? "", project.statut, project.budget ?? ""]
+        const haystack = [project.nom, project.entreprise?.nom ?? "", project.pays ?? "", project.ville ?? "", project.statut, project.budget ?? ""]
           .join(" ")
           .toLowerCase();
         return haystack.includes(searchQuery.toLowerCase());
@@ -90,6 +97,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
               <form action={createProject} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
                 <label>Nom du projet<input name="nom" required minLength={2} maxLength={120} placeholder="Ex. Lombok Residences" /></label>
+                <label>Entreprise<select name="entrepriseId" defaultValue=""><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                 <label>Pays<input name="pays" maxLength={80} placeholder="Indonésie" /></label>
                 <label>Ville<input name="ville" maxLength={80} placeholder="Kuta Selatan" /></label>
                 <label>Budget<input name="budget" maxLength={80} placeholder="€ 2.4M" /></label>
@@ -114,7 +122,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               ) : (
                 <div className="contacts-records-wrap">
                   <table className="contacts-records">
-                    <thead><tr><th>PROJET</th><th>LOCALISATION</th><th>STATUT</th><th>PROGRESSION</th><th>BUDGET</th><th>GESTION</th></tr></thead>
+                    <thead><tr><th>PROJET</th><th>ENTREPRISE</th><th>LOCALISATION</th><th>STATUT</th><th>PROGRESSION</th><th>BUDGET</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredProjects.map((project) => (
                         <tr key={project.id}>
@@ -122,6 +130,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                             <b>{project.nom}</b>
                             <small>{project.updatedAt.toLocaleDateString("fr-FR")}</small>
                           </td>
+                          <td>{project.entreprise?.nom || "—"}</td>
                           <td>{[project.ville, project.pays].filter(Boolean).join(" · ") || "—"}</td>
                           <td><span className="status-pill status-active"><i />{project.statut}</span></td>
                           <td>{project.progression}%</td>
@@ -133,6 +142,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                                 <form action={updateProject} className="contact-edit-form">
                                   <input type="hidden" name="id" value={project.id} />
                                   <label>Nom du projet<input name="nom" defaultValue={project.nom} required minLength={2} maxLength={120} /></label>
+                                  <label>Entreprise<select name="entrepriseId" defaultValue={project.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                                   <label>Pays<input name="pays" defaultValue={project.pays ?? ""} maxLength={80} /></label>
                                   <label>Ville<input name="ville" defaultValue={project.ville ?? ""} maxLength={80} /></label>
                                   <label>Budget<input name="budget" defaultValue={project.budget ?? ""} maxLength={80} /></label>

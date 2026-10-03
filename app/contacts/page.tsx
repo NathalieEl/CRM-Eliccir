@@ -2,6 +2,11 @@ import Link from "next/link";
 import { createContact, deleteContact, updateContact } from "@/app/contacts/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import type { Prisma } from "@/app/generated/prisma/client";
+
+type ContactRecord = Prisma.ContactGetPayload<{
+  include: { entreprises: { include: { entreprise: true } } };
+}>;
 
 type ContactsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string; statut?: string; secteur?: string; ville?: string; source?: string }>;
@@ -27,12 +32,16 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const searchQuery = (params.q ?? "").trim();
   const filters = { statut: params.statut ?? "", secteur: params.secteur ?? "", ville: params.ville ?? "", source: params.source ?? "" };
   let databaseAvailable = true;
-  let contacts: Awaited<ReturnType<typeof prisma.contact.findMany>> = [];
+  let contacts: ContactRecord[] = [];
   let titleOptions: { value: string; label: string }[] = [];
+  let entrepriseOptions: { id: string; nom: string }[] = [];
 
   try {
-    contacts = await prisma.contact.findMany({ orderBy: { updatedAt: "desc" } });
-    titleOptions = await prisma.lookupOption.findMany({ where: { category: "contact_title", active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }], select: { value: true, label: true } });
+    [contacts, titleOptions, entrepriseOptions] = await Promise.all([
+      prisma.contact.findMany({ include: { entreprises: { include: { entreprise: true } } }, orderBy: { updatedAt: "desc" } }),
+      prisma.lookupOption.findMany({ where: { category: "contact_title", active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }], select: { value: true, label: true } }),
+      prisma.entreprise.findMany({ select: { id: true, nom: true }, orderBy: { nom: "asc" } }),
+    ]);
   } catch {
     databaseAvailable = false;
   }
@@ -49,10 +58,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         const haystack = [
           contact.prenom ?? "",
           contact.nom,
+          ...contact.entreprises.flatMap(({ entreprise }) => [entreprise.nom]),
           contact.email ?? "",
           contact.telephone ?? "",
-          contact.entreprise ?? "",
-          contact.poste ?? "",
           contact.secteur ?? "",
           contact.ville ?? "",
           contact.statut ?? "",
@@ -137,8 +145,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 <label>Nom<input name="nom" autoComplete="family-name" required maxLength={120} placeholder="Ex. Martin" /></label>
                 <label>E-mail<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
                 <label>Téléphone<input name="telephone" type="tel" autoComplete="tel" maxLength={40} placeholder="+33 6 12 34 56 78" /></label>
-                <label>Entreprise<input name="entreprise" autoComplete="organization" maxLength={120} placeholder="Nom de l’entreprise" /></label>
-                <label>Poste<input name="poste" maxLength={120} placeholder="Fonction" /></label>
+                <label>Entreprises<select name="entrepriseIds" multiple size={3}>{entrepriseOptions.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                 <label>Secteur<input name="secteur" maxLength={80} placeholder="Secteur" /></label>
                 <label>Ville<input name="ville" maxLength={80} placeholder="Ville" /></label>
                 <label>Statut<input name="statut" maxLength={80} placeholder="Prospect" /></label>
@@ -167,7 +174,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                         <tr key={contact.id}>
                           <td><b>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</b><small>{contact.email || "Aucun e-mail"}</small></td>
                           <td>{contact.telephone || "—"}</td>
-                          <td><b>{contact.entreprise || "—"}</b><small>{contact.poste || "Poste non renseigné"}</small></td>
+                          <td><b>{contact.entreprises.map(({ entreprise }) => entreprise.nom).join(", ") || "—"}</b><small>{contact.entreprises.map(({ poste }) => poste).filter(Boolean).join(", ") || "Fonction non renseignée"}</small></td>
                           <td>{contact.secteur || "—"}</td>
                           <td>{[contact.ville, contact.departement].filter(Boolean).join(" · ") || "—"}</td>
                           <td><span className="contact-status-label">{contact.statut || "Non défini"}</span></td>
@@ -177,7 +184,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-view-details">
                                 <summary>Fiche</summary>
-                                <div className="contact-detail-card"><h3>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</h3><dl><dt>E-mail</dt><dd>{contact.email || "—"}</dd><dt>Téléphone</dt><dd>{contact.telephone || "—"}</dd><dt>Entreprise</dt><dd>{contact.entreprise || "—"}</dd><dt>Poste</dt><dd>{contact.poste || "—"}</dd><dt>Secteur</dt><dd>{contact.secteur || "—"}</dd><dt>Ville</dt><dd>{[contact.ville, contact.departement, contact.pays].filter(Boolean).join(" · ") || "—"}</dd><dt>Source</dt><dd>{contact.sourceAcquisition || "—"}</dd><dt>Statut</dt><dd>{contact.statut || "—"}</dd><dt>LinkedIn</dt><dd>{contact.linkedin ? <a href={contact.linkedin.startsWith("http") ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noreferrer">Voir le profil</a> : "—"}</dd></dl></div>
+                                <div className="contact-detail-card"><h3>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</h3><dl><dt>E-mail</dt><dd>{contact.email || "—"}</dd><dt>Téléphone</dt><dd>{contact.telephone || "—"}</dd><dt>Entreprises</dt><dd>{contact.entreprises.map(({ entreprise, poste }) => `${entreprise.nom}${poste ? ` · ${poste}` : ""}`).join(", ") || "—"}</dd><dt>Secteur</dt><dd>{contact.secteur || "—"}</dd><dt>Ville</dt><dd>{[contact.ville, contact.departement, contact.pays].filter(Boolean).join(" · ") || "—"}</dd><dt>Source</dt><dd>{contact.sourceAcquisition || "—"}</dd><dt>Statut</dt><dd>{contact.statut || "—"}</dd><dt>LinkedIn</dt><dd>{contact.linkedin ? <a href={contact.linkedin.startsWith("http") ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noreferrer">Voir le profil</a> : "—"}</dd></dl></div>
                               </details>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
@@ -188,8 +195,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                                   <label>Nom<input name="nom" autoComplete="family-name" defaultValue={contact.nom} required maxLength={120} /></label>
                                   <label>E-mail<input name="email" type="email" defaultValue={contact.email ?? ""} maxLength={254} /></label>
                                   <label>Téléphone<input name="telephone" type="tel" defaultValue={contact.telephone ?? ""} maxLength={40} /></label>
-                                  <label>Entreprise<input name="entreprise" defaultValue={contact.entreprise ?? ""} maxLength={120} /></label>
-                                  <label>Poste<input name="poste" defaultValue={contact.poste ?? ""} maxLength={120} /></label>
+                                  <label>Entreprises<select name="entrepriseIds" multiple size={3} defaultValue={contact.entreprises.map(({ entrepriseId }) => entrepriseId)}>{entrepriseOptions.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                                   <label>Secteur<input name="secteur" defaultValue={contact.secteur ?? ""} maxLength={80} /></label>
                                   <label>Ville<input name="ville" defaultValue={contact.ville ?? ""} maxLength={80} /></label>
                                   <label>Département<input name="departement" defaultValue={contact.departement ?? ""} maxLength={20} /></label>

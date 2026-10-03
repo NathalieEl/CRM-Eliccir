@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/login/actions";
 
-const navigation = ["Vue d’ensemble", "Contacts", "Activités", "Actions", "Projets", "Utilisateurs", "Maintenance"];
+const navigation = ["Vue d’ensemble", "Entreprises", "Contacts", "Activités", "Actions", "Projets", "Utilisateurs", "Maintenance", "Journal d’audit"];
 
 const defaultActivities = [
   { time: "09:30", kind: "RENDEZ-VOUS", title: "Visite du terrain avec Marc Delatour", detail: "Projet Lombok · Kuta Selatan", initials: "MD", color: "coral" },
@@ -28,11 +28,12 @@ const defaultProjects = [
   { name: "Phuket", location: "Patong · Thaïlande", progress: 22 },
 ];
 
-function formatActivityItem(activity: { titre: string; type: string; contact?: string | null; date?: Date | null; details?: string | null }) {
+function formatActivityItem(activity: { titre: string; type: string; contactLabel?: string | null; contact?: { prenom: string | null; nom: string } | null; entreprise?: { nom: string } | null; date?: Date | null; details?: string | null }) {
   const time = activity.date ? new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(activity.date)) : "09:00";
   const title = activity.titre;
-  const detail = activity.details || (activity.contact ? `Contact · ${activity.contact}` : "Activité CRM");
-  const initials = (activity.contact ?? activity.type)
+  const fullName = activity.contact ? [activity.contact.prenom, activity.contact.nom].filter(Boolean).join(" ") : activity.contactLabel;
+  const detail = activity.details || (activity.entreprise ? `Entreprise · ${activity.entreprise.nom}` : fullName ? `Contact · ${fullName}` : "Activité CRM");
+  const initials = (fullName || activity.entreprise?.nom || activity.type)
     .split(" ")
     .map((part) => part[0])
     .join("")
@@ -49,7 +50,7 @@ function formatActivityItem(activity: { titre: string; type: string; contact?: s
   };
 }
 
-function formatActionItem(action: { titre: string; dateEcheance?: Date | null; priorite?: string | null; statut?: string | null }) {
+function formatActionItem(action: { titre: string; dateEcheance?: Date | null; priorite?: string | null; statut?: string | null; entreprise?: { nom: string } | null }) {
   const due = action.dateEcheance
     ? `Échéance · ${new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short" }).format(new Date(action.dateEcheance))}`
     : "À planifier";
@@ -57,12 +58,12 @@ function formatActionItem(action: { titre: string; dateEcheance?: Date | null; p
   return {
     title: action.titre,
     due,
-    tag: action.priorite || action.statut || "Normale",
+    tag: action.entreprise?.nom || action.priorite || action.statut || "Normale",
   };
 }
 
-function formatProjectItem(project: { nom: string; ville?: string | null; pays?: string | null; progression: number }) {
-  const location = [project.ville, project.pays].filter(Boolean).join(" · ") || "Localisation non définie";
+function formatProjectItem(project: { nom: string; ville?: string | null; pays?: string | null; progression: number; entreprise?: { nom: string } | null }) {
+  const location = [project.entreprise?.nom, project.ville, project.pays].filter(Boolean).join(" · ") || "Localisation non définie";
 
   return {
     name: project.nom,
@@ -82,10 +83,10 @@ async function getDashboardData() {
       prisma.activity.count({ where: { date: { gte: now } } }),
       prisma.actionItem.count({ where: { statut: { not: "Terminée" } } }),
       prisma.actionItem.count({ where: { statut: { not: "Terminée" }, dateEcheance: { lt: now } } }),
-      prisma.contact.findMany({ take: 4, orderBy: { updatedAt: "desc" } }),
-      prisma.project.findMany({ take: 3, orderBy: { updatedAt: "desc" } }),
-      prisma.activity.findMany({ where: { date: { gte: now } }, take: 3, orderBy: { date: "asc" } }),
-      prisma.actionItem.findMany({ where: { statut: { not: "Terminée" } }, take: 3, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
+      prisma.contact.findMany({ include: { entreprises: { include: { entreprise: true } } }, take: 4, orderBy: { updatedAt: "desc" } }),
+      prisma.project.findMany({ include: { entreprise: true }, take: 3, orderBy: { updatedAt: "desc" } }),
+      prisma.activity.findMany({ include: { contact: true, entreprise: true }, where: { date: { gte: now } }, take: 3, orderBy: { date: "asc" } }),
+      prisma.actionItem.findMany({ include: { entreprise: true }, where: { statut: { not: "Terminée" } }, take: 3, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
     ]);
 
     return {
@@ -100,7 +101,7 @@ async function getDashboardData() {
       contacts: recentContacts.length > 0 ? recentContacts.map((contact) => ({
         name: [contact.prenom, contact.nom].filter(Boolean).join(" "),
         email: contact.email || "Aucun e-mail",
-        interest: [contact.entreprise, contact.telephone].filter(Boolean).join(" · ") || "Sans renseignement",
+        interest: [...contact.entreprises.map(({ entreprise }) => entreprise.nom), contact.telephone].filter(Boolean).join(" · ") || "Sans renseignement",
         status: "Actif",
         tone: "active",
         updated: "Actualisé aujourd’hui",
@@ -144,7 +145,7 @@ export default async function Home() {
             <p className="workspace-label">ESPACE DE TRAVAIL</p>
             <nav className="main-nav" aria-label="Navigation principale">
               {navigation.map((label, index) => {
-                const href = index === 1 ? "/contacts" : index === 2 ? "/activities" : index === 3 ? "/actions" : index === 4 ? "/projects" : index === 5 ? "/users" : index === 6 ? "/maintenance" : "#overview";
+                const href = index === 1 ? "/companies" : index === 2 ? "/contacts" : index === 3 ? "/activities" : index === 4 ? "/actions" : index === 5 ? "/projects" : index === 6 ? "/users" : index === 7 ? "/maintenance" : index === 8 ? "/audit" : "#overview";
                 return <a className={`nav-link${index === 0 ? " nav-link-active" : ""}`} href={href} key={label}><span>{String(index + 1).padStart(2, "0")}</span>{label}</a>;
               })}
             </nav>

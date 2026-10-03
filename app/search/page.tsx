@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
+import type { Prisma } from "@/app/generated/prisma/client";
+
+type ContactSearchRecord = Prisma.ContactGetPayload<{ include: { entreprises: { include: { entreprise: true } } } }>;
+type ProjectSearchRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true } }>;
+type ActivitySearchRecord = Prisma.ActivityGetPayload<{ include: { contact: true; entreprise: true } }>;
+type ActionSearchRecord = Prisma.ActionItemGetPayload<{ include: { contact: true; entreprise: true } }>;
 
 type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
@@ -16,20 +22,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = normalise(params.q ?? "");
 
   let databaseAvailable = true;
-  let contacts: Awaited<ReturnType<typeof prisma.contact.findMany>> = [];
-  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
-  let activities: Awaited<ReturnType<typeof prisma.activity.findMany>> = [];
-  let actions: Awaited<ReturnType<typeof prisma.actionItem.findMany>> = [];
+  let contacts: ContactSearchRecord[] = [];
+  let entreprises: Awaited<ReturnType<typeof prisma.entreprise.findMany>> = [];
+  let projects: ProjectSearchRecord[] = [];
+  let activities: ActivitySearchRecord[] = [];
+  let actions: ActionSearchRecord[] = [];
 
   try {
-    const [contactsData, projectsData, activitiesData, actionsData] = await Promise.all([
-      prisma.contact.findMany({ orderBy: { updatedAt: "desc" } }),
-      prisma.project.findMany({ orderBy: { updatedAt: "desc" } }),
-      prisma.activity.findMany({ orderBy: { date: "asc" } }),
-      prisma.actionItem.findMany({ orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
+    const [contactsData, entreprisesData, projectsData, activitiesData, actionsData] = await Promise.all([
+      prisma.contact.findMany({ include: { entreprises: { include: { entreprise: true } } }, orderBy: { updatedAt: "desc" } }),
+      prisma.entreprise.findMany({ orderBy: { nom: "asc" } }),
+      prisma.project.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } }),
+      prisma.activity.findMany({ include: { contact: true, entreprise: true }, orderBy: { date: "asc" } }),
+      prisma.actionItem.findMany({ include: { contact: true, entreprise: true }, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
     ]);
 
     contacts = contactsData;
+    entreprises = entreprisesData;
     projects = projectsData;
     activities = activitiesData;
     actions = actionsData;
@@ -39,28 +48,32 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const filteredContacts = query
     ? contacts.filter((contact) => {
-        const haystack = [contact.prenom ?? "", contact.nom, contact.email ?? "", contact.telephone ?? "", contact.entreprise ?? ""].join(" ").toLowerCase();
+        const haystack = [contact.prenom ?? "", contact.nom, contact.email ?? "", contact.telephone ?? "", ...contact.entreprises.map(({ entreprise }) => entreprise.nom)].join(" ").toLowerCase();
         return haystack.includes(query);
       })
     : contacts.slice(0, 4);
 
+  const filteredEntreprises = query
+    ? entreprises.filter((entreprise) => [entreprise.nom, entreprise.email ?? "", entreprise.secteur ?? "", entreprise.ville ?? "", entreprise.pays ?? ""].join(" ").toLowerCase().includes(query))
+    : entreprises.slice(0, 4);
+
   const filteredProjects = query
     ? projects.filter((project) => {
-        const haystack = [project.nom, project.ville ?? "", project.pays ?? "", project.statut, project.budget ?? ""].join(" ").toLowerCase();
+        const haystack = [project.nom, project.entreprise?.nom ?? "", project.ville ?? "", project.pays ?? "", project.statut, project.budget ?? ""].join(" ").toLowerCase();
         return haystack.includes(query);
       })
     : projects.slice(0, 3);
 
   const filteredActivities = query
     ? activities.filter((activity) => {
-        const haystack = [activity.titre, activity.type, activity.contact ?? "", activity.details ?? ""].join(" ").toLowerCase();
+        const haystack = [activity.titre, activity.type, activity.contactLabel ?? "", activity.contact?.prenom ?? "", activity.contact?.nom ?? "", activity.entreprise?.nom ?? "", activity.details ?? ""].join(" ").toLowerCase();
         return haystack.includes(query);
       })
     : activities.slice(0, 3);
 
   const filteredActions = query
     ? actions.filter((action) => {
-        const haystack = [action.titre, action.priorite, action.statut, action.contact ?? "", action.details ?? ""].join(" ").toLowerCase();
+        const haystack = [action.titre, action.priorite, action.statut, action.contactLabel ?? "", action.contact?.prenom ?? "", action.contact?.nom ?? "", action.entreprise?.nom ?? "", action.details ?? ""].join(" ").toLowerCase();
         return haystack.includes(query);
       })
     : actions.slice(0, 3);
@@ -82,7 +95,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <h1>Recherche globale</h1>
             <p className="contacts-intro">Trouvez rapidement un contact, un projet, une activité ou une action.</p>
           </div>
-          <span className="contacts-total">{databaseAvailable ? (contacts.length + projects.length + activities.length + actions.length) : "—"}<small>RÉSULTATS</small></span>
+          <span className="contacts-total">{databaseAvailable ? (contacts.length + entreprises.length + projects.length + activities.length + actions.length) : "—"}<small>RÉSULTATS</small></span>
         </section>
 
         <section className="contacts-toolbar">
@@ -109,6 +122,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
             <div className="search-results-grid">
               <section className="search-results-section">
+                <h2>Entreprises</h2>
+                {filteredEntreprises.length === 0 ? <p>Aucune entreprise.</p> : (
+                  <ul>{filteredEntreprises.map((entreprise) => <li key={entreprise.id}><strong>{entreprise.nom}</strong><span>{[entreprise.ville, entreprise.pays].filter(Boolean).join(" · ") || entreprise.secteur || "Coordonnées non renseignées"}</span><small>{entreprise.email || "Aucun e-mail"}</small></li>)}</ul>
+                )}
+              </section>
+              <section className="search-results-section">
                 <h2>Contacts</h2>
                 {filteredContacts.length === 0 ? <p>Aucun contact.</p> : (
                   <ul>
@@ -116,7 +135,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                       <li key={contact.id}>
                         <strong>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</strong>
                         <span>{contact.email || "Aucun e-mail"}</span>
-                        <small>{contact.entreprise || "Entreprise non renseignée"}</small>
+                        <small>{contact.entreprises.map(({ entreprise }) => entreprise.nom).join(", ") || "Entreprise non renseignée"}</small>
                       </li>
                     ))}
                   </ul>
@@ -131,7 +150,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                       <li key={project.id}>
                         <strong>{project.nom}</strong>
                         <span>{[project.ville, project.pays].filter(Boolean).join(" · ") || "Localisation non définie"}</span>
-                        <small>{project.statut}</small>
+                        <small>{[project.entreprise?.nom, project.statut].filter(Boolean).join(" · ")}</small>
                       </li>
                     ))}
                   </ul>
@@ -146,7 +165,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                       <li key={activity.id}>
                         <strong>{activity.titre}</strong>
                         <span>{activity.type}</span>
-                        <small>{activity.contact || "Contact non renseigné"}</small>
+                        <small>{[activity.contact ? [activity.contact.prenom, activity.contact.nom].filter(Boolean).join(" ") : activity.contactLabel, activity.entreprise?.nom].filter(Boolean).join(" · ") || "Aucun rattachement"}</small>
                       </li>
                     ))}
                   </ul>
@@ -161,7 +180,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                       <li key={action.id}>
                         <strong>{action.titre}</strong>
                         <span>{action.priorite}</span>
-                        <small>{action.statut}</small>
+                        <small>{[action.contact ? [action.contact.prenom, action.contact.nom].filter(Boolean).join(" ") : action.contactLabel, action.entreprise?.nom, action.statut].filter(Boolean).join(" · ")}</small>
                       </li>
                     ))}
                   </ul>

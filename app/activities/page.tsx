@@ -2,6 +2,11 @@ import Link from "next/link";
 import { createActivity, deleteActivity, updateActivity } from "@/app/activities/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import type { Prisma } from "@/app/generated/prisma/client";
+
+type ActivityRecord = Prisma.ActivityGetPayload<{ include: { contact: true; entreprise: true } }>;
+type ContactOption = { id: string; prenom: string | null; nom: string };
+type EntrepriseOption = { id: string; nom: string };
 
 type ActivitiesPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -30,17 +35,23 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
   let databaseAvailable = true;
-  let activities: Awaited<ReturnType<typeof prisma.activity.findMany>> = [];
+  let activities: ActivityRecord[] = [];
+  let contacts: ContactOption[] = [];
+  let entreprises: EntrepriseOption[] = [];
 
   try {
-    activities = await prisma.activity.findMany({ orderBy: { date: "asc" } });
+    [activities, contacts, entreprises] = await Promise.all([
+      prisma.activity.findMany({ include: { contact: true, entreprise: true }, orderBy: { date: "asc" } }),
+      prisma.contact.findMany({ select: { id: true, prenom: true, nom: true }, orderBy: [{ nom: "asc" }, { prenom: "asc" }] }),
+      prisma.entreprise.findMany({ select: { id: true, nom: true }, orderBy: { nom: "asc" } }),
+    ]);
   } catch {
     databaseAvailable = false;
   }
 
   const filteredActivities = searchQuery
     ? activities.filter((activity) => {
-        const haystack = [activity.titre, activity.type, activity.contact ?? "", activity.details ?? ""]
+        const haystack = [activity.titre, activity.type, activity.contactLabel ?? "", activity.contact?.prenom ?? "", activity.contact?.nom ?? "", activity.entreprise?.nom ?? "", activity.details ?? ""]
           .join(" ")
           .toLowerCase();
         return haystack.includes(searchQuery.toLowerCase());
@@ -96,7 +107,8 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
               <form action={createActivity} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
                 <label>Titre<input name="titre" required minLength={2} maxLength={120} placeholder="Ex. Appel de suivi" /></label>
                 <label>Type<input name="type" required minLength={2} maxLength={40} placeholder="Rendez-vous" /></label>
-                <label>Contact<input name="contact" maxLength={120} placeholder="Sophie Laurent" /></label>
+                <label>Contact<select name="contactId" defaultValue=""><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
+                <label>Entreprise<select name="entrepriseId" defaultValue=""><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                 <label>Date<input name="date" type="date" /></label>
                 <label style={{ gridColumn: "1 / -1" }}>Détails<input name="details" maxLength={500} placeholder="Résumé de l’activité..." /></label>
                 <button className="contact-primary-button" type="submit">Ajouter l’activité <span>+</span></button>
@@ -118,13 +130,14 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
               ) : (
                 <div className="contacts-records-wrap">
                   <table className="contacts-records">
-                    <thead><tr><th>TITRE</th><th>TYPE</th><th>CONTACT</th><th>DATE</th><th>DÉTAILS</th><th>GESTION</th></tr></thead>
+                    <thead><tr><th>TITRE</th><th>TYPE</th><th>CONTACT</th><th>ENTREPRISE</th><th>DATE</th><th>DÉTAILS</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredActivities.map((activity) => (
                         <tr key={activity.id}>
                           <td><b>{activity.titre}</b></td>
                           <td>{activity.type}</td>
-                          <td>{activity.contact || "—"}</td>
+                          <td>{activity.contact ? [activity.contact.prenom, activity.contact.nom].filter(Boolean).join(" ") : activity.contactLabel || "—"}</td>
+                          <td>{activity.entreprise?.nom || "—"}</td>
                           <td>{formatDate(activity.date)}</td>
                           <td>{activity.details || "—"}</td>
                           <td>
@@ -133,9 +146,11 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
                                 <summary>Modifier</summary>
                                 <form action={updateActivity} className="contact-edit-form">
                                   <input type="hidden" name="id" value={activity.id} />
+                                  <input type="hidden" name="legacyContact" value={activity.contactLabel ?? ""} />
                                   <label>Titre<input name="titre" defaultValue={activity.titre} required minLength={2} maxLength={120} /></label>
                                   <label>Type<input name="type" defaultValue={activity.type} required minLength={2} maxLength={40} /></label>
-                                  <label>Contact<input name="contact" defaultValue={activity.contact ?? ""} maxLength={120} /></label>
+                                  <label>Contact<select name="contactId" defaultValue={activity.contactId ?? ""}><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
+                                  <label>Entreprise<select name="entrepriseId" defaultValue={activity.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                                   <label>Date<input name="date" type="date" defaultValue={activity.date ? new Date(activity.date).toISOString().slice(0, 10) : ""} /></label>
                                   <label>Détails<input name="details" defaultValue={activity.details ?? ""} maxLength={500} /></label>
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>

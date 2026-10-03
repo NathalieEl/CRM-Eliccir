@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isTwoFactorActive, requireAdmin } from "@/lib/auth";
 import type { UserRole } from "@/lib/permissions";
+import { recordAudit } from "@/lib/audit";
 
 const editableRoles: UserRole[] = ["admin", "management", "sales", "member"];
 
@@ -15,7 +16,7 @@ function readRole(value: FormDataEntryValue | null): UserRole {
 }
 
 export async function createUser(formData: FormData) {
-  await requireAdmin();
+  const currentUser = await requireAdmin();
   const username = String(formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const role = readRole(formData.get("role"));
@@ -28,13 +29,22 @@ export async function createUser(formData: FormData) {
   if (existing) redirect("/users?error=exists");
 
   const twoFactorSecret = generateSecret();
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       username,
       passwordHash: await bcrypt.hash(password, 12),
       twoFactorSecret,
       role,
     },
+  });
+
+  await recordAudit({
+    actorId: currentUser.id,
+    actorUsername: currentUser.username,
+    action: "created",
+    entity: "user",
+    entityId: user.id,
+    details: `username=${user.username};role=${user.role}`,
   });
 
   if (isTwoFactorActive()) {
@@ -47,7 +57,20 @@ export async function deleteUser(formData: FormData) {
   const currentUser = await requireAdmin();
   const id = String(formData.get("id") ?? "");
   if (formData.get("confirmed") !== "yes") redirect("/users?error=confirm-delete");
-  if (id && id !== currentUser.id) await prisma.user.delete({ where: { id } });
+  if (id && id !== currentUser.id) {
+    const user = await prisma.user.findUnique({ where: { id } });
+    await prisma.user.delete({ where: { id } });
+    if (user) {
+      await recordAudit({
+        actorId: currentUser.id,
+        actorUsername: currentUser.username,
+        action: "deleted",
+        entity: "user",
+        entityId: user.id,
+        details: `username=${user.username}`,
+      });
+    }
+  }
   redirect("/users");
 }
 
@@ -70,16 +93,33 @@ export async function updateUser(formData: FormData) {
     },
   });
 
+  await recordAudit({
+    actorId: currentUser.id,
+    actorUsername: currentUser.username,
+    action: "updated",
+    entity: "user",
+    entityId: id,
+    details: `role=${role};active=${active};passwordChanged=${Boolean(password)}`,
+  });
+
   redirect("/users?notice=updated");
 }
 
 export async function resetTwoFactor(formData: FormData) {
-  await requireAdmin();
+  const currentUser = await requireAdmin();
   if (!isTwoFactorActive()) redirect("/users?error=2fa-inactive");
   const id = String(formData.get("id") ?? "");
   if (!id || formData.get("confirmed") !== "yes") redirect("/users?error=confirm-2fa");
 
   const twoFactorSecret = generateSecret();
   const user = await prisma.user.update({ where: { id }, data: { twoFactorSecret } });
+  await recordAudit({
+    actorId: currentUser.id,
+    actorUsername: currentUser.username,
+    action: "reset_2fa",
+    entity: "user",
+    entityId: user.id,
+    details: `username=${user.username}`,
+  });
   redirect(`/users?reset2fa=${encodeURIComponent(twoFactorSecret)}&username=${encodeURIComponent(user.username)}`);
 }

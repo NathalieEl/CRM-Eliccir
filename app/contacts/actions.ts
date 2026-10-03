@@ -4,10 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
+import { recordAudit } from "@/lib/audit";
 
 function field(formData: FormData, name: string) {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";
+}
+
+function selectedEntrepriseIds(formData: FormData) {
+  return [...new Set(formData.getAll("entrepriseIds").filter((value): value is string => typeof value === "string").map((value) => value.trim()).filter(Boolean))];
 }
 
 function parseContact(formData: FormData) {
@@ -16,8 +21,6 @@ function parseContact(formData: FormData) {
   const titre = field(formData, "titre");
   const email = field(formData, "email").toLowerCase();
   const telephone = field(formData, "telephone");
-  const entreprise = field(formData, "entreprise");
-  const poste = field(formData, "poste");
   const secteur = field(formData, "secteur");
   const ville = field(formData, "ville");
   const departement = field(formData, "departement");
@@ -36,8 +39,6 @@ function parseContact(formData: FormData) {
     email.length > 254 ||
     (email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
     telephone.length > 40 ||
-    entreprise.length > 120 ||
-    poste.length > 120 ||
     secteur.length > 80 ||
     ville.length > 80 ||
     departement.length > 20 ||
@@ -51,20 +52,21 @@ function parseContact(formData: FormData) {
   }
 
   return {
-    prenom,
-    nom,
-    titre: titre || null,
-    email: email || null,
-    telephone: telephone || null,
-    entreprise: entreprise || null,
-    poste: poste || null,
-    secteur: secteur || null,
-    ville: ville || null,
-    departement: departement || null,
-    pays: pays || null,
-    sourceAcquisition: sourceAcquisition || null,
-    statut: statut || null,
-    linkedin: linkedin || null,
+    data: {
+      prenom,
+      nom,
+      titre: titre || null,
+      email: email || null,
+      telephone: telephone || null,
+      secteur: secteur || null,
+      ville: ville || null,
+      departement: departement || null,
+      pays: pays || null,
+      sourceAcquisition: sourceAcquisition || null,
+      statut: statut || null,
+      linkedin: linkedin || null,
+    },
+    entrepriseIds: selectedEntrepriseIds(formData),
   };
 }
 
@@ -73,12 +75,23 @@ function hasPrismaCode(error: unknown, code: string) {
 }
 
 export async function createContact(formData: FormData) {
-  await requirePermission("crm.write");
+  const currentUser = await requirePermission("crm.write");
   const contact = parseContact(formData);
   if (!contact) redirect("/contacts?error=invalid");
+  const availableEntreprises = await prisma.entreprise.count({ where: { id: { in: contact.entrepriseIds } } });
+  if (availableEntreprises !== contact.entrepriseIds.length) redirect("/contacts?error=invalid");
 
   try {
-    await prisma.contact.create({ data: contact });
+    const created = await prisma.$transaction(async (transaction) => {
+      const record = await transaction.contact.create({ data: contact.data });
+      if (contact.entrepriseIds.length) {
+        await transaction.entrepriseContact.createMany({
+          data: contact.entrepriseIds.map((entrepriseId) => ({ entrepriseId, contactId: record.id })),
+        });
+      }
+      return record;
+    });
+    await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "created", entity: "contact", entityId: created.id, details: `name=${[created.prenom, created.nom].filter(Boolean).join(" ")}` });
   } catch (error) {
     if (hasPrismaCode(error, "P2002")) redirect("/contacts?error=email-exists");
     throw error;
@@ -89,14 +102,31 @@ export async function createContact(formData: FormData) {
 }
 
 export async function updateContact(formData: FormData) {
-  await requirePermission("crm.write");
+  const currentUser = await requirePermission("crm.write");
   const id = field(formData, "id");
   const contact = parseContact(formData);
   if (!id) redirect("/contacts?error=not-found");
   if (!contact) redirect("/contacts?error=invalid");
+  const availableEntreprises = await prisma.entreprise.count({ where: { id: { in: contact.entrepriseIds } } });
+  if (availableEntreprises !== contact.entrepriseIds.length) redirect("/contacts?error=invalid");
 
   try {
-    await prisma.contact.update({ where: { id }, data: contact });
+    const updated = await prisma.$transaction(async (transaction) => {
+      const record = await transaction.contact.update({ where: { id }, data: contact.data });
+      const previousLinks = await transaction.entrepriseContact.findMany({
+        where: { contactId: id, entrepriseId: { in: contact.entrepriseIds } },
+        select: { entrepriseId: true, poste: true },
+      });
+      const previousPostes = new Map(previousLinks.map((link) => [link.entrepriseId, link.poste]));
+      await transaction.entrepriseContact.deleteMany({ where: { contactId: id } });
+      if (contact.entrepriseIds.length) {
+        await transaction.entrepriseContact.createMany({
+          data: contact.entrepriseIds.map((entrepriseId) => ({ entrepriseId, contactId: id, poste: previousPostes.get(entrepriseId) ?? null })),
+        });
+      }
+      return record;
+    });
+    await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "updated", entity: "contact", entityId: updated.id, details: `name=${[updated.prenom, updated.nom].filter(Boolean).join(" ")}` });
   } catch (error) {
     if (hasPrismaCode(error, "P2002")) redirect("/contacts?error=email-exists");
     if (hasPrismaCode(error, "P2025")) redirect("/contacts?error=not-found");
@@ -108,13 +138,14 @@ export async function updateContact(formData: FormData) {
 }
 
 export async function deleteContact(formData: FormData) {
-  await requirePermission("crm.write");
+  const currentUser = await requirePermission("crm.write");
   const id = field(formData, "id");
   if (!id) redirect("/contacts?error=not-found");
   if (field(formData, "confirmed") !== "yes") redirect("/contacts?error=confirm-delete");
 
   try {
-    await prisma.contact.delete({ where: { id } });
+    const deleted = await prisma.contact.delete({ where: { id } });
+    await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "deleted", entity: "contact", entityId: deleted.id, details: `name=${[deleted.prenom, deleted.nom].filter(Boolean).join(" ")}` });
   } catch (error) {
     if (hasPrismaCode(error, "P2025")) redirect("/contacts?error=not-found");
     throw error;
