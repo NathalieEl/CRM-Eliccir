@@ -172,15 +172,15 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                     <tbody>
                       {visibleContacts.map((contact) => (
                         <tr key={contact.id}>
-                          <td><b>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</b><small>{contact.email || "Aucun e-mail"}</small></td>
-                          <td>{contact.telephone || "—"}</td>
-                          <td><b>{contact.entreprises.map(({ entreprise }) => entreprise.nom).join(", ") || "—"}</b><small>{contact.entreprises.map(({ poste }) => poste).filter(Boolean).join(", ") || "Fonction non renseignée"}</small></td>
-                          <td>{contact.secteur || "—"}</td>
-                          <td>{[contact.ville, contact.departement].filter(Boolean).join(" · ") || "—"}</td>
-                          <td><span className="contact-status-label">{contact.statut || "Non défini"}</span></td>
-                          <td>{contact.sourceAcquisition || "—"}</td>
-                          <td><time dateTime={contact.updatedAt.toISOString()}>{contact.updatedAt.toLocaleDateString("fr-FR")}</time></td>
-                          <td>
+                          <td data-label="Contact"><b>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</b><small>{contact.email || "Aucun e-mail"}</small></td>
+                          <td data-label="Téléphone">{contact.telephone || "—"}</td>
+                          <td data-label="Entreprise / poste"><b>{contact.entreprises.map(({ entreprise }) => entreprise.nom).join(", ") || "—"}</b><small>{contact.entreprises.map(({ poste }) => poste).filter(Boolean).join(", ") || "Fonction non renseignée"}</small></td>
+                          <td data-label="Secteur">{contact.secteur || "—"}</td>
+                          <td data-label="Ville">{[contact.ville, contact.departement].filter(Boolean).join(" · ") || "—"}</td>
+                          <td data-label="Statut"><span className="contact-status-label">{contact.statut || "Non défini"}</span></td>
+                          <td data-label="Source">{contact.sourceAcquisition || "—"}</td>
+                          <td data-label="Modifié"><time dateTime={contact.updatedAt.toISOString()}>{contact.updatedAt.toLocaleDateString("fr-FR")}</time></td>
+                          <td data-label="Gestion">
                             <div className="contact-row-actions">
                               <Link className="contact-profile-link" href={`/contacts/${contact.id}`}>Profil complet</Link>
                               {canWrite ? <details className="contact-delete-details">

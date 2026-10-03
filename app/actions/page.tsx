@@ -161,16 +161,16 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                     <tbody>
                       {filteredActions.map((action) => (
                         <tr key={action.id}>
-                          <td><b>{action.titre}</b><small>{action.details || "Aucun détail"}</small></td>
-                          <td><span className={priorityClasses[action.priorite] ?? "action-tag"}>{action.priorite}</span></td>
-                          <td>{action.statut}</td>
-                          <td>{action.contact ? [action.contact.prenom, action.contact.nom].filter(Boolean).join(" ") : action.contactLabel || "—"}</td>
-                          <td>{action.entreprise?.nom || "—"}</td>
-                          <td>{action.responsable?.username || "—"}</td>
-                          <td>{action.canal || "—"}<small>{action.dureeMinutes == null ? "Durée non définie" : `${action.dureeMinutes} min`}</small></td>
-                          <td>{formatDate(action.dateEcheance)}<small>Réalisation : {formatDate(action.dateRealisation)}</small></td>
-                          <td>{action.prochaineAction || action.resultat || action.details || "—"}</td>
-                          <td>
+                          <td data-label="Titre"><b>{action.titre}</b><small>{action.details || "Aucun détail"}</small></td>
+                          <td data-label="Priorité"><span className={priorityClasses[action.priorite] ?? "action-tag"}>{action.priorite}</span></td>
+                          <td data-label="Statut">{action.statut}</td>
+                          <td data-label="Contact">{action.contact ? [action.contact.prenom, action.contact.nom].filter(Boolean).join(" ") : action.contactLabel || "—"}</td>
+                          <td data-label="Entreprise">{action.entreprise?.nom || "—"}</td>
+                          <td data-label="Responsable">{action.responsable?.username || "—"}</td>
+                          <td data-label="Canal / durée">{action.canal || "—"}<small>{action.dureeMinutes == null ? "Durée non définie" : `${action.dureeMinutes} min`}</small></td>
+                          <td data-label="Échéance / réalisation">{formatDate(action.dateEcheance)}<small>Réalisation : {formatDate(action.dateRealisation)}</small></td>
+                          <td data-label="Prochaine action / résultat">{action.prochaineAction || action.resultat || action.details || "—"}</td>
+                          <td data-label="Gestion">
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>

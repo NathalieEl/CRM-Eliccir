@@ -145,16 +145,16 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
                     <tbody>
                       {filteredActivities.map((activity) => (
                         <tr key={activity.id}>
-                          <td><b>{activity.titre}</b></td>
-                          <td>{activity.type}<small>{activity.canal || "Canal non renseigné"}</small></td>
-                          <td>{activity.contact ? [activity.contact.prenom, activity.contact.nom].filter(Boolean).join(" ") : activity.contactLabel || "—"}</td>
-                          <td>{activity.entreprise?.nom || "—"}</td>
-                          <td>{activity.statut || "—"}</td>
-                          <td>{activity.responsable?.username || "—"}</td>
-                          <td>{formatDate(activity.date)}<small>Réalisation : {formatDate(activity.dateRealisation)}</small></td>
-                          <td>{activity.dureeMinutes == null ? "—" : `${activity.dureeMinutes} min`}</td>
-                          <td>{activity.prochaineAction || activity.resultat || activity.details || "—"}</td>
-                          <td>
+                          <td data-label="Titre"><b>{activity.titre}</b></td>
+                          <td data-label="Type / canal">{activity.type}<small>{activity.canal || "Canal non renseigné"}</small></td>
+                          <td data-label="Contact">{activity.contact ? [activity.contact.prenom, activity.contact.nom].filter(Boolean).join(" ") : activity.contactLabel || "—"}</td>
+                          <td data-label="Entreprise">{activity.entreprise?.nom || "—"}</td>
+                          <td data-label="Statut">{activity.statut || "—"}</td>
+                          <td data-label="Responsable">{activity.responsable?.username || "—"}</td>
+                          <td data-label="Date prévue / réalisation">{formatDate(activity.date)}<small>Réalisation : {formatDate(activity.dateRealisation)}</small></td>
+                          <td data-label="Durée">{activity.dureeMinutes == null ? "—" : `${activity.dureeMinutes} min`}</td>
+                          <td data-label="Prochaine action / résultat">{activity.prochaineAction || activity.resultat || activity.details || "—"}</td>
+                          <td data-label="Gestion">
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
