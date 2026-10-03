@@ -57,10 +57,11 @@ function isPrismaCode(error: unknown, code: string) {
   return typeof error === "object" && error !== null && "code" in error && error.code === code;
 }
 
-function refreshCompanyPages() {
+function refreshCompanyPages(entrepriseId?: string) {
   for (const path of ["/companies", "/contacts", "/activities", "/actions", "/projects", "/search", "/"]) {
     revalidatePath(path);
   }
+  if (entrepriseId) revalidatePath(`/companies/${entrepriseId}`);
 }
 
 export async function createEntreprise(formData: FormData) {
@@ -95,19 +96,19 @@ export async function updateEntreprise(formData: FormData) {
     where: { id: { not: id }, nom: { equals: entreprise.nom, mode: "insensitive" } },
     select: { id: true },
   });
-  if (duplicate) redirect("/companies?error=exists");
+  if (duplicate) redirect(`/companies/${id}?error=exists`);
 
   try {
     const updated = await prisma.entreprise.update({ where: { id }, data: entreprise });
     await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "updated", entity: "entreprise", entityId: updated.id, details: `name=${updated.nom}` });
   } catch (error) {
-    if (isPrismaCode(error, "P2002")) redirect("/companies?error=exists");
+    if (isPrismaCode(error, "P2002")) redirect(`/companies/${id}?error=exists`);
     if (isPrismaCode(error, "P2025")) redirect("/companies?error=not-found");
     throw error;
   }
 
-  refreshCompanyPages();
-  redirect("/companies?notice=updated");
+  refreshCompanyPages(id);
+  redirect(`/companies/${id}?notice=updated`);
 }
 
 export async function deleteEntreprise(formData: FormData) {
@@ -148,15 +149,15 @@ export async function linkContactToEntreprise(formData: FormData) {
   });
   await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "linked", entity: "entreprise_contact", entityId: contactId, details: `entreprise=${link.entreprise.nom};contact=${[link.contact.prenom, link.contact.nom].filter(Boolean).join(" ")}` });
 
-  refreshCompanyPages();
-  redirect("/companies?notice=linked");
+  refreshCompanyPages(entrepriseId);
+  redirect(`/companies/${entrepriseId}?notice=linked`);
 }
 
 export async function unlinkContactFromEntreprise(formData: FormData) {
   const currentUser = await requirePermission("crm.write");
   const entrepriseId = field(formData, "entrepriseId");
   const contactId = field(formData, "contactId");
-  if (!entrepriseId || !contactId || field(formData, "confirmed") !== "yes") redirect("/companies?error=confirm-unlink");
+  if (!entrepriseId || !contactId || field(formData, "confirmed") !== "yes") redirect(`/companies/${entrepriseId}?error=confirm-unlink`);
 
   const link = await prisma.entrepriseContact.findUnique({
     where: { entrepriseId_contactId: { entrepriseId, contactId } },
@@ -167,6 +168,6 @@ export async function unlinkContactFromEntreprise(formData: FormData) {
     await recordAudit({ actorId: currentUser.id, actorUsername: currentUser.username, action: "unlinked", entity: "entreprise_contact", entityId: contactId, details: `entreprise=${link.entreprise.nom};contact=${[link.contact.prenom, link.contact.nom].filter(Boolean).join(" ")}` });
   }
 
-  refreshCompanyPages();
-  redirect("/companies?notice=unlinked");
+  refreshCompanyPages(entrepriseId);
+  redirect(`/companies/${entrepriseId}?notice=unlinked`);
 }

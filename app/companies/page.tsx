@@ -1,14 +1,8 @@
 import Link from "next/link";
-import {
-  createEntreprise,
-  deleteEntreprise,
-  linkContactToEntreprise,
-  unlinkContactFromEntreprise,
-  updateEntreprise,
-} from "@/app/companies/actions";
+import { createEntreprise } from "@/app/companies/actions";
+import { CompanyFields } from "@/app/companies/company-fields";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
-import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type EntrepriseRecord = Prisma.EntrepriseGetPayload<{
@@ -16,10 +10,6 @@ type EntrepriseRecord = Prisma.EntrepriseGetPayload<{
     contacts: { include: { contact: true } };
     _count: { select: { activities: true; actionItems: true; projects: true } };
   };
-}>;
-
-type ContactOption = Prisma.ContactGetPayload<{
-  select: { id: true; prenom: true; nom: true; email: true };
 }>;
 
 type CompaniesPageProps = {
@@ -43,24 +33,8 @@ const errors: Record<string, string> = {
   "confirm-unlink": "Confirmez le retrait du contact.",
 };
 
-function contactName(contact: ContactOption | EntrepriseRecord["contacts"][number]["contact"]) {
+function contactName(contact: EntrepriseRecord["contacts"][number]["contact"]) {
   return [contact.prenom, contact.nom].filter(Boolean).join(" ");
-}
-
-function CompanyFields({ entreprise }: { entreprise?: EntrepriseRecord }) {
-  return (
-    <>
-      <label>Nom de l’entreprise<input name="nom" defaultValue={entreprise?.nom ?? ""} required minLength={2} maxLength={160} /></label>
-      <label>E-mail<input name="email" type="email" defaultValue={entreprise?.email ?? ""} maxLength={254} /></label>
-      <label>Téléphone<input name="telephone" type="tel" defaultValue={entreprise?.telephone ?? ""} maxLength={40} /></label>
-      <label>Site web<input name="siteWeb" type="url" defaultValue={entreprise?.siteWeb ?? ""} maxLength={254} /></label>
-      <label>Secteur<input name="secteur" defaultValue={entreprise?.secteur ?? ""} maxLength={80} /></label>
-      <label>Adresse<input name="adresse" defaultValue={entreprise?.adresse ?? ""} maxLength={160} /></label>
-      <label>Ville<input name="ville" defaultValue={entreprise?.ville ?? ""} maxLength={80} /></label>
-      <label>Département<input name="departement" defaultValue={entreprise?.departement ?? ""} maxLength={20} /></label>
-      <label>Pays<input name="pays" defaultValue={entreprise?.pays ?? ""} maxLength={80} /></label>
-    </>
-  );
 }
 
 export default async function CompaniesPage({ searchParams }: CompaniesPageProps) {
@@ -70,22 +44,15 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
   const query = (params.q ?? "").trim().toLowerCase();
   let databaseAvailable = true;
   let entreprises: EntrepriseRecord[] = [];
-  let contacts: ContactOption[] = [];
 
   try {
-    [entreprises, contacts] = await Promise.all([
-      prisma.entreprise.findMany({
-        include: {
-          contacts: { include: { contact: true } },
-          _count: { select: { activities: true, actionItems: true, projects: true } },
-        },
-        orderBy: { nom: "asc" },
-      }),
-      prisma.contact.findMany({
-        select: { id: true, prenom: true, nom: true, email: true },
-        orderBy: [{ nom: "asc" }, { prenom: "asc" }],
-      }),
-    ]);
+    entreprises = await prisma.entreprise.findMany({
+      include: {
+        contacts: { include: { contact: true } },
+        _count: { select: { activities: true, actionItems: true, projects: true } },
+      },
+      orderBy: { nom: "asc" },
+    });
   } catch {
     databaseAvailable = false;
   }
@@ -123,7 +90,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
             <input id="companies-search" name="q" type="search" defaultValue={params.q ?? ""} placeholder="Rechercher une entreprise ou un contact" autoComplete="off" />
             <button type="submit">Rechercher</button>
           </form>
-          {query ? <a className="contacts-search-reset" href="/companies">Réinitialiser</a> : null}
+          {query ? <Link className="contacts-search-reset" href="/companies">Réinitialiser</Link> : null}
         </section>
 
         {params.notice && notices[params.notice] && <p className="contacts-message" role="status">{notices[params.notice]}</p>}
@@ -152,62 +119,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                         <td><b>{entreprise.nom}</b><small>{[entreprise.ville, entreprise.pays].filter(Boolean).join(" · ") || entreprise.secteur || "Coordonnées non renseignées"}</small></td>
                         <td><b>{entreprise.contacts.length} contact{entreprise.contacts.length === 1 ? "" : "s"}</b><small>{entreprise.contacts.slice(0, 3).map(({ contact }) => contactName(contact)).join(", ")}{entreprise.contacts.length > 3 ? "…" : ""}</small></td>
                         <td><span>{entreprise._count.activities} activité{entreprise._count.activities === 1 ? "" : "s"}</span><small>{entreprise._count.actionItems} action{entreprise._count.actionItems === 1 ? "" : "s"} · {entreprise._count.projects} projet{entreprise._count.projects === 1 ? "" : "s"}</small></td>
-                        <td>
-                          <div className="contact-row-actions">
-                              <details className="contact-view-details">
-                                <summary>Voir</summary>
-                                <div className="contact-detail-card company-detail-card">
-                                  <h3>{entreprise.nom}</h3>
-                                  <dl>
-                                    <dt>E-mail</dt><dd>{entreprise.email || "—"}</dd>
-                                    <dt>Téléphone</dt><dd>{entreprise.telephone || "—"}</dd>
-                                    <dt>Site web</dt><dd>{entreprise.siteWeb ? <a href={entreprise.siteWeb} target="_blank" rel="noreferrer">{entreprise.siteWeb}</a> : "—"}</dd>
-                                    <dt>Secteur</dt><dd>{entreprise.secteur || "—"}</dd>
-                                    <dt>Adresse</dt><dd>{entreprise.adresse || "—"}</dd>
-                                    <dt>Ville</dt><dd>{entreprise.ville || "—"}</dd>
-                                    <dt>Département</dt><dd>{entreprise.departement || "—"}</dd>
-                                    <dt>Pays</dt><dd>{entreprise.pays || "—"}</dd>
-                                    <dt>Créée le</dt><dd>{entreprise.createdAt.toLocaleDateString("fr-FR")}</dd>
-                                    <dt>Modifiée le</dt><dd>{entreprise.updatedAt.toLocaleDateString("fr-FR")}</dd>
-                                  </dl>
-                                </div>
-                              </details>
-                              {canWrite ? <details className="company-edit-details">
-                                <summary>Modifier</summary>
-                                <UnsavedChangesForm action={updateEntreprise} className="company-edit-form">
-                                  <input type="hidden" name="id" value={entreprise.id} />
-                                  <CompanyFields entreprise={entreprise} />
-                                  <Link className="contact-cancel-link" href="/companies">Annuler</Link>
-                                  <button className="contact-primary-button" type="submit">Enregistrer</button>
-                                </UnsavedChangesForm>
-                              </details> : null}
-                            <details className="contact-edit-details">
-                              <summary>Contacts liés</summary>
-                              <div className="company-manage-panel">
-                                <h3>Contacts rattachés</h3>
-                                {entreprise.contacts.length ? entreprise.contacts.map(({ contact, poste }) => (
-                                  canWrite ? <form action={unlinkContactFromEntreprise} className="company-contact-row" key={contact.id}>
-                                    <input type="hidden" name="entrepriseId" value={entreprise.id} />
-                                    <input type="hidden" name="contactId" value={contact.id} />
-                                    <span><b>{contactName(contact)}</b><small>{poste || contact.email || "Fonction non renseignée"}</small></span>
-                                    <label className="company-unlink-confirm"><input name="confirmed" value="yes" type="checkbox" required /> Retirer</label>
-                                    <button type="submit">Détacher</button>
-                                  </form> : <div className="company-contact-row" key={contact.id}><span><b>{contactName(contact)}</b><small>{poste || contact.email || "Fonction non renseignée"}</small></span></div>
-                                )) : <p className="contacts-empty">Aucun contact rattaché.</p>}
-                                {canWrite ? <UnsavedChangesForm action={linkContactToEntreprise} className="company-link-form">
-                                  <input type="hidden" name="entrepriseId" value={entreprise.id} />
-                                  <label>Contact<select name="contactId" required defaultValue=""><option value="" disabled>Choisir un contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{contactName(contact)}{contact.email ? ` · ${contact.email}` : ""}</option>)}</select></label>
-                                  <label>Fonction dans cette entreprise<input name="poste" maxLength={120} placeholder="Consultant, conseiller…" /></label>
-                                  <Link className="contact-cancel-link" href="/companies">Annuler</Link>
-                                  <button className="contact-primary-button" type="submit">Rattacher le contact</button>
-                                </UnsavedChangesForm> : null}
-                                {canWrite ? <>
-                                  <form action={deleteEntreprise} className="company-delete-form"><input type="hidden" name="id" value={entreprise.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer l’entreprise</button></form>
-                                </> : null}
-                              </div>
-                            </details>
-                          </div>
-                        </td>
+                        <td><Link className="contact-profile-link" href={`/companies/${entreprise.id}`}>Ouvrir la fiche</Link></td>
                       </tr>
                     ))}</tbody>
                   </table>

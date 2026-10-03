@@ -381,6 +381,25 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contact-note-item form { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; }
 .contact-note-item form label { color: #56645a; font-size: 12px; }
 .contact-profile-link { color: var(--green); display: inline-block; font-size: 13px; font-weight: 650; white-space: nowrap; }
+.company-profile-summary { display: grid; gap: 12px 20px; grid-template-columns: minmax(130px, 220px) minmax(0, 1fr); margin: 0; max-width: 880px; }
+.company-profile-summary dt { color: #68756c; font-size: 14px; }
+.company-profile-summary dd { color: #344138; font-size: 15px; margin: 0; overflow-wrap: anywhere; }
+.company-profile-summary a { color: var(--green); }
+.company-profile-form { display: grid; gap: 16px; }
+.company-profile-table { min-width: 0; }
+.company-unlink-row { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; }
+.company-unlink-row label { align-items: center; color: #56645a; display: flex; font-size: 12px; gap: 5px; }
+.company-unlink-row button { background: #a84938; border: 0; border-radius: 3px; color: #fff; cursor: pointer; font: inherit; font-size: 12px; min-height: 36px; padding: 0 10px; }
+.company-link-form-full { border-top: 1px solid #e9ece7; display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 800px; padding-top: 16px; }
+.company-link-form-full label { color: #56645a; display: grid; font-size: 13px; font-weight: 600; gap: 6px; }
+.company-link-form-full input, .company-link-form-full select { background: #fff; border: 1px solid #dfe4de; border-radius: 3px; color: #27362d; font: inherit; font-size: 14px; height: 42px; min-width: 0; padding: 0 10px; }
+.company-link-form-full > *:nth-last-child(-n + 2) { justify-self: start; }
+.company-activity-counts { color: #56645a; display: flex; flex-wrap: wrap; font-size: 14px; gap: 16px; padding-top: 16px; }
+.company-delete-section { border-color: #f0d6ce; }
+.company-delete-section h2 { color: #8e4536; font-size: 16px; }
+.company-delete-form-full { align-items: center; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.company-delete-form-full label { align-items: center; color: #56645a; display: flex; font-size: 13px; gap: 8px; }
+.company-delete-form-full button { background: #a84938; border: 0; border-radius: 3px; color: #fff; cursor: pointer; font: inherit; font-size: 14px; min-height: 42px; padding: 0 14px; }
 .companies-records { min-width: 0; table-layout: fixed; }
 .companies-records th:nth-child(1), .companies-records td:nth-child(1) { width: 25%; }
 .companies-records th:nth-child(2), .companies-records td:nth-child(2) { width: 38%; }
@@ -435,6 +454,9 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
   .profile-fields-grid, .contact-note-form { grid-template-columns: minmax(0, 1fr); }
   .contact-note-form .note-content-field, .contact-note-form > button { grid-column: auto; }
   .contact-photo-actions form { align-items: stretch; flex-direction: column; }
+  .company-profile-summary { gap: 5px 12px; grid-template-columns: minmax(0, 1fr); }
+  .company-profile-summary dd { margin-bottom: 7px; }
+  .company-link-form-full { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 760px) {
   .contacts-records-wrap { max-height: none; overflow: visible; }
