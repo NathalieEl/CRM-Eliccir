@@ -146,7 +146,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
               {filtered.length === 0 ? <p className="contacts-empty">Aucune entreprise ne correspond à la recherche.</p> : (
                 <div className="contacts-records-wrap">
                   <table className="contacts-records companies-records">
-                    <thead><tr><th>ENTREPRISE</th><th>CONTACTS</th><th>SUIVI</th><th>GESTION</th></tr></thead>
+                    <thead><tr><th>ENTREPRISE</th><th>CONTACTS</th><th>SUIVI</th><th>ACTIONS</th></tr></thead>
                     <tbody>{filtered.map((entreprise) => (
                       <tr key={entreprise.id}>
                         <td><b>{entreprise.nom}</b><small>{[entreprise.ville, entreprise.pays].filter(Boolean).join(" · ") || entreprise.secteur || "Coordonnées non renseignées"}</small></td>
@@ -154,8 +154,35 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                         <td><span>{entreprise._count.activities} activité{entreprise._count.activities === 1 ? "" : "s"}</span><small>{entreprise._count.actionItems} action{entreprise._count.actionItems === 1 ? "" : "s"} · {entreprise._count.projects} projet{entreprise._count.projects === 1 ? "" : "s"}</small></td>
                         <td>
                           <div className="contact-row-actions">
+                              <details className="contact-view-details">
+                                <summary>Voir</summary>
+                                <div className="contact-detail-card company-detail-card">
+                                  <h3>{entreprise.nom}</h3>
+                                  <dl>
+                                    <dt>E-mail</dt><dd>{entreprise.email || "—"}</dd>
+                                    <dt>Téléphone</dt><dd>{entreprise.telephone || "—"}</dd>
+                                    <dt>Site web</dt><dd>{entreprise.siteWeb ? <a href={entreprise.siteWeb} target="_blank" rel="noreferrer">{entreprise.siteWeb}</a> : "—"}</dd>
+                                    <dt>Secteur</dt><dd>{entreprise.secteur || "—"}</dd>
+                                    <dt>Adresse</dt><dd>{entreprise.adresse || "—"}</dd>
+                                    <dt>Ville</dt><dd>{entreprise.ville || "—"}</dd>
+                                    <dt>Département</dt><dd>{entreprise.departement || "—"}</dd>
+                                    <dt>Pays</dt><dd>{entreprise.pays || "—"}</dd>
+                                    <dt>Créée le</dt><dd>{entreprise.createdAt.toLocaleDateString("fr-FR")}</dd>
+                                    <dt>Modifiée le</dt><dd>{entreprise.updatedAt.toLocaleDateString("fr-FR")}</dd>
+                                  </dl>
+                                </div>
+                              </details>
+                              {canWrite ? <details className="company-edit-details">
+                                <summary>Modifier</summary>
+                                <UnsavedChangesForm action={updateEntreprise} className="company-edit-form">
+                                  <input type="hidden" name="id" value={entreprise.id} />
+                                  <CompanyFields entreprise={entreprise} />
+                                  <Link className="contact-cancel-link" href="/companies">Annuler</Link>
+                                  <button className="contact-primary-button" type="submit">Enregistrer</button>
+                                </UnsavedChangesForm>
+                              </details> : null}
                             <details className="contact-edit-details">
-                              <summary>Gérer</summary>
+                              <summary>Contacts liés</summary>
                               <div className="company-manage-panel">
                                 <h3>Contacts rattachés</h3>
                                 {entreprise.contacts.length ? entreprise.contacts.map(({ contact, poste }) => (
@@ -175,7 +202,6 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                                   <button className="contact-primary-button" type="submit">Rattacher le contact</button>
                                 </UnsavedChangesForm> : null}
                                 {canWrite ? <>
-                                  <details className="company-edit-details"><summary>Modifier l’entreprise</summary><UnsavedChangesForm action={updateEntreprise} className="company-edit-form"><input type="hidden" name="id" value={entreprise.id} /><CompanyFields entreprise={entreprise} /><Link className="contact-cancel-link" href="/companies">Annuler</Link><button className="contact-primary-button" type="submit">Enregistrer</button></UnsavedChangesForm></details>
                                   <form action={deleteEntreprise} className="company-delete-form"><input type="hidden" name="id" value={entreprise.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer l’entreprise</button></form>
                                 </> : null}
                               </div>

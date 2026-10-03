@@ -387,8 +387,9 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .companies-records th:nth-child(3), .companies-records td:nth-child(3) { width: 21%; }
 .companies-records th:nth-child(4), .companies-records td:nth-child(4) { width: 16%; }
 .companies-records td { overflow-wrap: anywhere; }
-.companies-records .contact-row-actions { flex-wrap: wrap; gap: 8px; }
-.companies-records .contact-edit-details summary { white-space: normal; }
+.companies-records .contact-row-actions { align-items: flex-start; flex-direction: column; flex-wrap: wrap; gap: 8px; }
+.companies-records .contact-view-details summary, .companies-records .contact-edit-details summary { white-space: normal; }
+.companies-records .company-detail-card { min-width: min(340px, 80vw); }
 .contacts-data-table th, .contacts-data-table td { overflow-wrap: anywhere; word-break: normal; }
 .contacts-data-table th { font-size: 10px; padding: 10px 7px; }
 .contacts-data-table td { font-size: 12px; padding: 11px 7px; }
