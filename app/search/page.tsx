@@ -39,7 +39,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const filteredContacts = query
     ? contacts.filter((contact) => {
-        const haystack = [contact.nom, contact.email ?? "", contact.telephone ?? "", contact.entreprise ?? ""].join(" ").toLowerCase();
+        const haystack = [contact.prenom ?? "", contact.nom, contact.email ?? "", contact.telephone ?? "", contact.entreprise ?? ""].join(" ").toLowerCase();
         return haystack.includes(query);
       })
     : contacts.slice(0, 4);
@@ -114,7 +114,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   <ul>
                     {filteredContacts.map((contact) => (
                       <li key={contact.id}>
-                        <strong>{contact.nom}</strong>
+                        <strong>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</strong>
                         <span>{contact.email || "Aucun e-mail"}</span>
                         <small>{contact.entreprise || "Entreprise non renseignée"}</small>
                       </li>

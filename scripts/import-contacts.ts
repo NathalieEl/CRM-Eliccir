@@ -41,7 +41,8 @@ async function main() {
   const contacts = rows
     .map((row) => ({
       email: optional(row.email),
-      nom: [row.prenom, row.nom].filter(Boolean).join(" ").trim(),
+      prenom: optional(row.prenom) ?? "",
+      nom: optional(row.nom) ?? "",
       telephone: optional(row.telephone_mobile) ?? optional(row.telephone_fixe),
       entreprise: optional(row.entreprise),
       poste: optional(row.poste),
@@ -54,7 +55,7 @@ async function main() {
       linkedin: optional(row.linkedin),
       createdAt: createdAt(row.date_creation),
     }))
-    .filter((contact) => contact.nom && contact.email);
+    .filter((contact) => contact.prenom && contact.nom && contact.email);
 
   console.log(`${contacts.length} contacts valides détectés dans ${filePath}.`);
   if (!apply) {

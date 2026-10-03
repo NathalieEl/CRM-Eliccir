@@ -11,6 +11,7 @@ function field(formData: FormData, name: string) {
 }
 
 function parseContact(formData: FormData) {
+  const prenom = field(formData, "prenom");
   const nom = field(formData, "nom");
   const titre = field(formData, "titre");
   const email = field(formData, "email").toLowerCase();
@@ -27,7 +28,9 @@ function parseContact(formData: FormData) {
   const linkedin = linkedinInput && !/^https?:\/\//i.test(linkedinInput) ? `https://${linkedinInput}` : linkedinInput;
 
   if (
-    nom.length < 2 ||
+    prenom.length < 1 ||
+    prenom.length > 80 ||
+    nom.length < 1 ||
     nom.length > 120 ||
     titre.length > 30 ||
     email.length > 254 ||
@@ -48,6 +51,7 @@ function parseContact(formData: FormData) {
   }
 
   return {
+    prenom,
     nom,
     titre: titre || null,
     email: email || null,

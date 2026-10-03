@@ -14,6 +14,7 @@ model Contact {
   id         String   @id @default(cuid())
   titre      String?
   nom        String
+  prenom     String?
   email      String?  @unique
   telephone  String?
   entreprise String?

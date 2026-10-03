@@ -14,7 +14,7 @@ const notices: Record<string, string> = {
 };
 
 const errors: Record<string, string> = {
-  invalid: "Vérifiez le nom, l’adresse e-mail et la longueur des champs.",
+  invalid: "Vérifiez le prénom, le nom, l’adresse e-mail et la longueur des champs.",
   "email-exists": "Cette adresse e-mail est déjà associée à un contact.",
   "not-found": "Ce contact n’existe plus. Actualisez la liste.",
   "confirm-delete": "Confirmez la suppression avant de continuer.",
@@ -47,6 +47,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const filteredContacts = searchQuery
     ? contacts.filter((contact) => {
         const haystack = [
+          contact.prenom ?? "",
           contact.nom,
           contact.email ?? "",
           contact.telephone ?? "",
@@ -132,7 +133,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               </div>
               <form action={createContact} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
                 <label>Titre<select name="titre" defaultValue=""><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
-                <label>Nom complet<input name="nom" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ex. Camille Martin" /></label>
+                <label>Prénom<input name="prenom" autoComplete="given-name" required maxLength={80} placeholder="Ex. Camille" /></label>
+                <label>Nom<input name="nom" autoComplete="family-name" required maxLength={120} placeholder="Ex. Martin" /></label>
                 <label>E-mail<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
                 <label>Téléphone<input name="telephone" type="tel" autoComplete="tel" maxLength={40} placeholder="+33 6 12 34 56 78" /></label>
                 <label>Entreprise<input name="entreprise" autoComplete="organization" maxLength={120} placeholder="Nom de l’entreprise" /></label>
@@ -163,7 +165,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                     <tbody>
                       {visibleContacts.map((contact) => (
                         <tr key={contact.id}>
-                          <td><b>{[contact.titre, contact.nom].filter(Boolean).join(" ")}</b><small>{contact.email || "Aucun e-mail"}</small></td>
+                          <td><b>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</b><small>{contact.email || "Aucun e-mail"}</small></td>
                           <td>{contact.telephone || "—"}</td>
                           <td><b>{contact.entreprise || "—"}</b><small>{contact.poste || "Poste non renseigné"}</small></td>
                           <td>{contact.secteur || "—"}</td>
@@ -175,14 +177,15 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-view-details">
                                 <summary>Fiche</summary>
-                                <div className="contact-detail-card"><h3>{contact.nom}</h3><dl><dt>E-mail</dt><dd>{contact.email || "—"}</dd><dt>Téléphone</dt><dd>{contact.telephone || "—"}</dd><dt>Entreprise</dt><dd>{contact.entreprise || "—"}</dd><dt>Poste</dt><dd>{contact.poste || "—"}</dd><dt>Secteur</dt><dd>{contact.secteur || "—"}</dd><dt>Ville</dt><dd>{[contact.ville, contact.departement, contact.pays].filter(Boolean).join(" · ") || "—"}</dd><dt>Source</dt><dd>{contact.sourceAcquisition || "—"}</dd><dt>Statut</dt><dd>{contact.statut || "—"}</dd><dt>LinkedIn</dt><dd>{contact.linkedin ? <a href={contact.linkedin.startsWith("http") ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noreferrer">Voir le profil</a> : "—"}</dd></dl></div>
+                                <div className="contact-detail-card"><h3>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</h3><dl><dt>E-mail</dt><dd>{contact.email || "—"}</dd><dt>Téléphone</dt><dd>{contact.telephone || "—"}</dd><dt>Entreprise</dt><dd>{contact.entreprise || "—"}</dd><dt>Poste</dt><dd>{contact.poste || "—"}</dd><dt>Secteur</dt><dd>{contact.secteur || "—"}</dd><dt>Ville</dt><dd>{[contact.ville, contact.departement, contact.pays].filter(Boolean).join(" · ") || "—"}</dd><dt>Source</dt><dd>{contact.sourceAcquisition || "—"}</dd><dt>Statut</dt><dd>{contact.statut || "—"}</dd><dt>LinkedIn</dt><dd>{contact.linkedin ? <a href={contact.linkedin.startsWith("http") ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noreferrer">Voir le profil</a> : "—"}</dd></dl></div>
                               </details>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
                                 <form action={updateContact} className="contact-edit-form">
                                   <input type="hidden" name="id" value={contact.id} />
                                   <label>Titre<select name="titre" defaultValue={contact.titre ?? ""}><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
-                                  <label>Nom complet<input name="nom" defaultValue={contact.nom} required minLength={2} maxLength={120} /></label>
+                                  <label>Prénom<input name="prenom" autoComplete="given-name" defaultValue={contact.prenom ?? ""} required maxLength={80} /></label>
+                                  <label>Nom<input name="nom" autoComplete="family-name" defaultValue={contact.nom} required maxLength={120} /></label>
                                   <label>E-mail<input name="email" type="email" defaultValue={contact.email ?? ""} maxLength={254} /></label>
                                   <label>Téléphone<input name="telephone" type="tel" defaultValue={contact.telephone ?? ""} maxLength={40} /></label>
                                   <label>Entreprise<input name="entreprise" defaultValue={contact.entreprise ?? ""} maxLength={120} /></label>
