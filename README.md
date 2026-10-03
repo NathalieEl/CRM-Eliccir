@@ -1,4 +1,4 @@
-Eliccir CRM est une application Next.js avec PostgreSQL et authentification administrateur par mot de passe et code TOTP.
+Eliccir CRM est une application Next.js avec PostgreSQL. Le 2FA TOTP est en sommeil par défaut et peut être activé explicitement.
 
 ## Configuration d’authentification
 
@@ -8,10 +8,10 @@ Dans Railway, ajoutez ces variables au service `CRM-Eliccir` :
 AUTH_SECRET
 ADMIN_USERNAME
 ADMIN_PASSWORD
-ADMIN_TOTP_SECRET
+TWO_FACTOR_STATUS=Inactive
 ```
 
-`AUTH_SECRET` doit contenir au moins 32 caractères. `ADMIN_TOTP_SECRET` doit être un secret Base32 ajouté dans une application d’authentification. Le premier accès crée automatiquement le compte administrateur et exige le code TOTP.
+`AUTH_SECRET` doit contenir au moins 32 caractères. Le 2FA reste inactif tant que `TWO_FACTOR_STATUS` n’est pas défini sur `Active`. Pour le réactiver, définissez `TWO_FACTOR_STATUS=Active` et configurez `ADMIN_TOTP_SECRET` avec un secret Base32 dans une application d’authentification. Le premier accès crée automatiquement le compte administrateur; il exige un code TOTP uniquement lorsque le statut est `Active`.
 
 ## Getting Started
 

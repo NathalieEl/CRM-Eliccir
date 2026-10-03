@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { createUser, deleteUser, resetTwoFactor, updateUser } from "@/app/users/actions";
-import { requireAdmin } from "@/lib/auth";
+import { isTwoFactorActive, requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PasswordField } from "@/app/components/password-field";
 import { roleLabels, type UserRole } from "@/lib/permissions";
 
 export default async function UsersPage({ searchParams }: { searchParams: Promise<{ created?: string; reset2fa?: string; username?: string; error?: string; notice?: string }> }) {
   await requireAdmin();
+  const twoFactorActive = isTwoFactorActive();
   const params = await searchParams;
   const users = await prisma.user.findMany({ orderBy: { createdAt: "asc" } });
 
@@ -18,7 +19,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
       </header>
       <div className="contacts-content">
         <section className="contacts-title-row">
-          <div><p className="section-index">ESPACE DE TRAVAIL <i>·</i> ADMINISTRATION</p><h1>Utilisateurs</h1><p className="contacts-intro">Créez les accès de votre équipe et activez leur double authentification.</p></div>
+          <div><p className="section-index">ESPACE DE TRAVAIL <i>·</i> ADMINISTRATION</p><h1>Utilisateurs</h1><p className="contacts-intro">Créez les accès de votre équipe. Double authentification : {twoFactorActive ? "Active" : "En sommeil"}.</p></div>
           <span className="contacts-total">{users.length}<small>COMPTES</small></span>
         </section>
 
@@ -27,9 +28,11 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         {params.error === "self" && <p className="auth-error" role="alert">Tu ne peux pas désactiver ou rétrograder ton propre compte.</p>}
         {params.error === "confirm-delete" && <p className="auth-error" role="alert">Confirme la suppression du compte avant de continuer.</p>}
         {params.error === "confirm-2fa" && <p className="auth-error" role="alert">Confirme la réinitialisation de la double authentification.</p>}
+        {params.error === "2fa-inactive" && <p className="auth-error" role="alert">La double authentification est en sommeil.</p>}
         {params.notice === "updated" && <p className="contacts-message" role="status">Le compte a été mis à jour.</p>}
-        {params.created && params.username && <section className="users-setup-note"><h2>Compte créé pour {params.username}</h2><p>Ajoutez ce secret dans l’application d’authentification de l’utilisateur. Il ne sera plus affiché après cette page.</p><code>{params.created}</code></section>}
-        {params.reset2fa && params.username && <section className="users-setup-note"><h2>2FA réinitialisée pour {params.username}</h2><p>Ajoutez ce nouveau secret dans l’application d’authentification. L’ancien secret est désormais invalide.</p><code>{params.reset2fa}</code></section>}
+        {params.notice === "created" && <p className="contacts-message" role="status">Le compte a été créé. Le 2FA est en sommeil.</p>}
+        {twoFactorActive && params.created && params.username && <section className="users-setup-note"><h2>Compte créé pour {params.username}</h2><p>Ajoutez ce secret dans l’application d’authentification de l’utilisateur. Il ne sera plus affiché après cette page.</p><code>{params.created}</code></section>}
+        {twoFactorActive && params.reset2fa && params.username && <section className="users-setup-note"><h2>2FA réinitialisée pour {params.username}</h2><p>Ajoutez ce nouveau secret dans l’application d’authentification. L’ancien secret est désormais invalide.</p><code>{params.reset2fa}</code></section>}
 
         <section className="contacts-create-section">
           <div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Créer un accès</h2></div></div>
@@ -43,7 +46,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
 
         <section className="contacts-list-section">
           <div className="contacts-section-heading"><div><p className="section-index">02 <i>·</i> ACCÈS ACTIFS</p><h2>Comptes existants</h2></div></div>
-          <div className="users-table-wrap"><table className="contacts-records"><thead><tr><th>UTILISATEUR</th><th>PROFIL</th><th>ÉTAT</th><th>GESTION</th></tr></thead><tbody>{users.map((user) => <tr key={user.id}><td><b>{user.username}</b><small>2FA activée</small></td><td>{roleLabels[user.role as UserRole] ?? roleLabels.member}</td><td>{user.active ? "Actif" : "Désactivé"}</td><td><div className="user-row-actions"><details><summary>Modifier</summary><form action={updateUser} className="user-edit-form"><input type="hidden" name="id" value={user.id} /><label>Profil<select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label><label>Nouveau mot de passe<input name="password" type="password" minLength={8} placeholder="Laisser vide pour conserver" /></label><label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /> Compte actif</label><button className="contact-primary-button" type="submit">Enregistrer</button></form></details><details><summary>Réinitialiser 2FA</summary><form action={resetTwoFactor} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la réinitialisation</label><button type="submit">Générer un nouveau secret</button></form></details><details><summary className="user-delete-button">Supprimer</summary><form action={deleteUser} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer définitivement</button></form></details></div></td></tr>)}</tbody></table></div>
+          <div className="users-table-wrap"><table className="contacts-records"><thead><tr><th>UTILISATEUR</th><th>PROFIL</th><th>ÉTAT</th><th>GESTION</th></tr></thead><tbody>{users.map((user) => <tr key={user.id}><td><b>{user.username}</b><small>{twoFactorActive ? "2FA active" : "2FA en sommeil"}</small></td><td>{roleLabels[user.role as UserRole] ?? roleLabels.member}</td><td>{user.active ? "Actif" : "Désactivé"}</td><td><div className="user-row-actions"><details><summary>Modifier</summary><form action={updateUser} className="user-edit-form"><input type="hidden" name="id" value={user.id} /><label>Profil<select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label><label>Nouveau mot de passe<input name="password" type="password" minLength={8} placeholder="Laisser vide pour conserver" /></label><label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /> Compte actif</label><button className="contact-primary-button" type="submit">Enregistrer</button></form></details>{twoFactorActive ? <details><summary>Réinitialiser 2FA</summary><form action={resetTwoFactor} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la réinitialisation</label><button type="submit">Générer un nouveau secret</button></form></details> : null}<details><summary className="user-delete-button">Supprimer</summary><form action={deleteUser} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer définitivement</button></form></details></div></td></tr>)}</tbody></table></div>
         </section>
       </div>
     </main>

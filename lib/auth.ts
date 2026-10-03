@@ -1,9 +1,13 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
-import { verifySync } from "otplib";
+import { generateSecret, verifySync } from "otplib";
 import { prisma } from "@/lib/prisma";
 import { sessionCookie, sessionDuration, signSession, verifySession } from "@/lib/session-token";
 import { requirePermission } from "@/lib/permissions";
+
+export function isTwoFactorActive() {
+  return process.env.TWO_FACTOR_STATUS?.trim().toLowerCase() === "active";
+}
 
 export async function createSession(userId: string) {
   const token = await signSession(userId);
@@ -43,7 +47,7 @@ export async function authenticate(username: string, password: string, code: str
     : await prisma.user.findUnique({ where: { username } });
 
   if (!user || !user.active || user.username !== username || !(await bcrypt.compare(password, user.passwordHash))) return false;
-  if (process.env.NODE_ENV === "development") return true;
+  if (!isTwoFactorActive()) return true;
 
   try {
     return verifySync({ token: code.replace(/\s/g, ""), secret: user.twoFactorSecret }).valid;
@@ -55,10 +59,11 @@ export async function authenticate(username: string, password: string, code: str
 async function provisionAdmin() {
   const username = process.env.ADMIN_USERNAME;
   const password = process.env.ADMIN_PASSWORD;
-  const twoFactorSecret = process.env.ADMIN_TOTP_SECRET;
-  if (!username || !password || !twoFactorSecret) return null;
+  const configuredTwoFactorSecret = process.env.ADMIN_TOTP_SECRET;
+  if (!username || !password || (isTwoFactorActive() && !configuredTwoFactorSecret)) return null;
 
   const existing = await prisma.user.findUnique({ where: { username } });
+  const twoFactorSecret = configuredTwoFactorSecret ?? existing?.twoFactorSecret ?? generateSecret();
   if (existing) {
     return prisma.user.update({
       where: { id: existing.id },

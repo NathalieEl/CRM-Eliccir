@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { generateSecret } from "otplib";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { isTwoFactorActive, requireAdmin } from "@/lib/auth";
 import type { UserRole } from "@/lib/permissions";
 
 const editableRoles: UserRole[] = ["admin", "management", "sales", "member"];
@@ -37,7 +37,10 @@ export async function createUser(formData: FormData) {
     },
   });
 
-  redirect(`/users?created=${encodeURIComponent(twoFactorSecret)}&username=${encodeURIComponent(username)}`);
+  if (isTwoFactorActive()) {
+    redirect(`/users?created=${encodeURIComponent(twoFactorSecret)}&username=${encodeURIComponent(username)}`);
+  }
+  redirect("/users?notice=created");
 }
 
 export async function deleteUser(formData: FormData) {
@@ -72,6 +75,7 @@ export async function updateUser(formData: FormData) {
 
 export async function resetTwoFactor(formData: FormData) {
   await requireAdmin();
+  if (!isTwoFactorActive()) redirect("/users?error=2fa-inactive");
   const id = String(formData.get("id") ?? "");
   if (!id || formData.get("confirmed") !== "yes") redirect("/users?error=confirm-2fa");
 

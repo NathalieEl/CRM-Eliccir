@@ -1,8 +1,9 @@
 import { login } from "@/app/login/actions";
 import { PasswordField } from "@/app/components/password-field";
+import { isTwoFactorActive } from "@/lib/auth";
 
 const messages = {
-  invalid: "Identifiants ou code de double authentification incorrects.",
+  invalid: "Identifiants invalides ou authentification incorrecte.",
   unavailable: "Le service d’authentification est momentanément indisponible.",
 };
 
@@ -24,7 +25,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <form action={login} className="auth-form">
           <label>Nom d’utilisateur<input name="username" autoComplete="username" required /></label>
           <PasswordField name="password" label="Mot de passe" autoComplete="current-password" />
-          {process.env.NODE_ENV === "development" ? null : <label>Code 2FA<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" required /></label>}
+          {isTwoFactorActive() ? <label>Code 2FA<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" required /></label> : null}
           <button className="contact-primary-button" type="submit">Se connecter <span>↗</span></button>
         </form>
       </section>

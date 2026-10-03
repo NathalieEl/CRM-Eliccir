@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { authenticate, clearSession, createSession } from "@/lib/auth";
+import { authenticate, clearSession, createSession, isTwoFactorActive } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function login(formData: FormData) {
@@ -9,7 +9,7 @@ export async function login(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const code = String(formData.get("code") ?? "");
 
-  const requiresTwoFactor = process.env.NODE_ENV !== "development";
+  const requiresTwoFactor = isTwoFactorActive();
   if (!username || !password || (requiresTwoFactor && !/^\d{6}$/.test(code.replace(/\s/g, "")))) {
     redirect("/login?error=invalid");
   }
