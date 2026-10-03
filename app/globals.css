@@ -381,6 +381,14 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contact-note-item form { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; }
 .contact-note-item form label { color: #56645a; font-size: 12px; }
 .contact-profile-link { color: var(--green); display: inline-block; font-size: 13px; font-weight: 650; white-space: nowrap; }
+.companies-records { min-width: 0; table-layout: fixed; }
+.companies-records th:nth-child(1), .companies-records td:nth-child(1) { width: 25%; }
+.companies-records th:nth-child(2), .companies-records td:nth-child(2) { width: 38%; }
+.companies-records th:nth-child(3), .companies-records td:nth-child(3) { width: 21%; }
+.companies-records th:nth-child(4), .companies-records td:nth-child(4) { width: 16%; }
+.companies-records td { overflow-wrap: anywhere; }
+.companies-records .contact-row-actions { flex-wrap: wrap; gap: 8px; }
+.companies-records .contact-edit-details summary { white-space: normal; }
 
 @media (max-width: 760px) {
   .profile-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

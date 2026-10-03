@@ -145,7 +145,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
               <div className="contacts-section-heading"><div><p className="section-index">02 · PORTFEUILLE</p><h2>Entreprises enregistrées</h2></div><span className="contacts-list-count">{filtered.length}</span></div>
               {filtered.length === 0 ? <p className="contacts-empty">Aucune entreprise ne correspond à la recherche.</p> : (
                 <div className="contacts-records-wrap">
-                  <table className="contacts-records">
+                  <table className="contacts-records companies-records">
                     <thead><tr><th>ENTREPRISE</th><th>CONTACTS</th><th>SUIVI</th><th>GESTION</th></tr></thead>
                     <tbody>{filtered.map((entreprise) => (
                       <tr key={entreprise.id}>
