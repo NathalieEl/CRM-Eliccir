@@ -192,7 +192,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         {!databaseAvailable ? (
           <section className="contacts-database-error" role="alert">
             <h2>La base de données est inaccessible</h2>
-            <p>Ajoutez la variable <code>DATABASE_URL</code> puis rechargez la page pour activer la recherche globale sur les données vivantes.</p>
+            <p>Ajoute la variable <code>DATABASE_URL</code> puis recharge la page pour activer la recherche globale sur les données vivantes.</p>
           </section>
         ) : (
           <>
