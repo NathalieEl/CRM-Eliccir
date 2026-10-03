@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { createContact, deleteContact, updateContact } from "@/app/contacts/actions";
+import { createContact, deleteContact } from "@/app/contacts/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
-import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type ContactRecord = Prisma.ContactGetPayload<{
@@ -182,41 +181,16 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                           <td>{contact.sourceAcquisition || "—"}</td>
                           <td><time dateTime={contact.updatedAt.toISOString()}>{contact.updatedAt.toLocaleDateString("fr-FR")}</time></td>
                           <td>
-                            <Link className="contact-profile-link" href={`/contacts/${contact.id}`}>Profil complet</Link>
-                            <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
-                              <details className="contact-view-details">
-                                <summary>Fiche</summary>
-                                <div className="contact-detail-card"><h3>{[contact.titre, contact.prenom, contact.nom].filter(Boolean).join(" ")}</h3><dl><dt>E-mail</dt><dd>{contact.email || "—"}</dd><dt>Téléphone</dt><dd>{contact.telephone || "—"}</dd><dt>Entreprises</dt><dd>{contact.entreprises.map(({ entreprise, poste }) => `${entreprise.nom}${poste ? ` · ${poste}` : ""}`).join(", ") || "—"}</dd><dt>Secteur</dt><dd>{contact.secteur || "—"}</dd><dt>Ville</dt><dd>{[contact.ville, contact.departement, contact.pays].filter(Boolean).join(" · ") || "—"}</dd><dt>Source</dt><dd>{contact.sourceAcquisition || "—"}</dd><dt>Statut</dt><dd>{contact.statut || "—"}</dd><dt>LinkedIn</dt><dd>{contact.linkedin ? <a href={contact.linkedin.startsWith("http") ? contact.linkedin : `https://${contact.linkedin}`} target="_blank" rel="noreferrer">Voir le profil</a> : "—"}</dd></dl></div>
-                              </details>
-                              <details className="contact-edit-details">
-                                <summary>Modifier</summary>
-                                <UnsavedChangesForm action={updateContact} className="contact-edit-form">
-                                  <input type="hidden" name="id" value={contact.id} />
-                                  <label>Titre<select name="titre" defaultValue={contact.titre ?? ""}><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
-                                  <label>Prénom<input name="prenom" autoComplete="given-name" defaultValue={contact.prenom ?? ""} required maxLength={80} /></label>
-                                  <label>Nom<input name="nom" autoComplete="family-name" defaultValue={contact.nom} required maxLength={120} /></label>
-                                  <label>E-mail<input name="email" type="email" defaultValue={contact.email ?? ""} maxLength={254} /></label>
-                                  <label>Téléphone<input name="telephone" type="tel" defaultValue={contact.telephone ?? ""} maxLength={40} /></label>
-                                  <label>Entreprises<select name="entrepriseIds" multiple size={3} defaultValue={contact.entreprises.map(({ entrepriseId }) => entrepriseId)}>{entrepriseOptions.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-                                  <label>Secteur<input name="secteur" defaultValue={contact.secteur ?? ""} maxLength={80} /></label>
-                                  <label>Ville<input name="ville" defaultValue={contact.ville ?? ""} maxLength={80} /></label>
-                                  <label>Département<input name="departement" defaultValue={contact.departement ?? ""} maxLength={20} /></label>
-                                  <label>Pays<input name="pays" defaultValue={contact.pays ?? ""} maxLength={80} /></label>
-                                  <label>Source<input name="sourceAcquisition" defaultValue={contact.sourceAcquisition ?? ""} maxLength={120} /></label>
-                                  <label>Statut<input name="statut" defaultValue={contact.statut ?? ""} maxLength={80} /></label>
-                                  <label>LinkedIn<input name="linkedin" type="url" defaultValue={contact.linkedin ?? ""} maxLength={254} /></label>
-                                  <Link className="contact-cancel-link" href="/contacts">Annuler</Link>
-                                  <button className="contact-primary-button" type="submit">Enregistrer</button>
-                                </UnsavedChangesForm>
-                              </details>
-                              <details className="contact-delete-details">
+                            <div className="contact-row-actions">
+                              <Link className="contact-profile-link" href={`/contacts/${contact.id}`}>Profil complet</Link>
+                              {canWrite ? <details className="contact-delete-details">
                                 <summary>Supprimer</summary>
                                 <form action={deleteContact} className="contact-delete-form">
                                   <input type="hidden" name="id" value={contact.id} />
                                   <label><input type="checkbox" name="confirmed" value="yes" required /> Confirmer la suppression</label>
                                   <button type="submit">Supprimer ce contact</button>
                                 </form>
-                              </details>
+                              </details> : null}
                             </div>
                           </td>
                         </tr>
