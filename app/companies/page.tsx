@@ -8,6 +8,7 @@ import {
 } from "@/app/companies/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type EntrepriseRecord = Prisma.EntrepriseGetPayload<{
@@ -166,14 +167,15 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                                     <button type="submit">Détacher</button>
                                   </form> : <div className="company-contact-row" key={contact.id}><span><b>{contactName(contact)}</b><small>{poste || contact.email || "Fonction non renseignée"}</small></span></div>
                                 )) : <p className="contacts-empty">Aucun contact rattaché.</p>}
-                                {canWrite ? <form action={linkContactToEntreprise} className="company-link-form">
+                                {canWrite ? <UnsavedChangesForm action={linkContactToEntreprise} className="company-link-form">
                                   <input type="hidden" name="entrepriseId" value={entreprise.id} />
                                   <label>Contact<select name="contactId" required defaultValue=""><option value="" disabled>Choisir un contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{contactName(contact)}{contact.email ? ` · ${contact.email}` : ""}</option>)}</select></label>
                                   <label>Fonction dans cette entreprise<input name="poste" maxLength={120} placeholder="Consultant, conseiller…" /></label>
+                                  <Link className="contact-cancel-link" href="/companies">Annuler</Link>
                                   <button className="contact-primary-button" type="submit">Rattacher le contact</button>
-                                </form> : null}
+                                </UnsavedChangesForm> : null}
                                 {canWrite ? <>
-                                  <details className="company-edit-details"><summary>Modifier l’entreprise</summary><form action={updateEntreprise} className="company-edit-form"><input type="hidden" name="id" value={entreprise.id} /><CompanyFields entreprise={entreprise} /><button className="contact-primary-button" type="submit">Enregistrer</button></form></details>
+                                  <details className="company-edit-details"><summary>Modifier l’entreprise</summary><UnsavedChangesForm action={updateEntreprise} className="company-edit-form"><input type="hidden" name="id" value={entreprise.id} /><CompanyFields entreprise={entreprise} /><Link className="contact-cancel-link" href="/companies">Annuler</Link><button className="contact-primary-button" type="submit">Enregistrer</button></UnsavedChangesForm></details>
                                   <form action={deleteEntreprise} className="company-delete-form"><input type="hidden" name="id" value={entreprise.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer l’entreprise</button></form>
                                 </> : null}
                               </div>

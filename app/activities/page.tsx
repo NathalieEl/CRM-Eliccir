@@ -2,11 +2,13 @@ import Link from "next/link";
 import { createActivity, deleteActivity, updateActivity } from "@/app/activities/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
-type ActivityRecord = Prisma.ActivityGetPayload<{ include: { contact: true; entreprise: true } }>;
+type ActivityRecord = Prisma.ActivityGetPayload<{ include: { contact: true; entreprise: true; responsable: true } }>;
 type ContactOption = { id: string; prenom: string | null; nom: string };
 type EntrepriseOption = { id: string; nom: string };
+type ResponsibleOption = { id: string; username: string };
 
 type ActivitiesPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -38,12 +40,14 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
   let activities: ActivityRecord[] = [];
   let contacts: ContactOption[] = [];
   let entreprises: EntrepriseOption[] = [];
+  let users: ResponsibleOption[] = [];
 
   try {
-    [activities, contacts, entreprises] = await Promise.all([
-      prisma.activity.findMany({ include: { contact: true, entreprise: true }, orderBy: { date: "asc" } }),
+    [activities, contacts, entreprises, users] = await Promise.all([
+      prisma.activity.findMany({ include: { contact: true, entreprise: true, responsable: true }, orderBy: { date: "asc" } }),
       prisma.contact.findMany({ select: { id: true, prenom: true, nom: true }, orderBy: [{ nom: "asc" }, { prenom: "asc" }] }),
       prisma.entreprise.findMany({ select: { id: true, nom: true }, orderBy: { nom: "asc" } }),
+      prisma.user.findMany({ select: { id: true, username: true }, orderBy: { username: "asc" } }),
     ]);
   } catch {
     databaseAvailable = false;
@@ -51,7 +55,7 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
 
   const filteredActivities = searchQuery
     ? activities.filter((activity) => {
-        const haystack = [activity.titre, activity.type, activity.contactLabel ?? "", activity.contact?.prenom ?? "", activity.contact?.nom ?? "", activity.entreprise?.nom ?? "", activity.details ?? ""]
+        const haystack = [activity.titre, activity.type, activity.canal ?? "", activity.resultat ?? "", activity.prochaineAction ?? "", activity.statut ?? "", activity.responsable?.username ?? "", activity.contactLabel ?? "", activity.contact?.prenom ?? "", activity.contact?.nom ?? "", activity.entreprise?.nom ?? "", activity.details ?? ""]
           .join(" ")
           .toLowerCase();
         return haystack.includes(searchQuery.toLowerCase());
@@ -110,7 +114,14 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
                 <label>Contact<select name="contactId" defaultValue=""><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
                 <label>Entreprise<select name="entrepriseId" defaultValue=""><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                 <label>Date<input name="date" type="date" /></label>
+                <label>Canal<input name="canal" maxLength={80} placeholder="Téléphone, e-mail…" /></label>
+                <label>Durée (minutes)<input name="dureeMinutes" type="number" min={0} max={1440} step={5} /></label>
+                <label>Responsable<select name="responsableId" defaultValue=""><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
+                <label>Statut<select name="statut" defaultValue="Planifiée"><option value="Planifiée">Planifiée</option><option value="En cours">En cours</option><option value="Réalisée">Réalisée</option><option value="Annulée">Annulée</option></select></label>
+                <label>Date de réalisation<input name="dateRealisation" type="date" /></label>
+                <label>Prochaine action<input name="prochaineAction" maxLength={1000} /></label>
                 <label style={{ gridColumn: "1 / -1" }}>Détails<input name="details" maxLength={500} placeholder="Résumé de l’activité..." /></label>
+                <label style={{ gridColumn: "1 / -1" }}>Résultat<textarea name="resultat" maxLength={10000} rows={3} /></label>
                 <button className="contact-primary-button" type="submit">Ajouter l’activité <span>+</span></button>
               </form>
             </section>
@@ -130,21 +141,24 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
               ) : (
                 <div className="contacts-records-wrap">
                   <table className="contacts-records">
-                    <thead><tr><th>TITRE</th><th>TYPE</th><th>CONTACT</th><th>ENTREPRISE</th><th>DATE</th><th>DÉTAILS</th><th>GESTION</th></tr></thead>
+                    <thead><tr><th>TITRE</th><th>TYPE / CANAL</th><th>CONTACT</th><th>ENTREPRISE</th><th>STATUT</th><th>RESPONSABLE</th><th>DATE PRÉVUE / RÉALISÉE</th><th>DURÉE</th><th>PROCHAINE ACTION / RÉSULTAT</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredActivities.map((activity) => (
                         <tr key={activity.id}>
                           <td><b>{activity.titre}</b></td>
-                          <td>{activity.type}</td>
+                          <td>{activity.type}<small>{activity.canal || "Canal non renseigné"}</small></td>
                           <td>{activity.contact ? [activity.contact.prenom, activity.contact.nom].filter(Boolean).join(" ") : activity.contactLabel || "—"}</td>
                           <td>{activity.entreprise?.nom || "—"}</td>
-                          <td>{formatDate(activity.date)}</td>
-                          <td>{activity.details || "—"}</td>
+                          <td>{activity.statut || "—"}</td>
+                          <td>{activity.responsable?.username || "—"}</td>
+                          <td>{formatDate(activity.date)}<small>Réalisation : {formatDate(activity.dateRealisation)}</small></td>
+                          <td>{activity.dureeMinutes == null ? "—" : `${activity.dureeMinutes} min`}</td>
+                          <td>{activity.prochaineAction || activity.resultat || activity.details || "—"}</td>
                           <td>
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
-                                <form action={updateActivity} className="contact-edit-form">
+                                <UnsavedChangesForm action={updateActivity} className="contact-edit-form">
                                   <input type="hidden" name="id" value={activity.id} />
                                   <input type="hidden" name="legacyContact" value={activity.contactLabel ?? ""} />
                                   <label>Titre<input name="titre" defaultValue={activity.titre} required minLength={2} maxLength={120} /></label>
@@ -152,9 +166,17 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
                                   <label>Contact<select name="contactId" defaultValue={activity.contactId ?? ""}><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
                                   <label>Entreprise<select name="entrepriseId" defaultValue={activity.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                                   <label>Date<input name="date" type="date" defaultValue={activity.date ? new Date(activity.date).toISOString().slice(0, 10) : ""} /></label>
+                                  <label>Canal<input name="canal" defaultValue={activity.canal ?? ""} maxLength={80} /></label>
+                                  <label>Durée (minutes)<input name="dureeMinutes" type="number" min={0} max={1440} step={5} defaultValue={activity.dureeMinutes ?? ""} /></label>
+                                  <label>Responsable<select name="responsableId" defaultValue={activity.responsableId ?? ""}><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
+                                  <label>Statut<select name="statut" defaultValue={activity.statut ?? "Planifiée"}><option value="Planifiée">Planifiée</option><option value="En cours">En cours</option><option value="Réalisée">Réalisée</option><option value="Annulée">Annulée</option></select></label>
+                                  <label>Date de réalisation<input name="dateRealisation" type="date" defaultValue={activity.dateRealisation ? new Date(activity.dateRealisation).toISOString().slice(0, 10) : ""} /></label>
+                                  <label>Prochaine action<input name="prochaineAction" defaultValue={activity.prochaineAction ?? ""} maxLength={1000} /></label>
                                   <label>Détails<input name="details" defaultValue={activity.details ?? ""} maxLength={500} /></label>
+                                  <label>Résultat<textarea name="resultat" defaultValue={activity.resultat ?? ""} maxLength={10000} rows={3} /></label>
+                                  <Link className="contact-cancel-link" href="/activities">Annuler</Link>
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
-                                </form>
+                                </UnsavedChangesForm>
                               </details>
                               <details className="contact-delete-details">
                                 <summary>Supprimer</summary>

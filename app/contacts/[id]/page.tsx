@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { addContactNote, deleteContactNote, deleteContactPhoto, saveContactProfile, uploadContactPhoto } from "@/app/contacts/profile-actions";
+import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
 import type { Prisma } from "@/app/generated/prisma/client";
@@ -120,13 +121,13 @@ export default async function ContactProfilePage({ params, searchParams }: {
           <div className="contact-photo-row">
             {photo?.photoProfil ? <Image src={`/contacts/${id}/photo`} alt={`Photo de ${contact.prenom ?? ""} ${contact.nom}`} width={144} height={144} unoptimized className="contact-profile-photo" /> : <span className="contact-profile-photo-placeholder">{[contact.prenom?.[0], contact.nom[0]].filter(Boolean).join("").toUpperCase()}</span>}
             {canWrite ? <div className="contact-photo-actions">
-              <form action={uploadContactPhoto} encType="multipart/form-data"><input type="hidden" name="contactId" value={id} /><label>Choisir une image<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required /></label><button className="contact-primary-button" type="submit">Téléverser la photo</button></form>
+              <UnsavedChangesForm action={uploadContactPhoto} encType="multipart/form-data"><input type="hidden" name="contactId" value={id} /><label>Choisir une image<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required /></label><div className="profile-form-actions"><Link className="contact-cancel-link" href="/contacts">Annuler</Link><button className="contact-primary-button" type="submit">Téléverser la photo</button></div></UnsavedChangesForm>
               {photo?.photoProfil ? <form action={deleteContactPhoto}><input type="hidden" name="contactId" value={id} /><button type="submit" className="company-photo-delete">Supprimer la photo</button></form> : null}
             </div> : null}
           </div>
         </section>
 
-        <form action={saveContactProfile} className="contact-profile-form">
+        <UnsavedChangesForm action={saveContactProfile} className="contact-profile-form">
           <input type="hidden" name="contactId" value={id} />
           <section className="contacts-create-section profile-section">
             <div className="contacts-section-heading"><div><p className="section-index">02 · IDENTITÉ</p><h2>Informations personnelles</h2></div></div>
@@ -214,11 +215,11 @@ export default async function ContactProfilePage({ params, searchParams }: {
             <div className="profile-fields-grid profile-repeat-row"><label>Nouvelle clé personnalisée<input name="customKey" /></label><label>Valeur<input name="customValue" /></label></div>
           </section>
           {canWrite ? <div className="profile-form-actions"><Link className="contact-cancel-link" href="/contacts">Annuler</Link><button className="contact-primary-button profile-save-button" type="submit">Enregistrer la fiche</button></div> : null}
-        </form>
+        </UnsavedChangesForm>
 
         <section className="contacts-list-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">09 · HISTORIQUE</p><h2>Notes de rencontre</h2></div><span className="contacts-list-count">{contact.notes.length}</span></div>
-          {canWrite ? <form action={addContactNote} className="contact-note-form"><input type="hidden" name="contactId" value={id} /><label>Date de rencontre<input name="date" type="date" defaultValue={todayInParis()} required /></label><label>Nature<select name="nature" required defaultValue="Telephonique"><option value="Telephonique">Téléphonique</option><option value="Email">Email</option><option value="WhatsApps">WhatsApps</option><option value="Presentiel">Présentiel</option><option value="Autre">Autre</option></select></label><label className="note-content-field">Note<textarea name="contenu" rows={4} maxLength={20000} required placeholder="Compte rendu de l’échange…" /></label><button className="contact-primary-button" type="submit">Ajouter la note <span>+</span></button></form> : null}
+          {canWrite ? <UnsavedChangesForm action={addContactNote} className="contact-note-form"><input type="hidden" name="contactId" value={id} /><label>Date de rencontre<input name="date" type="date" defaultValue={todayInParis()} required /></label><label>Nature<select name="nature" required defaultValue="Telephonique"><option value="Telephonique">Téléphonique</option><option value="Email">Email</option><option value="WhatsApps">WhatsApps</option><option value="Presentiel">Présentiel</option><option value="Autre">Autre</option></select></label><label className="note-content-field">Note<textarea name="contenu" rows={4} maxLength={20000} required placeholder="Compte rendu de l’échange…" /></label><div className="profile-form-actions"><Link className="contact-cancel-link" href="/contacts">Annuler</Link><button className="contact-primary-button" type="submit">Ajouter la note <span>+</span></button></div></UnsavedChangesForm> : null}
           {contact.notes.length ? <div className="contact-note-list">{contact.notes.map((note) => <article className="contact-note-item" key={note.id}><header><div><b>{noteNatureLabels[note.nature] ?? note.nature}</b><time dateTime={dateInput(note.date)}>{new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(note.date)}</time></div><small>Par {note.authorUsername}</small></header><p>{note.contenu}</p>{canWrite ? <form action={deleteContactNote}><input type="hidden" name="contactId" value={id} /><input type="hidden" name="noteId" value={note.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer la note</button></form> : null}</article>)}</div> : <p className="contacts-empty">Aucune note enregistrée pour ce contact.</p>}
         </section>
       </div>

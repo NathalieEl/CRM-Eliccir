@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createContact, deleteContact, updateContact } from "@/app/contacts/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type ContactRecord = Prisma.ContactGetPayload<{
@@ -189,7 +190,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                               </details>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
-                                <form action={updateContact} className="contact-edit-form">
+                                <UnsavedChangesForm action={updateContact} className="contact-edit-form">
                                   <input type="hidden" name="id" value={contact.id} />
                                   <label>Titre<select name="titre" defaultValue={contact.titre ?? ""}><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
                                   <label>Prénom<input name="prenom" autoComplete="given-name" defaultValue={contact.prenom ?? ""} required maxLength={80} /></label>
@@ -206,7 +207,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                                   <label>LinkedIn<input name="linkedin" type="url" defaultValue={contact.linkedin ?? ""} maxLength={254} /></label>
                                   <Link className="contact-cancel-link" href="/contacts">Annuler</Link>
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
-                                </form>
+                                </UnsavedChangesForm>
                               </details>
                               <details className="contact-delete-details">
                                 <summary>Supprimer</summary>

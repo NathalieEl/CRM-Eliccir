@@ -2,11 +2,13 @@ import Link from "next/link";
 import { createAction, deleteAction, updateAction } from "@/app/actions/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
-type ActionRecord = Prisma.ActionItemGetPayload<{ include: { contact: true; entreprise: true } }>;
+type ActionRecord = Prisma.ActionItemGetPayload<{ include: { contact: true; entreprise: true; responsable: true } }>;
 type ContactOption = { id: string; prenom: string | null; nom: string };
 type EntrepriseOption = { id: string; nom: string };
+type ResponsibleOption = { id: string; username: string };
 
 type ActionsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -44,12 +46,14 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
   let actions: ActionRecord[] = [];
   let contacts: ContactOption[] = [];
   let entreprises: EntrepriseOption[] = [];
+  let users: ResponsibleOption[] = [];
 
   try {
-    [actions, contacts, entreprises] = await Promise.all([
-      prisma.actionItem.findMany({ include: { contact: true, entreprise: true }, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
+    [actions, contacts, entreprises, users] = await Promise.all([
+      prisma.actionItem.findMany({ include: { contact: true, entreprise: true, responsable: true }, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
       prisma.contact.findMany({ select: { id: true, prenom: true, nom: true }, orderBy: [{ nom: "asc" }, { prenom: "asc" }] }),
       prisma.entreprise.findMany({ select: { id: true, nom: true }, orderBy: { nom: "asc" } }),
+      prisma.user.findMany({ select: { id: true, username: true }, orderBy: { username: "asc" } }),
     ]);
   } catch {
     databaseAvailable = false;
@@ -57,7 +61,7 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
 
   const filteredActions = searchQuery
     ? actions.filter((action) => {
-        const haystack = [action.titre, action.priorite, action.statut, action.contactLabel ?? "", action.contact?.prenom ?? "", action.contact?.nom ?? "", action.entreprise?.nom ?? "", action.details ?? ""]
+        const haystack = [action.titre, action.priorite, action.statut, action.canal ?? "", action.resultat ?? "", action.prochaineAction ?? "", action.responsable?.username ?? "", action.contactLabel ?? "", action.contact?.prenom ?? "", action.contact?.nom ?? "", action.entreprise?.nom ?? "", action.details ?? ""]
           .join(" ")
           .toLowerCase();
         return haystack.includes(searchQuery.toLowerCase());
@@ -120,12 +124,20 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                 <label>Statut<select name="statut" defaultValue="À faire">
                   <option value="À faire">À faire</option>
                   <option value="En cours">En cours</option>
+                  <option value="En attente">En attente</option>
                   <option value="Terminée">Terminée</option>
+                  <option value="Annulée">Annulée</option>
                 </select></label>
                 <label>Contact<select name="contactId" defaultValue=""><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
                 <label>Entreprise<select name="entrepriseId" defaultValue=""><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                 <label>Date d’échéance<input name="dateEcheance" type="date" /></label>
+                <label>Canal<input name="canal" maxLength={80} placeholder="Téléphone, e-mail…" /></label>
+                <label>Durée (minutes)<input name="dureeMinutes" type="number" min={0} max={1440} step={5} /></label>
+                <label>Responsable<select name="responsableId" defaultValue=""><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
+                <label>Date de réalisation<input name="dateRealisation" type="date" /></label>
+                <label>Prochaine action<input name="prochaineAction" maxLength={1000} /></label>
                 <label style={{ gridColumn: "1 / -1" }}>Détails<input name="details" maxLength={500} placeholder="Informations complémentaires..." /></label>
+                <label style={{ gridColumn: "1 / -1" }}>Résultat<textarea name="resultat" maxLength={10000} rows={3} /></label>
                 <button className="contact-primary-button" type="submit">Ajouter l’action <span>+</span></button>
               </form>
             </section>
@@ -145,7 +157,7 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
               ) : (
                 <div className="contacts-records-wrap">
                   <table className="contacts-records">
-                    <thead><tr><th>TITRE</th><th>PRIORITÉ</th><th>STATUT</th><th>CONTACT</th><th>ENTREPRISE</th><th>ÉCHÉANCE</th><th>GESTION</th></tr></thead>
+                    <thead><tr><th>TITRE</th><th>PRIORITÉ</th><th>STATUT</th><th>CONTACT</th><th>ENTREPRISE</th><th>RESPONSABLE</th><th>CANAL / DURÉE</th><th>ÉCHÉANCE / RÉALISATION</th><th>PROCHAINE ACTION / RÉSULTAT</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredActions.map((action) => (
                         <tr key={action.id}>
@@ -154,12 +166,15 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                           <td>{action.statut}</td>
                           <td>{action.contact ? [action.contact.prenom, action.contact.nom].filter(Boolean).join(" ") : action.contactLabel || "—"}</td>
                           <td>{action.entreprise?.nom || "—"}</td>
-                          <td>{formatDate(action.dateEcheance)}</td>
+                          <td>{action.responsable?.username || "—"}</td>
+                          <td>{action.canal || "—"}<small>{action.dureeMinutes == null ? "Durée non définie" : `${action.dureeMinutes} min`}</small></td>
+                          <td>{formatDate(action.dateEcheance)}<small>Réalisation : {formatDate(action.dateRealisation)}</small></td>
+                          <td>{action.prochaineAction || action.resultat || action.details || "—"}</td>
                           <td>
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
-                                <form action={updateAction} className="contact-edit-form">
+                                <UnsavedChangesForm action={updateAction} className="contact-edit-form">
                                   <input type="hidden" name="id" value={action.id} />
                                   <input type="hidden" name="legacyContact" value={action.contactLabel ?? ""} />
                                   <label>Titre<input name="titre" defaultValue={action.titre} required minLength={2} maxLength={160} /></label>
@@ -171,14 +186,23 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                                   <label>Statut<select name="statut" defaultValue={action.statut}>
                                     <option value="À faire">À faire</option>
                                     <option value="En cours">En cours</option>
+                                    <option value="En attente">En attente</option>
                                     <option value="Terminée">Terminée</option>
+                                    <option value="Annulée">Annulée</option>
                                   </select></label>
                                   <label>Contact<select name="contactId" defaultValue={action.contactId ?? ""}><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
                                   <label>Entreprise<select name="entrepriseId" defaultValue={action.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                                   <label>Date d’échéance<input name="dateEcheance" type="date" defaultValue={action.dateEcheance ? new Date(action.dateEcheance).toISOString().slice(0, 10) : ""} /></label>
+                                  <label>Canal<input name="canal" defaultValue={action.canal ?? ""} maxLength={80} /></label>
+                                  <label>Durée (minutes)<input name="dureeMinutes" type="number" min={0} max={1440} step={5} defaultValue={action.dureeMinutes ?? ""} /></label>
+                                  <label>Responsable<select name="responsableId" defaultValue={action.responsableId ?? ""}><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
+                                  <label>Date de réalisation<input name="dateRealisation" type="date" defaultValue={action.dateRealisation ? new Date(action.dateRealisation).toISOString().slice(0, 10) : ""} /></label>
+                                  <label>Prochaine action<input name="prochaineAction" defaultValue={action.prochaineAction ?? ""} maxLength={1000} /></label>
                                   <label>Détails<input name="details" defaultValue={action.details ?? ""} maxLength={500} /></label>
+                                  <label>Résultat<textarea name="resultat" defaultValue={action.resultat ?? ""} maxLength={10000} rows={3} /></label>
+                                  <Link className="contact-cancel-link" href="/actions">Annuler</Link>
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
-                                </form>
+                                </UnsavedChangesForm>
                               </details>
                               <details className="contact-delete-details">
                                 <summary>Supprimer</summary>

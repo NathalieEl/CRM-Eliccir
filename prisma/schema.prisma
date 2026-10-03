@@ -308,18 +308,28 @@ model Activity {
   id             String    @id @default(cuid())
   titre          String
   type           String
+  canal          String?
+  dureeMinutes   Int?
+  resultat       String?   @db.Text
+  prochaineAction String?  @db.Text
+  statut         String?
+  dateRealisation DateTime? @db.Date
   contactLabel   String?   @map("contact")
   contactId      String?
   entrepriseId   String?
+  responsableId  String?
   date           DateTime?
   details        String?
   contact        Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
   entreprise     Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  responsable    User?     @relation("ActivityResponsible", fields: [responsableId], references: [id], onDelete: SetNull)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   @@index([contactId])
   @@index([entrepriseId])
+  @@index([responsableId])
+  @@index([statut, dateRealisation])
 }
 
 model ActionItem {
@@ -327,18 +337,27 @@ model ActionItem {
   titre          String
   priorite       String    @default("Normale")
   statut         String    @default("À faire")
+  canal          String?
+  dureeMinutes   Int?
+  resultat       String?   @db.Text
+  prochaineAction String?  @db.Text
+  dateRealisation DateTime? @db.Date
   contactLabel   String?   @map("contact")
   contactId      String?
   entrepriseId   String?
+  responsableId  String?
   dateEcheance   DateTime?
   details        String?
   contact        Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
   entreprise     Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  responsable    User?     @relation("ActionResponsible", fields: [responsableId], references: [id], onDelete: SetNull)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   @@index([contactId])
   @@index([entrepriseId])
+  @@index([responsableId])
+  @@index([statut, dateRealisation])
 }
 
 model User {
@@ -349,6 +368,8 @@ model User {
   role            String    @default("member")
   active          Boolean   @default(true)
   authoredContactNotes ContactNote[]
+  activitiesAssigned Activity[] @relation("ActivityResponsible")
+  actionsAssigned    ActionItem[] @relation("ActionResponsible")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }

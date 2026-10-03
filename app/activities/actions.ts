@@ -14,17 +14,33 @@ function field(formData: FormData, name: string) {
 function parseActivity(formData: FormData) {
   const titre = field(formData, "titre");
   const type = field(formData, "type");
+  const canal = field(formData, "canal");
+  const dureeRaw = field(formData, "dureeMinutes");
+  const resultat = field(formData, "resultat");
+  const prochaineAction = field(formData, "prochaineAction");
+  const statut = field(formData, "statut") || "Planifiée";
+  const dateRealisation = field(formData, "dateRealisation");
+  const responsableId = field(formData, "responsableId");
   const contactId = field(formData, "contactId");
   const entrepriseId = field(formData, "entrepriseId");
   const contactLabel = field(formData, "legacyContact");
   const date = field(formData, "date");
   const details = field(formData, "details");
+  const dureeMinutes = dureeRaw ? Number(dureeRaw) : null;
+  const allowedStatuses = ["Planifiée", "En cours", "Réalisée", "Annulée"];
 
   if (
     titre.length < 2 ||
     titre.length > 120 ||
     type.length < 2 ||
     type.length > 40 ||
+    canal.length > 80 ||
+    (dureeRaw !== "" && (!Number.isInteger(dureeMinutes) || (dureeMinutes ?? -1) < 0 || (dureeMinutes ?? 1441) > 1440)) ||
+    resultat.length > 10000 ||
+    prochaineAction.length > 1000 ||
+    !allowedStatuses.includes(statut) ||
+    responsableId.length > 64 ||
+    (dateRealisation && !/^\d{4}-\d{2}-\d{2}$/.test(dateRealisation)) ||
     contactId.length > 64 ||
     entrepriseId.length > 64 ||
     contactLabel.length > 120 ||
@@ -37,6 +53,13 @@ function parseActivity(formData: FormData) {
   return {
     titre,
     type,
+    canal: canal || null,
+    dureeMinutes,
+    resultat: resultat || null,
+    prochaineAction: prochaineAction || null,
+    statut,
+    dateRealisation: dateRealisation ? new Date(`${dateRealisation}T12:00:00.000Z`) : null,
+    responsableId: responsableId || null,
     contactId: contactId || null,
     entrepriseId: entrepriseId || null,
     contactLabel: contactId ? null : contactLabel || null,
@@ -52,11 +75,16 @@ async function validAssociations(contactId: string | null, entrepriseId: string 
   return true;
 }
 
+async function validResponsible(responsableId: string | null) {
+  return !responsableId || Boolean(await prisma.user.findUnique({ where: { id: responsableId }, select: { id: true } }));
+}
+
 export async function createActivity(formData: FormData) {
   const currentUser = await requirePermission("crm.write");
   const activity = parseActivity(formData);
   if (!activity) redirect("/activities?error=invalid");
   if (!(await validAssociations(activity.contactId, activity.entrepriseId))) redirect("/activities?error=invalid");
+  if (!(await validResponsible(activity.responsableId))) redirect("/activities?error=invalid");
 
   try {
     const created = await prisma.activity.create({ data: activity });
@@ -78,6 +106,7 @@ export async function updateActivity(formData: FormData) {
   if (!id) redirect("/activities?error=not-found");
   if (!activity) redirect("/activities?error=invalid");
   if (!(await validAssociations(activity.contactId, activity.entrepriseId))) redirect("/activities?error=invalid");
+  if (!(await validResponsible(activity.responsableId))) redirect("/activities?error=invalid");
 
   try {
     const updated = await prisma.activity.update({ where: { id }, data: activity });

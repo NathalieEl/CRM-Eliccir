@@ -3,6 +3,7 @@ import { createUser, deleteUser, resetTwoFactor, updateUser } from "@/app/users/
 import { isTwoFactorActive, requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PasswordField } from "@/app/components/password-field";
+import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import { roleLabels, type UserRole } from "@/lib/permissions";
 
 export default async function UsersPage({ searchParams }: { searchParams: Promise<{ created?: string; reset2fa?: string; username?: string; error?: string; notice?: string }> }) {
@@ -46,7 +47,32 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
 
         <section className="contacts-list-section">
           <div className="contacts-section-heading"><div><p className="section-index">02 <i>·</i> ACCÈS ACTIFS</p><h2>Comptes existants</h2></div></div>
-          <div className="users-table-wrap"><table className="contacts-records"><thead><tr><th>UTILISATEUR</th><th>PROFIL</th><th>ÉTAT</th><th>GESTION</th></tr></thead><tbody>{users.map((user) => <tr key={user.id}><td><b>{user.username}</b><small>{twoFactorActive ? "2FA active" : "2FA en sommeil"}</small></td><td>{roleLabels[user.role as UserRole] ?? roleLabels.member}</td><td>{user.active ? "Actif" : "Désactivé"}</td><td><div className="user-row-actions"><details><summary>Modifier</summary><form action={updateUser} className="user-edit-form"><input type="hidden" name="id" value={user.id} /><label>Profil<select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label><label>Nouveau mot de passe<input name="password" type="password" minLength={8} placeholder="Laisser vide pour conserver" /></label><label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /> Compte actif</label><button className="contact-primary-button" type="submit">Enregistrer</button></form></details>{twoFactorActive ? <details><summary>Réinitialiser 2FA</summary><form action={resetTwoFactor} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la réinitialisation</label><button type="submit">Générer un nouveau secret</button></form></details> : null}<details><summary className="user-delete-button">Supprimer</summary><form action={deleteUser} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer définitivement</button></form></details></div></td></tr>)}</tbody></table></div>
+          <div className="users-table-wrap">
+            <table className="contacts-records">
+              <thead><tr><th>UTILISATEUR</th><th>PROFIL</th><th>ÉTAT</th><th>GESTION</th></tr></thead>
+              <tbody>{users.map((user) => (
+                <tr key={user.id}>
+                  <td><b>{user.username}</b><small>{twoFactorActive ? "2FA active" : "2FA en sommeil"}</small></td>
+                  <td>{roleLabels[user.role as UserRole] ?? roleLabels.member}</td>
+                  <td>{user.active ? "Actif" : "Désactivé"}</td>
+                  <td><div className="user-row-actions">
+                    <details>
+                      <summary>Modifier</summary>
+                      <UnsavedChangesForm action={updateUser} className="user-edit-form">
+                        <input type="hidden" name="id" value={user.id} />
+                        <label>Profil<select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label>
+                        <label>Nouveau mot de passe<input name="password" type="password" minLength={8} placeholder="Laisser vide pour conserver" /></label>
+                        <label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /> Compte actif</label>
+                        <div className="profile-form-actions"><Link className="contact-cancel-link" href="/users">Annuler</Link><button className="contact-primary-button" type="submit">Enregistrer</button></div>
+                      </UnsavedChangesForm>
+                    </details>
+                    {twoFactorActive ? <details><summary>Réinitialiser 2FA</summary><form action={resetTwoFactor} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la réinitialisation</label><button type="submit">Générer un nouveau secret</button></form></details> : null}
+                    <details><summary className="user-delete-button">Supprimer</summary><form action={deleteUser} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer définitivement</button></form></details>
+                  </div></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
         </section>
       </div>
     </main>

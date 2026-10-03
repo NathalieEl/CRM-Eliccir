@@ -15,17 +15,32 @@ function parseAction(formData: FormData) {
   const titre = field(formData, "titre");
   const priorite = field(formData, "priorite") || "Normale";
   const statut = field(formData, "statut") || "À faire";
+  const canal = field(formData, "canal");
+  const dureeRaw = field(formData, "dureeMinutes");
+  const resultat = field(formData, "resultat");
+  const prochaineAction = field(formData, "prochaineAction");
+  const dateRealisation = field(formData, "dateRealisation");
+  const responsableId = field(formData, "responsableId");
   const contactId = field(formData, "contactId");
   const entrepriseId = field(formData, "entrepriseId");
   const contactLabel = field(formData, "legacyContact");
   const dateEcheance = field(formData, "dateEcheance");
   const details = field(formData, "details");
+  const dureeMinutes = dureeRaw ? Number(dureeRaw) : null;
+  const allowedStatuses = ["À faire", "En cours", "En attente", "Terminée", "Annulée"];
 
   if (
     titre.length < 2 ||
     titre.length > 160 ||
     priorite.length > 40 ||
+    !allowedStatuses.includes(statut) ||
     statut.length > 40 ||
+    canal.length > 80 ||
+    (dureeRaw !== "" && (!Number.isInteger(dureeMinutes) || (dureeMinutes ?? -1) < 0 || (dureeMinutes ?? 1441) > 1440)) ||
+    resultat.length > 10000 ||
+    prochaineAction.length > 1000 ||
+    responsableId.length > 64 ||
+    (dateRealisation && !/^\d{4}-\d{2}-\d{2}$/.test(dateRealisation)) ||
     contactId.length > 64 ||
     entrepriseId.length > 64 ||
     contactLabel.length > 120 ||
@@ -39,6 +54,12 @@ function parseAction(formData: FormData) {
     titre,
     priorite,
     statut,
+    canal: canal || null,
+    dureeMinutes,
+    resultat: resultat || null,
+    prochaineAction: prochaineAction || null,
+    dateRealisation: dateRealisation ? new Date(`${dateRealisation}T12:00:00.000Z`) : null,
+    responsableId: responsableId || null,
     contactId: contactId || null,
     entrepriseId: entrepriseId || null,
     contactLabel: contactId ? null : contactLabel || null,
@@ -54,11 +75,16 @@ async function validAssociations(contactId: string | null, entrepriseId: string 
   return true;
 }
 
+async function validResponsible(responsableId: string | null) {
+  return !responsableId || Boolean(await prisma.user.findUnique({ where: { id: responsableId }, select: { id: true } }));
+}
+
 export async function createAction(formData: FormData) {
   const currentUser = await requirePermission("crm.write");
   const action = parseAction(formData);
   if (!action) redirect("/actions?error=invalid");
   if (!(await validAssociations(action.contactId, action.entrepriseId))) redirect("/actions?error=invalid");
+  if (!(await validResponsible(action.responsableId))) redirect("/actions?error=invalid");
 
   try {
     const created = await prisma.actionItem.create({ data: action });
@@ -80,6 +106,7 @@ export async function updateAction(formData: FormData) {
   if (!id) redirect("/actions?error=not-found");
   if (!action) redirect("/actions?error=invalid");
   if (!(await validAssociations(action.contactId, action.entrepriseId))) redirect("/actions?error=invalid");
+  if (!(await validResponsible(action.responsableId))) redirect("/actions?error=invalid");
 
   try {
     const updated = await prisma.actionItem.update({ where: { id }, data: action });

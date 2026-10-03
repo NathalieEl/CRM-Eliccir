@@ -29,11 +29,11 @@ const defaultProjects = [
   { name: "Phuket", location: "Patong · Thaïlande", progress: 22 },
 ];
 
-function formatActivityItem(activity: { titre: string; type: string; contactLabel?: string | null; contact?: { prenom: string | null; nom: string } | null; entreprise?: { nom: string } | null; date?: Date | null; details?: string | null }) {
+function formatActivityItem(activity: { titre: string; type: string; contactLabel?: string | null; contact?: { prenom: string | null; nom: string } | null; entreprise?: { nom: string } | null; responsable?: { username: string } | null; resultat?: string | null; dateRealisation?: Date | null; statut?: string | null; date?: Date | null; details?: string | null }) {
   const time = activity.date ? new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(activity.date)) : "09:00";
   const title = activity.titre;
   const fullName = activity.contact ? [activity.contact.prenom, activity.contact.nom].filter(Boolean).join(" ") : activity.contactLabel;
-  const detail = activity.details || (activity.entreprise ? `Entreprise · ${activity.entreprise.nom}` : fullName ? `Contact · ${fullName}` : "Activité CRM");
+  const detail = activity.resultat || activity.details || [activity.entreprise?.nom, fullName, activity.responsable?.username, activity.statut, activity.dateRealisation ? `Réalisée le ${new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(activity.dateRealisation)}` : ""].filter(Boolean).join(" · ") || "Activité CRM";
   const initials = (fullName || activity.entreprise?.nom || activity.type)
     .split(" ")
     .map((part) => part[0])
@@ -86,8 +86,8 @@ async function getDashboardData() {
       prisma.actionItem.count({ where: { statut: { not: "Terminée" }, dateEcheance: { lt: now } } }),
       prisma.contact.findMany({ include: { entreprises: { include: { entreprise: true } } }, take: 4, orderBy: { updatedAt: "desc" } }),
       prisma.project.findMany({ include: { entreprise: true }, take: 3, orderBy: { updatedAt: "desc" } }),
-      prisma.activity.findMany({ include: { contact: true, entreprise: true }, where: { date: { gte: now } }, take: 3, orderBy: { date: "asc" } }),
-      prisma.actionItem.findMany({ include: { entreprise: true }, where: { statut: { not: "Terminée" } }, take: 3, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
+      prisma.activity.findMany({ include: { contact: true, entreprise: true, responsable: true }, where: { date: { gte: now } }, take: 3, orderBy: { date: "asc" } }),
+      prisma.actionItem.findMany({ include: { entreprise: true, responsable: true }, where: { statut: { not: "Terminée" } }, take: 3, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
     ]);
 
     return {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createProject, deleteProject, updateProject } from "@/app/projects/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type ProjectRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true } }>;
@@ -139,7 +140,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>
-                                <form action={updateProject} className="contact-edit-form">
+                                <UnsavedChangesForm action={updateProject} className="contact-edit-form">
                                   <input type="hidden" name="id" value={project.id} />
                                   <label>Nom du projet<input name="nom" defaultValue={project.nom} required minLength={2} maxLength={120} /></label>
                                   <label>Entreprise<select name="entrepriseId" defaultValue={project.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
@@ -148,8 +149,9 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                                   <label>Budget<input name="budget" defaultValue={project.budget ?? ""} maxLength={80} /></label>
                                   <label>Statut<input name="statut" defaultValue={project.statut} maxLength={40} /></label>
                                   <label>Progression (%)<input name="progression" type="number" min={0} max={100} defaultValue={project.progression} /></label>
+                                  <Link className="contact-cancel-link" href="/projects">Annuler</Link>
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
-                                </form>
+                                </UnsavedChangesForm>
                               </details>
                               <details className="contact-delete-details">
                                 <summary>Supprimer</summary>
