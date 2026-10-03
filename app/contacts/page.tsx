@@ -19,10 +19,10 @@ const notices: Record<string, string> = {
 };
 
 const errors: Record<string, string> = {
-  invalid: "Vérifiez le prénom, le nom, l’adresse e-mail et la longueur des champs.",
+  invalid: "Vérifie le prénom, le nom, l’adresse e-mail et la longueur des champs.",
   "email-exists": "Cette adresse e-mail est déjà associée à un contact.",
-  "not-found": "Ce contact n’existe plus. Actualisez la liste.",
-  "confirm-delete": "Confirmez la suppression avant de continuer.",
+  "not-found": "Ce contact n’existe plus. Actualise la liste.",
+  "confirm-delete": "Confirme la suppression avant de continuer.",
 };
 
 export default async function ContactsPage({ searchParams }: ContactsPageProps) {
@@ -93,8 +93,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         <section className="contacts-title-row">
           <div>
             <p className="section-index">ESPACE DE TRAVAIL <i>·</i> CONTACTS</p>
-            <h1>Votre carnet de contacts</h1>
-            <p className="contacts-intro">Retrouvez et mettez à jour les informations de votre portefeuille.</p>
+            <h1>Ton carnet de contacts</h1>
+            <p className="contacts-intro">Retrouve et mets à jour les informations de ton portefeuille.</p>
           </div>
           <span className="contacts-total">{databaseAvailable ? contacts.length : "—"}<small>CONTACTS</small></span>
         </section>
@@ -131,7 +131,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         {!databaseAvailable ? (
           <section className="contacts-database-error" role="alert">
             <h2>La base de données est inaccessible</h2>
-            <p>Vérifiez que <code>DATABASE_URL</code> dans le fichier <code>.env</code> contient les bons identifiants PostgreSQL, puis rechargez cette page.</p>
+            <p>Vérifie que <code>DATABASE_URL</code> dans le fichier <code>.env</code> contient les bons identifiants PostgreSQL, puis recharge cette page.</p>
           </section>
         ) : (
           <>
@@ -162,8 +162,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               {visibleContacts.length === 0 ? (
                 <p className="contacts-empty">
                   {searchQuery
-                    ? `Aucun résultat pour “${searchQuery}”. Essayez une autre recherche.`
-                    : "Aucun contact pour le moment. Ajoutez votre premier contact ci-dessus."}
+                    ? `Aucun résultat pour “${searchQuery}”. Essaie une autre recherche.`
+                    : "Aucun contact pour le moment. Ajoute ton premier contact ci-dessus."}
                 </p>
               ) : (
                 <div className="contacts-records-wrap">

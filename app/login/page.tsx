@@ -20,7 +20,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="auth-brand"><span className="brand-mark">E</span><span className="brand-name">eliccir<small>CRM</small></span></div>
         <p className="section-index">ESPACE SÉCURISÉ</p>
         <h1>Connexion</h1>
-        <p className="auth-intro">Accédez à votre espace de travail.</p>
+        <p className="auth-intro">Accède à ton espace de travail.</p>
         {error && messages[error] ? <p className="auth-error" role="alert">{messages[error]}</p> : null}
         <form action={login} className="auth-form">
           <label>Nom d’utilisateur<input name="username" autoComplete="username" required /></label>

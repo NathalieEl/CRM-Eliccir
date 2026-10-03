@@ -22,8 +22,8 @@ export default async function MaintenancePage({ searchParams }: MaintenancePageP
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>
       <div className="contacts-content">
-        <section className="contacts-title-row"><div><p className="section-index">ESPACE DE TRAVAIL <i>·</i> ADMINISTRATION</p><h1>Maintenance des tables</h1><p className="contacts-intro">Gérez les options utilisées dans les menus déroulants du CRM.</p></div><span className="contacts-total">{options.length}<small>OPTIONS</small></span></section>
-        {params.error === "invalid" && <p className="auth-error" role="alert">Renseignez une catégorie et un libellé valides.</p>}
+        <section className="contacts-title-row"><div><p className="section-index">ESPACE DE TRAVAIL <i>·</i> ADMINISTRATION</p><h1>Maintenance des tables</h1><p className="contacts-intro">Gère les options utilisées dans les menus déroulants du CRM.</p></div><span className="contacts-total">{options.length}<small>OPTIONS</small></span></section>
+        {params.error === "invalid" && <p className="auth-error" role="alert">Renseigne une catégorie et un libellé valides.</p>}
         {params.error === "exists" && <p className="auth-error" role="alert">Cette option existe déjà dans cette table.</p>}
         {params.notice === "created" && <p className="contacts-message" role="status">L’option a été ajoutée.</p>}
         <section className="contacts-create-section"><div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> NOUVELLE OPTION</p><h2>Ajouter une valeur de menu</h2></div></div><form action={createLookupOption} className="contact-form maintenance-form"><label>Catégorie<input name="category" required placeholder="ex. contact_title" /></label><label>Libellé<input name="label" required placeholder="ex. Mme" /></label><label>Valeur technique<input name="value" placeholder="Identique au libellé par défaut" /></label><label>Ordre<input name="sortOrder" type="number" defaultValue={100} /></label><button className="contact-primary-button" type="submit">Ajouter <span>+</span></button></form></section>

@@ -25,12 +25,12 @@ const notices: Record<string, string> = {
 };
 
 const errors: Record<string, string> = {
-  invalid: "Vérifiez le nom et les coordonnées de l’entreprise.",
+  invalid: "Vérifie le nom et les coordonnées de l’entreprise.",
   exists: "Une entreprise porte déjà ce nom.",
-  "not-found": "Cette entreprise n’existe plus. Actualisez la liste.",
-  "confirm-delete": "Confirmez la suppression de l’entreprise.",
-  "invalid-link": "Sélectionnez une entreprise et un contact valides.",
-  "confirm-unlink": "Confirmez le retrait du contact.",
+  "not-found": "Cette entreprise n’existe plus. Actualise la liste.",
+  "confirm-delete": "Confirme la suppression de l’entreprise.",
+  "invalid-link": "Sélectionne une entreprise et un contact valides.",
+  "confirm-unlink": "Confirme le retrait du contact.",
 };
 
 function contactName(contact: EntrepriseRecord["contacts"][number]["contact"]) {
@@ -80,7 +80,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
       </header>
       <div className="contacts-content">
         <section className="contacts-title-row">
-          <div><p className="section-index">ESPACE DE TRAVAIL · ORGANISATIONS</p><h1>Entreprises</h1><p className="contacts-intro">Gérez les organisations, leurs contacts et leur suivi commercial.</p></div>
+          <div><p className="section-index">ESPACE DE TRAVAIL · ORGANISATIONS</p><h1>Entreprises</h1><p className="contacts-intro">Gère les organisations, leurs contacts et leur suivi commercial.</p></div>
           <span className="contacts-total">{databaseAvailable ? entreprises.length : "—"}<small>ENTREPRISES</small></span>
         </section>
 
@@ -97,7 +97,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
         {params.error && errors[params.error] && <p className="contacts-message contacts-message-error" role="alert">{errors[params.error]}</p>}
 
         {!databaseAvailable ? (
-          <section className="contacts-database-error" role="alert"><h2>La base de données est inaccessible</h2><p>Vérifiez la configuration PostgreSQL puis rechargez cette page.</p></section>
+          <section className="contacts-database-error" role="alert"><h2>La base de données est inaccessible</h2><p>Vérifie la configuration PostgreSQL puis recharge cette page.</p></section>
         ) : (
           <>
             <section className="contacts-create-section">

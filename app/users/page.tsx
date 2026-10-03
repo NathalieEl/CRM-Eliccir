@@ -20,11 +20,11 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
       </header>
       <div className="contacts-content">
         <section className="contacts-title-row">
-          <div><p className="section-index">ESPACE DE TRAVAIL <i>·</i> ADMINISTRATION</p><h1>Utilisateurs</h1><p className="contacts-intro">Créez les accès de votre équipe. Double authentification : {twoFactorActive ? "Active" : "En sommeil"}.</p></div>
+          <div><p className="section-index">ESPACE DE TRAVAIL <i>·</i> ADMINISTRATION</p><h1>Utilisateurs</h1><p className="contacts-intro">Crée les accès de ton équipe. Double authentification : {twoFactorActive ? "Active" : "En sommeil"}.</p></div>
           <span className="contacts-total">{users.length}<small>COMPTES</small></span>
         </section>
 
-        {params.error === "invalid" && <p className="auth-error" role="alert">Renseignez le prénom, un nom d’utilisateur valide et un mot de passe d’au moins 8 caractères.</p>}
+        {params.error === "invalid" && <p className="auth-error" role="alert">Renseigne le prénom, un nom d’utilisateur valide et un mot de passe d’au moins 8 caractères.</p>}
         {params.error === "exists" && <p className="auth-error" role="alert">Ce nom d’utilisateur existe déjà.</p>}
         {params.error === "self" && <p className="auth-error" role="alert">Tu ne peux pas désactiver ou rétrograder ton propre compte.</p>}
         {params.error === "confirm-delete" && <p className="auth-error" role="alert">Confirme la suppression du compte avant de continuer.</p>}
@@ -32,8 +32,8 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         {params.error === "2fa-inactive" && <p className="auth-error" role="alert">La double authentification est en sommeil.</p>}
         {params.notice === "updated" && <p className="contacts-message" role="status">Le compte a été mis à jour.</p>}
         {params.notice === "created" && <p className="contacts-message" role="status">Le compte a été créé. Le 2FA est en sommeil.</p>}
-        {twoFactorActive && params.created && params.username && <section className="users-setup-note"><h2>Compte créé pour {params.username}</h2><p>Ajoutez ce secret dans l’application d’authentification de l’utilisateur. Il ne sera plus affiché après cette page.</p><code>{params.created}</code></section>}
-        {twoFactorActive && params.reset2fa && params.username && <section className="users-setup-note"><h2>2FA réinitialisée pour {params.username}</h2><p>Ajoutez ce nouveau secret dans l’application d’authentification. L’ancien secret est désormais invalide.</p><code>{params.reset2fa}</code></section>}
+        {twoFactorActive && params.created && params.username && <section className="users-setup-note"><h2>Compte créé pour {params.username}</h2><p>Ajoute ce secret dans ton application d’authentification pour ce compte. Il ne sera plus affiché après cette page.</p><code>{params.created}</code></section>}
+        {twoFactorActive && params.reset2fa && params.username && <section className="users-setup-note"><h2>2FA réinitialisée pour {params.username}</h2><p>Ajoute ce nouveau secret dans ton application d’authentification pour ce compte. L’ancien secret est désormais invalide.</p><code>{params.reset2fa}</code></section>}
 
         <section className="contacts-create-section">
           <div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Créer un accès</h2></div></div>

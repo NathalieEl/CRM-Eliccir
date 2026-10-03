@@ -21,9 +21,9 @@ const notices: Record<string, string> = {
 };
 
 const errors: Record<string, string> = {
-  invalid: "Vérifiez le titre, le type et la date de l’activité.",
-  "not-found": "Cette activité n’existe plus. Actualisez la liste.",
-  "confirm-delete": "Confirmez la suppression avant de continuer.",
+  invalid: "Vérifie le titre, le type et la date de l’activité.",
+  "not-found": "Cette activité n’existe plus. Actualise la liste.",
+  "confirm-delete": "Confirme la suppression avant de continuer.",
 };
 
 const formatDate = (date: Date | null) => {
@@ -77,7 +77,7 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
           <div>
             <p className="section-index">ESPACE DE TRAVAIL <i>·</i> ACTIVITÉS</p>
             <h1>Planification des activités</h1>
-            <p className="contacts-intro">Suivez les rendez-vous, appels et tâches à venir.</p>
+            <p className="contacts-intro">Suis les rendez-vous, appels et tâches à venir.</p>
           </div>
           <span className="contacts-total">{databaseAvailable ? activities.length : "—"}<small>ACTIVITÉS</small></span>
         </section>
@@ -99,7 +99,7 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
         {!databaseAvailable ? (
           <section className="contacts-database-error" role="alert">
             <h2>La base de données est inaccessible</h2>
-            <p>Vérifiez que <code>DATABASE_URL</code> dans le fichier <code>.env</code> contient les bons identifiants PostgreSQL, puis rechargez cette page.</p>
+            <p>Vérifie que <code>DATABASE_URL</code> dans le fichier <code>.env</code> contient les bons identifiants PostgreSQL, puis recharge cette page.</p>
           </section>
         ) : (
           <>
@@ -135,8 +135,8 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
               {filteredActivities.length === 0 ? (
                 <p className="contacts-empty">
                   {searchQuery
-                    ? `Aucun résultat pour “${searchQuery}”. Essayez une autre recherche.`
-                    : "Aucune activité pour le moment. Ajoutez votre première activité ci-dessus."}
+                    ? `Aucun résultat pour “${searchQuery}”. Essaie une autre recherche.`
+                    : "Aucune activité pour le moment. Ajoute ta première activité ci-dessus."}
                 </p>
               ) : (
                 <div className="contacts-records-wrap">

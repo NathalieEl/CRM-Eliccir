@@ -44,12 +44,12 @@ const messages: Record<string, string> = {
 };
 
 const errors: Record<string, string> = {
-  invalid: "Vérifiez les rubriques saisies et les valeurs sélectionnées.",
+  invalid: "Vérifie les rubriques saisies et les valeurs sélectionnées.",
   "email-exists": "Cette adresse e-mail est déjà associée à un autre contact.",
-  "invalid-note": "Vérifiez la date, la nature et le contenu de la note.",
-  "confirm-note-delete": "Confirmez la suppression de la note.",
-  "invalid-photo": "Choisissez une image JPEG, PNG ou WebP de moins de 10 Mo.",
-  "photo-too-large": "L’image est trop complexe. Choisissez une image plus légère.",
+  "invalid-note": "Vérifie la date, la nature et le contenu de la note.",
+  "confirm-note-delete": "Confirme la suppression de la note.",
+  "invalid-photo": "Choisis une image JPEG, PNG ou WebP de moins de 10 Mo.",
+  "photo-too-large": "L’image est trop complexe. Choisis une image plus légère.",
 };
 
 function dateInput(value: Date | null) {
@@ -109,7 +109,7 @@ export default async function ContactProfilePage({ params, searchParams }: {
       </header>
       <div className="contacts-content contact-profile-page">
         <section className="contacts-title-row">
-          <div><p className="section-index">ESPACE DE TRAVAIL · FICHE CONTACT</p><h1>{[contact.titre, contact.prenom, contact.deuxiemePrenom, contact.nom].filter(Boolean).join(" ")}</h1><p className="contacts-intro">Modifiez les informations et consultez l’historique des échanges.</p></div>
+          <div><p className="section-index">ESPACE DE TRAVAIL · FICHE CONTACT</p><h1>{[contact.titre, contact.prenom, contact.deuxiemePrenom, contact.nom].filter(Boolean).join(" ")}</h1><p className="contacts-intro">Modifie les informations et consulte l’historique des échanges.</p></div>
           <span className="contacts-total">{contact.notes.length}<small>NOTES</small></span>
         </section>
 

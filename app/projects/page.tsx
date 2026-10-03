@@ -18,9 +18,9 @@ const notices: Record<string, string> = {
 };
 
 const errors: Record<string, string> = {
-  invalid: "Vérifiez le nom du projet et les champs numériques.",
-  "not-found": "Ce projet n’existe plus. Actualisez la liste.",
-  "confirm-delete": "Confirmez la suppression avant de continuer.",
+  invalid: "Vérifie le nom du projet et les champs numériques.",
+  "not-found": "Ce projet n’existe plus. Actualise la liste.",
+  "confirm-delete": "Confirme la suppression avant de continuer.",
 };
 
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
@@ -65,7 +65,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           <div>
             <p className="section-index">ESPACE DE TRAVAIL <i>·</i> PROJETS</p>
             <h1>Suivi des projets</h1>
-            <p className="contacts-intro">Suivez les investissements, leur statut et leur avancement.</p>
+            <p className="contacts-intro">Suis les investissements, leur statut et leur avancement.</p>
           </div>
           <span className="contacts-total">{databaseAvailable ? projects.length : "—"}<small>PROJETS</small></span>
         </section>
@@ -87,7 +87,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
         {!databaseAvailable ? (
           <section className="contacts-database-error" role="alert">
             <h2>La base de données est inaccessible</h2>
-            <p>Vérifiez que <code>DATABASE_URL</code> dans le fichier <code>.env</code> contient les bons identifiants PostgreSQL, puis rechargez cette page.</p>
+            <p>Vérifie que <code>DATABASE_URL</code> dans le fichier <code>.env</code> contient les bons identifiants PostgreSQL, puis recharge cette page.</p>
           </section>
         ) : (
           <>
@@ -117,8 +117,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               {filteredProjects.length === 0 ? (
                 <p className="contacts-empty">
                   {searchQuery
-                    ? `Aucun résultat pour “${searchQuery}”. Essayez une autre recherche.`
-                    : "Aucun projet pour le moment. Ajoutez votre premier projet ci-dessus."}
+                    ? `Aucun résultat pour “${searchQuery}”. Essaie une autre recherche.`
+                    : "Aucun projet pour le moment. Ajoute ton premier projet ci-dessus."}
                 </p>
               ) : (
                 <div className="contacts-records-wrap">
