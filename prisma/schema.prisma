@@ -18,6 +18,160 @@ enum ContactNoteNature {
   Autre
 }
 
+enum PropertyType {
+  VILLA
+  HOUSE
+  APARTMENT
+  LAND
+  COMMERCIAL
+  BUILDING
+  WAREHOUSE
+  GUESTHOUSE_HOTEL
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  UNDER_OFFER
+  SOLD
+  RENTED
+  WITHDRAWN
+}
+
+enum PropertyCondition {
+  NEW
+  GOOD
+  TO_RENOVATE
+  OFF_PLAN
+}
+
+enum Furnishing {
+  FURNISHED
+  SEMI_FURNISHED
+  UNFURNISHED
+}
+
+enum WaterSource {
+  PDAM
+  WELL
+  BOTH
+  NONE
+}
+
+enum TransactionType {
+  SALE
+  SHORT_TERM_RENTAL
+  LONG_TERM_RENTAL
+  PURCHASE_SEARCH
+}
+
+enum MandateType {
+  EXCLUSIVE
+  SIMPLE
+  CO_AGENCY
+}
+
+enum PriceUnit {
+  TOTAL
+  PER_SQM
+  PER_ARE
+  PER_MONTH
+  PER_YEAR
+}
+
+enum PayerParty {
+  BUYER
+  SELLER
+  SPLIT
+  TO_BE_DETERMINED
+}
+
+enum DealStage {
+  PROSPECT
+  MANDATE_SIGNED
+  LISTED
+  OFFER_RECEIVED
+  PRELIMINARY_AGREEMENT
+  CLOSED
+  LOST
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COUNTERED
+  WITHDRAWN
+}
+
+enum FinancingType {
+  CASH
+  MORTGAGE
+  MIXED
+}
+
+enum LandRightType {
+  HAK_MILIK
+  HGB
+  HAK_PAKAI
+  HAK_SEWA
+  HMSRS
+  GIRIK
+  UNKNOWN
+}
+
+enum HoldingStructure {
+  INDIVIDUAL
+  LOCAL_COMPANY
+  PT_PMA
+}
+
+enum BuildingPermitStatus {
+  PBG_OBTAINED
+  SLF_OBTAINED
+  LEGACY_IMB
+  NONE
+  UNKNOWN
+}
+
+enum ZoningType {
+  RESIDENTIAL
+  TOURISM
+  COMMERCIAL
+  MIXED
+  AGRICULTURAL_PROTECTED
+  UNKNOWN
+}
+
+enum CostType {
+  PBB
+  BPHTB
+  SELLER_TAX
+  PPN
+  NOTARY_PPAT_FEE
+  AGENCY_COMMISSION
+  OTHER
+}
+
+enum ResidencyStatus {
+  CITIZEN
+  KITAS
+  KITAP
+  TOURIST
+  OTHER
+}
+
+enum DocumentType {
+  LAND_CERTIFICATE
+  PBG
+  SLF
+  PBB_RECEIPT
+  MANDATE
+  PPJB
+  AJB
+  LEASE_AGREEMENT
+  OTHER
+}
+
 model Contact {
   id         String   @id @default(cuid())
   titre      String?
@@ -64,6 +218,11 @@ model Contact {
   notes ContactNote[]
   activities Activity[]
   actionItems ActionItem[]
+  ownedProperties Property[] @relation("PropertyOwner")
+  realEstateProfile ContactRealEstateProfile?
+  searchCriteria SearchCriteria[]
+  deals Deal[] @relation("DealClient")
+  viewings Viewing[] @relation("ViewingContact")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -388,4 +547,273 @@ model AuditLog {
   @@index([createdAt])
   @@index([entity, entityId])
   @@index([actorId, createdAt])
+}
+
+model Agent {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?  @unique
+  phone     String?
+  createdAt DateTime @default(now())
+
+  mandates Mandate[]
+  deals    Deal[]
+  viewings Viewing[]
+}
+
+model ContactRealEstateProfile {
+  id              String           @id @default(cuid())
+  contactId       String           @unique
+  contact         Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  nationality     String?
+  residencyStatus ResidencyStatus?
+  visaType        String?
+  visaExpiryDate  DateTime?
+  financingType   FinancingType?
+  leadSource      String?
+  notes           String?
+}
+
+model SearchCriteria {
+  id              String          @id @default(cuid())
+  contactId       String
+  contact         Contact         @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  transactionType TransactionType
+  propertyTypes   PropertyType[]
+  areas           String[]
+  budgetMin       Decimal?        @db.Decimal(20, 2)
+  budgetMax       Decimal?        @db.Decimal(20, 2)
+  currency        String          @default("IDR")
+  minBedrooms     Int?
+  minLandAreaSqm  Decimal?        @db.Decimal(12, 2)
+  mustHave        String[]
+  niceToHave      String[]
+  targetDate      DateTime?
+  isActive        Boolean         @default(true)
+  notes           String?
+  createdAt       DateTime        @default(now())
+
+  @@index([contactId])
+}
+
+model Property {
+  id            String           @id @default(cuid())
+  reference     String           @unique
+  title         String
+  description   String?
+  type          PropertyType
+  status        PropertyStatus   @default(AVAILABLE)
+  condition     PropertyCondition?
+  yearBuilt     Int?
+  yearRenovated Int?
+
+  ownerId String?
+  owner   Contact? @relation("PropertyOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  address              String?
+  kecamatan            String?
+  kabupaten            String?
+  province             String?
+  postalCode           String?
+  neighborhood         String?
+  latitude             Decimal? @db.Decimal(9, 6)
+  longitude            Decimal? @db.Decimal(9, 6)
+  distanceBeachKm      Decimal? @db.Decimal(6, 2)
+  distanceAirportKm    Decimal? @db.Decimal(6, 2)
+  accessRoadWidthM     Decimal? @db.Decimal(5, 2)
+  accessRoadType       String?
+  views                String[]
+  floodRisk            Boolean?
+
+  landAreaSqm          Decimal? @db.Decimal(12, 2)
+  buildingAreaSqm      Decimal? @db.Decimal(12, 2)
+  bedrooms             Int?
+  bathrooms            Int?
+  floors               Int?
+  hasPool              Boolean  @default(false)
+  hasGarden            Boolean  @default(false)
+  parkingSpaces        Int?
+  furnishing           Furnishing?
+  amenities            String[]
+
+  electricityVA        Int?
+  waterSource          WaterSource?
+  sanitation           String?
+  internetProvider     String?
+  staffIncluded        String[]
+
+  managementCompany    String?
+  estimatedYieldPct    Decimal? @db.Decimal(5, 2)
+  occupancyRatePct     Decimal? @db.Decimal(5, 2)
+
+  zoning               ZoningType?
+  buildingPermit       BuildingPermitStatus?
+  hasLitigation        Boolean  @default(false)
+  hasMortgageLien      Boolean  @default(false)
+  banjarFeesMonthly    Decimal? @db.Decimal(14, 2)
+  foreignerEligible    Boolean?
+  foreignerEligibleNote String?
+
+  landTitle LandTitle?
+  mandates  Mandate[]
+  deals     Deal[]
+  viewings  Viewing[]
+  documents PropertyDocument[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([province, kabupaten])
+}
+
+model LandTitle {
+  id         String   @id @default(cuid())
+  propertyId String   @unique
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  rightType         LandRightType
+  certificateNumber String?
+  nib               String?
+  holderName        String?
+  holdingStructure  HoldingStructure?
+  verifiedWithBpn   Boolean   @default(false)
+  verifiedAt        DateTime?
+
+  expiryDate        DateTime?
+  remainingYears    Decimal?  @db.Decimal(5, 1)
+  extensionPossible Boolean?
+  extensionCost     Decimal?  @db.Decimal(20, 2)
+
+  leaseStartDate DateTime?
+  leaseEndDate   DateTime?
+  renewalOption  Boolean?
+  lessorName     String?
+
+  notes String?
+}
+
+model Mandate {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  agentId    String?
+  agent      Agent?   @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  transactionType  TransactionType
+  mandateType      MandateType
+  startDate        DateTime?
+  endDate          DateTime?
+  isActive         Boolean         @default(true)
+  commissionPct    Decimal?        @db.Decimal(5, 2)
+  commissionPaidBy PayerParty?
+
+  askingPrice      Decimal?  @db.Decimal(20, 2)
+  currency         String    @default("IDR")
+  priceUnit        PriceUnit @default(TOTAL)
+  exchangeRate     Decimal?  @db.Decimal(18, 6)
+  exchangeRateDate DateTime?
+
+  monthlyRent       Decimal? @db.Decimal(20, 2)
+  annualRent        Decimal? @db.Decimal(20, 2)
+  minDurationMonths Int?
+  securityDeposit   Decimal? @db.Decimal(20, 2)
+  chargesIncluded   Boolean?
+
+  publishedOnPortals String[]
+  notes              String?
+
+  deals Deal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([propertyId])
+}
+
+model Deal {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  mandateId  String?
+  mandate    Mandate? @relation(fields: [mandateId], references: [id], onDelete: SetNull)
+  clientId   String
+  client     Contact  @relation("DealClient", fields: [clientId], references: [id], onDelete: Restrict)
+  agentId    String?
+  agent      Agent?   @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  transactionType     TransactionType
+  stage               DealStage  @default(PROSPECT)
+  negotiatedPrice     Decimal?   @db.Decimal(20, 2)
+  finalPrice          Decimal?   @db.Decimal(20, 2)
+  currency            String     @default("IDR")
+  expectedClosingDate DateTime?
+  closedAt            DateTime?
+  lostReason          String?
+  notes               String?
+
+  offers    Offer[]
+  costs     TransactionCost[]
+  documents PropertyDocument[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stage])
+  @@index([clientId])
+}
+
+model Offer {
+  id          String      @id @default(cuid())
+  dealId      String
+  deal        Deal        @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  amount      Decimal     @db.Decimal(20, 2)
+  currency    String      @default("IDR")
+  conditions  String?
+  status      OfferStatus @default(PENDING)
+  offeredAt   DateTime    @default(now())
+  respondedAt DateTime?
+}
+
+model Viewing {
+  id            String   @id @default(cuid())
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  contactId     String
+  contact       Contact  @relation("ViewingContact", fields: [contactId], references: [id], onDelete: Cascade)
+  agentId       String?
+  agent         Agent?   @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  scheduledAt   DateTime
+  feedback      String?
+  interestLevel Int?
+  createdAt     DateTime @default(now())
+
+  @@index([propertyId])
+  @@index([contactId])
+}
+
+model TransactionCost {
+  id       String    @id @default(cuid())
+  dealId   String
+  deal     Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  type     CostType
+  amount   Decimal?  @db.Decimal(20, 2)
+  currency String    @default("IDR")
+  paidBy   PayerParty @default(TO_BE_DETERMINED)
+  notes    String?
+}
+
+model PropertyDocument {
+  id         String        @id @default(cuid())
+  type       DocumentType
+  name       String
+  url        String?
+  issuedAt   DateTime?
+  expiresAt  DateTime?
+  propertyId String?
+  property   Property?     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  dealId     String?
+  deal       Deal?          @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt  DateTime      @default(now())
 }
