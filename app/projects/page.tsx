@@ -136,15 +136,16 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                           <td data-label="Progression">{project.progression}%</td>
                           <td data-label="Budget">{project.budget || "—"}</td>
                           <td data-label="Gestion">
-                            <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
-                              <details className="contact-delete-details">
-                                <summary>Supprimer</summary>
-                                <form action={deleteProject} className="contact-delete-form">
-                                  <input type="hidden" name="id" value={project.id} />
-                                  <label><input type="checkbox" name="confirmed" value="yes" required /> Confirmer la suppression</label>
-                                  <button type="submit">Supprimer ce projet</button>
-                                </form>
-                              </details>
+                            <div className="contact-row-actions">
+                              <Link className="contacts-search-reset" href={`/projects/${project.id}`}>{canWrite ? "Modifier" : "Voir"}</Link>
+                              {canWrite ? <details className="contact-delete-details">
+                                  <summary>Supprimer</summary>
+                                  <form action={deleteProject} className="contact-delete-form">
+                                    <input type="hidden" name="id" value={project.id} />
+                                    <label><input type="checkbox" name="confirmed" value="yes" required /> Confirmer la suppression</label>
+                                    <button type="submit">Supprimer ce projet</button>
+                                  </form>
+                                </details> : null}
                             </div>
                           </td>
                         </tr>
