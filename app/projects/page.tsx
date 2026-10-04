@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { createProject, deleteProject, updateProject } from "@/app/projects/actions";
+import { createProject, deleteProject } from "@/app/projects/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
-import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type ProjectRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true } }>;
@@ -76,7 +75,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
             <input id="projects-search" name="q" type="search" defaultValue={searchQuery} placeholder="Rechercher un projet, pays ou ville" autoComplete="off" />
             <button type="submit">Rechercher</button>
           </form>
-          {searchQuery ? <a className="contacts-search-reset" href="/projects">Réinitialiser</a> : null}
+          {searchQuery ? <Link className="contacts-search-reset" href="/projects">Réinitialiser</Link> : null}
         </section>
 
         {searchQuery ? <p className="contacts-search-results">Résultats pour “{searchQuery}” : {filteredProjects.length} projet{filteredProjects.length > 1 ? "s" : ""}</p> : null}
@@ -128,7 +127,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                       {filteredProjects.map((project) => (
                         <tr key={project.id}>
                           <td data-label="Projet">
-                            <b>{project.nom}</b>
+                            <b><Link href={`/projects/${project.id}`}>{project.nom}</Link></b>
                             <small>{project.updatedAt.toLocaleDateString("fr-FR")}</small>
                           </td>
                           <td data-label="Entreprise">{project.entreprise?.nom || "—"}</td>
@@ -138,21 +137,6 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                           <td data-label="Budget">{project.budget || "—"}</td>
                           <td data-label="Gestion">
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
-                              <details className="contact-edit-details">
-                                <summary>Modifier</summary>
-                                <UnsavedChangesForm action={updateProject} className="contact-edit-form">
-                                  <input type="hidden" name="id" value={project.id} />
-                                  <label>Nom du projet<input name="nom" defaultValue={project.nom} required minLength={2} maxLength={120} /></label>
-                                  <label>Entreprise<select name="entrepriseId" defaultValue={project.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-                                  <label>Pays<input name="pays" defaultValue={project.pays ?? ""} maxLength={80} /></label>
-                                  <label>Ville<input name="ville" defaultValue={project.ville ?? ""} maxLength={80} /></label>
-                                  <label>Budget<input name="budget" defaultValue={project.budget ?? ""} maxLength={80} /></label>
-                                  <label>Statut<input name="statut" defaultValue={project.statut} maxLength={40} /></label>
-                                  <label>Progression (%)<input name="progression" type="number" min={0} max={100} defaultValue={project.progression} /></label>
-                                  <Link className="contact-cancel-link" href="/projects">Annuler</Link>
-                                  <button className="contact-primary-button" type="submit">Enregistrer</button>
-                                </UnsavedChangesForm>
-                              </details>
                               <details className="contact-delete-details">
                                 <summary>Supprimer</summary>
                                 <form action={deleteProject} className="contact-delete-form">

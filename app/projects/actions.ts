@@ -69,9 +69,11 @@ export async function updateProject(formData: FormData) {
   const currentUser = await requirePermission("crm.write");
   const id = field(formData, "id");
   const project = parseProject(formData);
+  const profilePath = field(formData, "returnTo") === "profile";
+  const destination = profilePath && id ? `/projects/${id}` : "/projects";
 
   if (!id) redirect("/projects?error=not-found");
-  if (!project) redirect("/projects?error=invalid");
+  if (!project) redirect(`${destination}?error=invalid`);
 
   try {
     const updated = await prisma.project.update({ where: { id }, data: project });
@@ -83,13 +85,14 @@ export async function updateProject(formData: FormData) {
       "code" in error &&
       (error as { code?: string }).code === "P2025"
     ) {
-      redirect("/projects?error=not-found");
+      redirect(`${destination}?error=not-found`);
     }
     throw error;
   }
 
   revalidatePath("/projects");
-  redirect("/projects?notice=updated");
+  revalidatePath(`/projects/${id}`);
+  redirect(`${destination}?notice=updated`);
 }
 
 export async function deleteProject(formData: FormData) {
