@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UnsavedChangesProvider } from "@/app/components/unsaved-changes-form";
+import { WorkspaceShell } from "@/app/components/workspace-shell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col"><UnsavedChangesProvider>{children}</UnsavedChangesProvider></body>
+      <body className="min-h-full flex flex-col"><UnsavedChangesProvider><WorkspaceShell>{children}</WorkspaceShell></UnsavedChangesProvider></body>
     </html>
   );
 }

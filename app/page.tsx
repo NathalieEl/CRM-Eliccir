@@ -1,9 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { logout } from "@/app/login/actions";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
-
-const navigation = ["Vue d’ensemble", "Entreprises", "Contacts", "Activités", "Actions", "Projets", "Utilisateurs", "Maintenance", "Journal d’audit"];
 
 const defaultActivities = [
   { time: "09:30", kind: "RENDEZ-VOUS", title: "Visite du terrain avec Marc Delatour", detail: "Projet Lombok · Kuta Selatan", initials: "MD", color: "coral" },
@@ -141,24 +138,7 @@ export default async function Home() {
   const databaseMode = dashboard.databaseMode;
   return (
     <div className="crm-shell" id="overview">
-      <div className="dashboard-layout">
-        <main className="main-content">
-          <aside className="sidebar">
-            <a className="brand" href="#overview" aria-label="Eliccir CRM, accueil"><span className="brand-mark">E</span><span className="brand-name">eliccir<small>CRM</small></span></a>
-            <p className="workspace-label">ESPACE DE TRAVAIL</p>
-            <nav className="main-nav" aria-label="Navigation principale">
-              {navigation.map((label, index) => {
-                const href = index === 1 ? "/companies" : index === 2 ? "/contacts" : index === 3 ? "/activities" : index === 4 ? "/actions" : index === 5 ? "/projects" : index === 6 ? "/users" : index === 7 ? "/maintenance" : index === 8 ? "/audit" : "#overview";
-                return <a className={`nav-link${index === 0 ? " nav-link-active" : ""}`} href={href} key={label}><span>{String(index + 1).padStart(2, "0")}</span>{label}</a>;
-              })}
-            </nav>
-            <div className="sidebar-search-link-wrap">
-              <a className="sidebar-search-link" href="/search">Recherche globale</a>
-            </div>
-            <section className="sidebar-project" id="projects"><p>PROJET EN COURS</p><strong>Lombok</strong><span>Kuta Selatan, Indonésie</span><div className="project-progress"><i /></div><small>Parcelles suivies <b>08 / 12</b></small></section>
-            <div className="sidebar-bottom"><span className="online-dot" /> Session sécurisée<div className="profile-row"><span className="profile-avatar">AD</span><span><b>Administrateur</b><small>Accès complet</small></span><form action={logout}><button className="profile-logout" type="submit">Se déconnecter</button></form></div></div>
-          </aside>
-
+      <main className="main-content">
           <header className="topbar"><div className="breadcrumb"><span>ESPACE</span><i>/</i><b>Vue d’ensemble</b></div><div className="topbar-right"><time>Lundi 28 septembre 2026</time><span className="top-avatar">AD</span></div></header>
           <div className="dashboard-content">
             <section className="welcome-row"><div><p className="eyebrow"><i /> TON ACTIVITÉ, EN UN COUP D’ŒIL</p><h1>Bonjour, <em>{greetingName}.</em></h1><p className="welcome-copy">Voici les contacts et les priorités de ton portefeuille aujourd’hui.</p></div><Link className="text-link" href="/contacts">Voir mes contacts <span>↗</span></Link></section>
@@ -176,8 +156,7 @@ export default async function Home() {
             <section className="panel projects-panel" id="projects"><div className="section-heading"><div><p className="section-index">04 <i>·</i> PROJETS</p><h2>Opportunités actives</h2></div><a href="/projects">Tous les projets <span>→</span></a></div><div className="project-summary-list">{projects.map((project) => <div className="project-summary-item" key={project.name}><strong>{project.name}</strong><span>{project.location}</span><em>{project.progress}%</em></div>)}</div></section>
           </div>
           <footer className="dashboard-footer"><b>ELICCIR CRM</b><span>{databaseMode ? "DONNÉES SYNCHRONISÉES" : "BASE DE DONNÉES INDISPONIBLE"}</span><span>LOMBOK · INDONÉSIE</span></footer>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
