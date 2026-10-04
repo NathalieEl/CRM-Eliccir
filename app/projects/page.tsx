@@ -1,25 +1,26 @@
 import Link from "next/link";
-import { createProject, deleteProject } from "@/app/projects/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
 import type { Prisma } from "@/app/generated/prisma/client";
 
-type ProjectRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true } }>;
+type ProjectRecord = Prisma.PropertyGetPayload<{ include: { entreprise: true } }>;
 
 type ProjectsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
 };
 
-const notices: Record<string, string> = {
-  created: "Le projet a été ajouté.",
-  updated: "Les modifications ont été enregistrées.",
-  deleted: "Le projet a été supprimé.",
+const errors: Record<string, string> = {
+  invalid: "Vérifie les champs du projet, du titre foncier et des documents.",
+  "reference-exists": "Cette référence de projet existe déjà.",
+  "not-found": "Ce projet n’existe plus. Actualise la liste.",
 };
 
-const errors: Record<string, string> = {
-  invalid: "Vérifie le nom du projet et les champs numériques.",
-  "not-found": "Ce projet n’existe plus. Actualise la liste.",
-  "confirm-delete": "Confirme la suppression avant de continuer.",
+import { deleteProperty } from "@/app/properties/actions";
+const notices: Record<string, string> = {
+  created: "Le projet a été créé.",
+  updated: "Les modifications ont été enregistrées.",
+  deleted: "Le projet et ses données immobilières liées ont été supprimés.",
+  "confirm-delete": "Confirme la suppression du projet.",
 };
 
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
@@ -29,20 +30,16 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const searchQuery = (params.q ?? "").trim();
   let databaseAvailable = true;
   let projects: ProjectRecord[] = [];
-  let entreprises: { id: string; nom: string }[] = [];
 
   try {
-    [projects, entreprises] = await Promise.all([
-      prisma.project.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } }),
-      prisma.entreprise.findMany({ select: { id: true, nom: true }, orderBy: { nom: "asc" } }),
-    ]);
+    projects = await prisma.property.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } });
   } catch {
     databaseAvailable = false;
   }
 
   const filteredProjects = searchQuery
     ? projects.filter((project) => {
-        const haystack = [project.nom, project.entreprise?.nom ?? "", project.pays ?? "", project.ville ?? "", project.statut, project.budget ?? ""]
+        const haystack = [project.title, project.reference, project.entreprise?.nom ?? "", project.country ?? "", project.kabupaten ?? "", project.province ?? "", project.projectStatus ?? "", project.projectBudget ?? "", project.type, project.status]
           .join(" ")
           .toLowerCase();
         return haystack.includes(searchQuery.toLowerCase());
@@ -64,7 +61,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           <div>
             <p className="section-index">ESPACE DE TRAVAIL <i>·</i> PROJETS</p>
             <h1>Suivi des projets</h1>
-            <p className="contacts-intro">Suis les investissements, leur statut et leur avancement.</p>
+            <p className="contacts-intro">Retrouve les informations immobilières, foncières et financières de chaque projet.</p>
           </div>
           <span className="contacts-total">{databaseAvailable ? projects.length : "—"}<small>PROJETS</small></span>
         </section>
@@ -75,6 +72,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
             <input id="projects-search" name="q" type="search" defaultValue={searchQuery} placeholder="Rechercher un projet, pays ou ville" autoComplete="off" />
             <button type="submit">Rechercher</button>
           </form>
+          {canWrite ? <Link className="contact-primary-button" href="/projects/new">Ajouter un projet <span>+</span></Link> : null}
           {searchQuery ? <Link className="contacts-search-reset" href="/projects">Réinitialiser</Link> : null}
         </section>
 
@@ -90,26 +88,9 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           </section>
         ) : (
           <>
-            <section className="contacts-create-section">
-              <div className="contacts-section-heading">
-                <div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Ajouter un projet</h2></div>
-              </div>
-
-              <form action={createProject} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
-                <label>Nom du projet<input name="nom" required minLength={2} maxLength={120} placeholder="Ex. Lombok Residences" /></label>
-                <label>Entreprise<select name="entrepriseId" defaultValue=""><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-                <label>Pays<input name="pays" maxLength={80} placeholder="Indonésie" /></label>
-                <label>Ville<input name="ville" maxLength={80} placeholder="Kuta Selatan" /></label>
-                <label>Budget<input name="budget" maxLength={80} placeholder="€ 2.4M" /></label>
-                <label>Statut<input name="statut" maxLength={40} defaultValue="En cours" /></label>
-                <label>Progression (%)<input name="progression" type="number" min={0} max={100} defaultValue={35} /></label>
-                <button className="contact-primary-button" type="submit">Ajouter le projet <span>+</span></button>
-              </form>
-            </section>
-
             <section className="contacts-list-section">
               <div className="contacts-section-heading">
-                <div><p className="section-index">02 <i>·</i> PORTEFEUILLE</p><h2>Projets enregistrés</h2></div>
+                <div><p className="section-index">01 <i>·</i> PORTEFEUILLE</p><h2>Projets enregistrés</h2></div>
                 <span className="contacts-list-count">{filteredProjects.length}</span>
               </div>
 
@@ -117,7 +98,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                 <p className="contacts-empty">
                   {searchQuery
                     ? `Aucun résultat pour “${searchQuery}”. Essaie une autre recherche.`
-                    : "Aucun projet pour le moment. Ajoute ton premier projet ci-dessus."}
+                    : "Aucun projet pour le moment. Ajoute ton premier projet."}
                 </p>
               ) : (
                 <div className="contacts-records-wrap">
@@ -127,25 +108,26 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                       {filteredProjects.map((project) => (
                         <tr key={project.id}>
                           <td data-label="Projet">
-                            <b><Link href={`/projects/${project.id}`}>{project.nom}</Link></b>
-                            <small>{project.updatedAt.toLocaleDateString("fr-FR")}</small>
+                            <b><Link href={`/projects/${project.id}`}>{project.title}</Link></b>
+                            <small>{project.reference}</small>
                           </td>
                           <td data-label="Entreprise">{project.entreprise?.nom || "—"}</td>
-                          <td data-label="Localisation">{[project.ville, project.pays].filter(Boolean).join(" · ") || "—"}</td>
-                          <td data-label="Statut"><span className="status-pill status-active"><i />{project.statut}</span></td>
-                          <td data-label="Progression">{project.progression}%</td>
-                          <td data-label="Budget">{project.budget || "—"}</td>
+                          <td data-label="Localisation">{[project.neighborhood, project.kabupaten, project.province, project.country].filter(Boolean).join(" · ") || "—"}</td>
+                          <td data-label="Statut"><span className="status-pill status-active"><i />{project.projectStatus || project.status}</span></td>
+                          <td data-label="Progression">{project.projectProgression === null ? "—" : `${project.projectProgression}%`}</td>
+                          <td data-label="Budget">{project.projectBudget || "—"}</td>
                           <td data-label="Gestion">
                             <div className="contact-row-actions">
-                              <Link className="contacts-search-reset" href={`/projects/${project.id}`}>{canWrite ? "Modifier" : "Voir"}</Link>
+                              <Link className="contact-profile-link" href={`/projects/${project.id}`}>{canWrite ? "Modifier" : "Voir"}</Link>
                               {canWrite ? <details className="contact-delete-details">
-                                  <summary>Supprimer</summary>
-                                  <form action={deleteProject} className="contact-delete-form">
-                                    <input type="hidden" name="id" value={project.id} />
-                                    <label><input type="checkbox" name="confirmed" value="yes" required /> Confirmer la suppression</label>
-                                    <button type="submit">Supprimer ce projet</button>
-                                  </form>
-                                </details> : null}
+                                <summary>Supprimer</summary>
+                                <form action={deleteProperty} className="contact-delete-form">
+                                  <input type="hidden" name="id" value={project.id} />
+                                  <p>Supprime aussi les titres, documents, mandats, dossiers et visites liés.</p>
+                                  <label><input type="checkbox" name="confirmed" value="yes" required /> Confirmer la suppression</label>
+                                  <button type="submit">Supprimer le projet</button>
+                                </form>
+                              </details> : null}
                             </div>
                           </td>
                         </tr>

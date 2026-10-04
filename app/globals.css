@@ -232,6 +232,42 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contact-delete-form label { align-items: center; color: #56645a; display: flex; font-size: 13px; gap: 7px; }
 .contact-delete-form button { background: #a84938; border: 0; border-radius: 3px; color: white; cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; min-height: 44px; }
 .contacts-empty { border-top: 1px solid #eff0ed; color: #59665d; font-size: 15px; margin: 0; padding: 22px 0 7px; }
+.property-profile-page { max-width: 1320px; }
+.property-edit-form { display: grid; gap: 1px; }
+.property-fieldset { border: 0; display: grid; gap: 1px; margin: 0; min-width: 0; padding: 0; }
+.property-fieldset:disabled { opacity: .82; }
+.property-fields-grid, .property-system-fields { display: grid; gap: 13px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.property-fields-grid label, .property-system-fields label { color: #56645a; display: grid; font-size: 14px; font-weight: 600; gap: 6px; min-width: 0; }
+.property-fields-grid input, .property-fields-grid select, .property-fields-grid textarea, .property-system-fields input { background: #fff; border: 1px solid #dfe4de; border-radius: 3px; color: #27362d; font: inherit; font-size: 16px; min-height: 44px; min-width: 0; padding: 9px 10px; }
+.property-fields-grid textarea { min-height: 96px; resize: vertical; }
+.property-fields-grid input:focus, .property-fields-grid select:focus, .property-fields-grid textarea:focus { border-color: var(--green); outline: 2px solid rgba(35,99,71,.13); }
+.property-fields-grid input[type="checkbox"], .property-delete-document input[type="checkbox"] { accent-color: var(--green); height: 18px; min-height: 18px; width: 18px; }
+.property-field-wide { grid-column: 1 / -1; }
+.property-checkbox { align-items: center; display: flex !important; gap: 10px !important; min-height: 44px; }
+.property-checkbox input { flex: 0 0 auto; }
+.property-system-fields { margin-bottom: 14px; }
+.property-system-fields input { background: #f3f5f1; color: #68756c; font-family: var(--font-geist-mono); font-size: 12px; }
+.property-document-row { border-top: 1px solid #e9ece7; display: grid; gap: 14px; margin-top: 16px; padding-top: 16px; }
+.property-delete-document { align-items: center; color: #ad5946; display: flex; font-size: 13px; gap: 8px; }
+.property-related-list { display: grid; gap: 0; }
+.property-related-list p { border-top: 1px solid #eff0ed; display: grid; font-size: 13px; gap: 5px; margin: 0; padding: 12px 0; }
+.property-related-list b { color: #344138; overflow-wrap: anywhere; }
+.property-related-list span { color: #68756c; }
+.properties-data-table th:nth-child(1), .properties-data-table td:nth-child(1) { width: 21%; }
+.properties-data-table th:nth-child(2), .properties-data-table td:nth-child(2) { width: 12%; }
+.properties-data-table th:nth-child(3), .properties-data-table td:nth-child(3) { width: 12%; }
+.properties-data-table th:nth-child(4), .properties-data-table td:nth-child(4) { width: 21%; }
+.properties-data-table th:nth-child(5), .properties-data-table td:nth-child(5) { width: 16%; }
+.properties-data-table th:nth-child(6), .properties-data-table td:nth-child(6) { width: 10%; }
+.properties-data-table th:nth-child(7), .properties-data-table td:nth-child(7) { width: 8%; }
+
+@media (max-width: 760px) {
+  .property-fields-grid, .property-system-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .property-fields-grid, .property-system-fields { grid-template-columns: minmax(0, 1fr); }
+  .property-field-wide { grid-column: auto; }
+}
 
 @media (max-width: 1050px) {
   .workspace-layout { grid-template-columns: minmax(0, 1fr) 210px; }

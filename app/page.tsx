@@ -61,13 +61,13 @@ function formatActionItem(action: { titre: string; dateEcheance?: Date | null; p
   };
 }
 
-function formatProjectItem(project: { nom: string; ville?: string | null; pays?: string | null; progression: number; entreprise?: { nom: string } | null }) {
-  const location = [project.entreprise?.nom, project.ville, project.pays].filter(Boolean).join(" · ") || "Localisation non définie";
+function formatProjectItem(project: { title: string; country?: string | null; kabupaten?: string | null; province?: string | null; projectProgression?: number | null; entreprise?: { nom: string } | null }) {
+  const location = [project.entreprise?.nom, project.kabupaten, project.province, project.country].filter(Boolean).join(" · ") || "Localisation non définie";
 
   return {
-    name: project.nom,
+    name: project.title,
     location,
-    progress: project.progression || 0,
+    progress: project.projectProgression || 0,
   };
 }
 
@@ -78,12 +78,12 @@ async function getDashboardData() {
     const [contactsCount, newContactsCount, projectsCount, activitiesCount, pendingActionsCount, overdueActionsCount, recentContacts, recentProjects, upcomingActivities, nextActions] = await Promise.all([
       prisma.contact.count(),
       prisma.contact.count({ where: { createdAt: { gte: monthStart } } }),
-      prisma.project.count({ where: { statut: { not: "Terminé" } } }),
+      prisma.property.count({ where: { status: { not: "SOLD" } } }),
       prisma.activity.count({ where: { date: { gte: now } } }),
       prisma.actionItem.count({ where: { statut: { not: "Terminée" } } }),
       prisma.actionItem.count({ where: { statut: { not: "Terminée" }, dateEcheance: { lt: now } } }),
       prisma.contact.findMany({ include: { entreprises: { include: { entreprise: true } } }, take: 4, orderBy: { updatedAt: "desc" } }),
-      prisma.project.findMany({ include: { entreprise: true }, take: 3, orderBy: { updatedAt: "desc" } }),
+      prisma.property.findMany({ include: { entreprise: true }, take: 3, orderBy: { updatedAt: "desc" } }),
       prisma.activity.findMany({ include: { contact: true, entreprise: true, responsable: true }, where: { date: { gte: now } }, take: 3, orderBy: { date: "asc" } }),
       prisma.actionItem.findMany({ include: { entreprise: true, responsable: true }, where: { statut: { not: "Terminée" } }, take: 3, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
     ]);
@@ -153,7 +153,7 @@ export default async function Home() {
 
               <section className="panel contacts-panel" id="contacts"><div className="section-heading"><div><p className="section-index">03 <i>·</i> PORTEFEUILLE</p><h2>Contacts récemment suivis</h2></div><Link href="/contacts">Tous les contacts <span>→</span></Link></div><div className="contact-table-wrap"><table><thead><tr><th>CONTACT</th><th>INTÉRÊT</th><th>STATUT</th><th>DERNIÈRE ACTIVITÉ</th><th /></tr></thead><tbody>{contacts.map((contact) => <tr key={contact.email}><td data-label="Contact"><div className="contact-identity"><span className={`avatar avatar-${contact.color}`}>{contact.initials}</span><span><b>{contact.name}</b><small>{contact.email}</small></span></div></td><td data-label="Intérêt">{contact.interest}</td><td data-label="Statut"><span className={`status-pill status-${contact.tone}`}><i />{contact.status}</span></td><td data-label="Dernière activité">{contact.updated}</td><td className="row-arrow" aria-hidden="true">↗</td></tr>)}</tbody></table></div></section>
 
-            <section className="panel projects-panel" id="projects"><div className="section-heading"><div><p className="section-index">04 <i>·</i> PROJETS</p><h2>Opportunités actives</h2></div><a href="/projects">Tous les projets <span>→</span></a></div><div className="project-summary-list">{projects.map((project) => <div className="project-summary-item" key={project.name}><strong>{project.name}</strong><span>{project.location}</span><em>{project.progress}%</em></div>)}</div></section>
+            <section className="panel projects-panel" id="projects"><div className="section-heading"><div><p className="section-index">04 <i>·</i> PROJETS</p><h2>Opportunités actives</h2></div><Link href="/projects">Tous les projets <span>→</span></Link></div><div className="project-summary-list">{projects.map((project) => <div className="project-summary-item" key={project.name}><strong>{project.name}</strong><span>{project.location}</span><em>{project.progress}%</em></div>)}</div></section>
           </div>
           <footer className="dashboard-footer"><b>ELICCIR CRM</b><span>{databaseMode ? "DONNÉES SYNCHRONISÉES" : "BASE DE DONNÉES INDISPONIBLE"}</span><span>LOMBOK · INDONÉSIE</span></footer>
       </main>

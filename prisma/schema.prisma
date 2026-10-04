@@ -19,6 +19,7 @@ enum ContactNoteNature {
 }
 
 enum PropertyType {
+  PROJECT
   VILLA
   HOUSE
   APARTMENT
@@ -242,6 +243,7 @@ model Entreprise {
   activities  Activity[]
   actionItems ActionItem[]
   projects    Project[]
+  properties  Property[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -287,6 +289,7 @@ model Project {
   progression Int      @default(0)
   entreprise  Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
   contacts ContactProject[]
+  property Property?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -600,6 +603,12 @@ model Property {
   id            String           @id @default(cuid())
   reference     String           @unique
   title         String
+  country       String?
+  projectStatus String?
+  projectBudget String?
+  projectProgression  Int?
+  entrepriseId         String?
+  legacyProjectId String?        @unique
   description   String?
   type          PropertyType
   status        PropertyStatus   @default(AVAILABLE)
@@ -609,6 +618,8 @@ model Property {
 
   ownerId String?
   owner   Contact? @relation("PropertyOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  entreprise Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  legacyProject Project? @relation(fields: [legacyProjectId], references: [id], onDelete: SetNull)
 
   address              String?
   kecamatan            String?
@@ -666,6 +677,7 @@ model Property {
   @@index([status])
   @@index([type])
   @@index([province, kabupaten])
+  @@index([entrepriseId])
 }
 
 model LandTitle {

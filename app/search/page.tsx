@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
 import type { Prisma } from "@/app/generated/prisma/client";
 
-type ProjectSearchRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true } }>;
+type ProjectSearchRecord = Prisma.PropertyGetPayload<{ include: { entreprise: true } }>;
 type ActivitySearchRecord = Prisma.ActivityGetPayload<{ include: { contact: true; entreprise: true; responsable: true } }>;
 type ActionSearchRecord = Prisma.ActionItemGetPayload<{ include: { contact: true; entreprise: true; responsable: true } }>;
 type ContactSearchRecord = Prisma.ContactGetPayload<{
@@ -80,7 +80,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         orderBy: { updatedAt: "desc" },
       }),
       prisma.entreprise.findMany({ orderBy: { nom: "asc" } }),
-      prisma.project.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } }),
+      prisma.property.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } }),
       prisma.activity.findMany({ include: { contact: true, entreprise: true, responsable: true }, orderBy: { date: "asc" } }),
       prisma.actionItem.findMany({ include: { contact: true, entreprise: true, responsable: true }, orderBy: [{ dateEcheance: "asc" }, { updatedAt: "desc" }] }),
     ]);
@@ -141,7 +141,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const filteredProjects = query
     ? projects.filter((project) => {
-        const haystack = [project.nom, project.entreprise?.nom ?? "", project.ville ?? "", project.pays ?? "", project.statut, project.budget ?? ""].join(" ").toLowerCase();
+        const haystack = [project.title, project.reference, project.entreprise?.nom ?? "", project.kabupaten ?? "", project.province ?? "", project.country ?? "", project.projectStatus ?? "", project.projectBudget ?? "", project.type, project.status].join(" ").toLowerCase();
         return haystack.includes(query);
       })
     : projects.slice(0, 3);
@@ -235,9 +235,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   <ul>
                     {filteredProjects.map((project) => (
                       <li key={project.id}>
-                        <strong>{project.nom}</strong>
-                        <span>{[project.ville, project.pays].filter(Boolean).join(" · ") || "Localisation non définie"}</span>
-                        <small>{[project.entreprise?.nom, project.statut].filter(Boolean).join(" · ")}</small>
+                        <strong><Link href={`/projects/${project.id}`}>{project.title}</Link></strong>
+                        <span>{[project.kabupaten, project.province, project.country].filter(Boolean).join(" · ") || "Localisation non définie"}</span>
+                        <small>{[project.entreprise?.nom, project.projectStatus ?? project.status].filter(Boolean).join(" · ")}</small>
                       </li>
                     ))}
                   </ul>
