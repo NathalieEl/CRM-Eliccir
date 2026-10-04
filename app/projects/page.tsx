@@ -122,21 +122,21 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                 </p>
               ) : (
                 <div className="contacts-records-wrap">
-                  <table className="contacts-records">
+                  <table className="contacts-records contacts-data-table projects-data-table">
                     <thead><tr><th>PROJET</th><th>ENTREPRISE</th><th>LOCALISATION</th><th>STATUT</th><th>PROGRESSION</th><th>BUDGET</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredProjects.map((project) => (
                         <tr key={project.id}>
-                          <td>
+                          <td data-label="Projet">
                             <b>{project.nom}</b>
                             <small>{project.updatedAt.toLocaleDateString("fr-FR")}</small>
                           </td>
-                          <td>{project.entreprise?.nom || "—"}</td>
-                          <td>{[project.ville, project.pays].filter(Boolean).join(" · ") || "—"}</td>
-                          <td><span className="status-pill status-active"><i />{project.statut}</span></td>
-                          <td>{project.progression}%</td>
-                          <td>{project.budget || "—"}</td>
-                          <td>
+                          <td data-label="Entreprise">{project.entreprise?.nom || "—"}</td>
+                          <td data-label="Localisation">{[project.ville, project.pays].filter(Boolean).join(" · ") || "—"}</td>
+                          <td data-label="Statut"><span className="status-pill status-active"><i />{project.statut}</span></td>
+                          <td data-label="Progression">{project.progression}%</td>
+                          <td data-label="Budget">{project.budget || "—"}</td>
+                          <td data-label="Gestion">
                             <div className={`contact-row-actions${canWrite ? "" : " permission-hidden"}`}>
                               <details className="contact-edit-details">
                                 <summary>Modifier</summary>

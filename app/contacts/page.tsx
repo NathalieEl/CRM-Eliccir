@@ -167,7 +167,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 </p>
               ) : (
                 <div className="contacts-records-wrap">
-                  <table className="contacts-records">
+                  <table className="contacts-records contacts-data-table">
                     <thead><tr><th>CONTACT</th><th>TÉLÉPHONE</th><th>ENTREPRISE / POSTE</th><th>SECTEUR</th><th>VILLE</th><th>STATUT</th><th>SOURCE</th><th>MODIFIÉ</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {visibleContacts.map((contact) => (

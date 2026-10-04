@@ -49,14 +49,14 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         <section className="contacts-list-section">
           <div className="contacts-section-heading"><div><p className="section-index">02 <i>·</i> ACCÈS ACTIFS</p><h2>Comptes existants</h2></div></div>
           <div className="users-table-wrap">
-            <table className="contacts-records">
+            <table className="contacts-records contacts-data-table users-data-table">
               <thead><tr><th>UTILISATEUR</th><th>PROFIL</th><th>ÉTAT</th><th>GESTION</th></tr></thead>
               <tbody>{users.map((user) => (
                 <tr key={user.id}>
-                  <td><b>{user.prenom || user.username}</b><small>{user.username} · {twoFactorActive ? "2FA active" : "2FA en sommeil"}</small></td>
-                  <td>{roleLabels[user.role as UserRole] ?? roleLabels.member}</td>
-                  <td>{user.active ? "Actif" : "Désactivé"}</td>
-                  <td><div className="user-row-actions">
+                  <td data-label="Utilisateur"><b>{user.prenom || user.username}</b><small>{user.username} · {twoFactorActive ? "2FA active" : "2FA en sommeil"}</small></td>
+                  <td data-label="Profil">{roleLabels[user.role as UserRole] ?? roleLabels.member}</td>
+                  <td data-label="État">{user.active ? "Actif" : "Désactivé"}</td>
+                  <td data-label="Gestion"><div className="user-row-actions">
                     <details>
                       <summary>Modifier</summary>
                       <UnsavedChangesForm action={updateUser} className="user-edit-form">

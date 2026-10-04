@@ -140,7 +140,7 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
                 </p>
               ) : (
                 <div className="contacts-records-wrap">
-                  <table className="contacts-records">
+                  <table className="contacts-records contacts-data-table activities-data-table">
                     <thead><tr><th>TITRE</th><th>TYPE / CANAL</th><th>CONTACT</th><th>ENTREPRISE</th><th>STATUT</th><th>RESPONSABLE</th><th>DATE PRÉVUE / RÉALISÉE</th><th>DURÉE</th><th>PROCHAINE ACTION / RÉSULTAT</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredActivities.map((activity) => (

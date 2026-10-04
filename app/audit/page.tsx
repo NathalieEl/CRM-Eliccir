@@ -31,7 +31,7 @@ export default async function AuditPage() {
         <section className="contacts-list-section">
           <div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> ACTIVITÉ</p><h2>Historique récent</h2></div></div>
           {entries.length === 0 ? <p className="contacts-empty">Aucun événement enregistré.</p> : (
-            <div className="contacts-records-wrap"><table className="contacts-records"><thead><tr><th>DATE</th><th>ACTEUR</th><th>ACTION</th><th>OBJET</th><th>DÉTAILS</th></tr></thead><tbody>{entries.map((entry) => <tr key={entry.id}><td><time dateTime={entry.createdAt.toISOString()}>{entry.createdAt.toLocaleString("fr-FR")}</time></td><td>{entry.actorUsername}</td><td>{actionLabels[entry.action] ?? entry.action}</td><td>{entityLabels[entry.entity] ?? entry.entity}</td><td>{entry.details ?? "—"}</td></tr>)}</tbody></table></div>
+            <div className="contacts-records-wrap"><table className="contacts-records contacts-data-table audit-data-table"><thead><tr><th>DATE</th><th>ACTEUR</th><th>ACTION</th><th>OBJET</th><th>DÉTAILS</th></tr></thead><tbody>{entries.map((entry) => <tr key={entry.id}><td data-label="Date"><time dateTime={entry.createdAt.toISOString()}>{entry.createdAt.toLocaleString("fr-FR")}</time></td><td data-label="Acteur">{entry.actorUsername}</td><td data-label="Action">{actionLabels[entry.action] ?? entry.action}</td><td data-label="Objet">{entityLabels[entry.entity] ?? entry.entity}</td><td data-label="Détails">{entry.details ?? "—"}</td></tr>)}</tbody></table></div>
           )}
         </section>
       </div>

@@ -156,7 +156,7 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                 </p>
               ) : (
                 <div className="contacts-records-wrap">
-                  <table className="contacts-records">
+                  <table className="contacts-records contacts-data-table actions-data-table">
                     <thead><tr><th>TITRE</th><th>PRIORITÉ</th><th>STATUT</th><th>CONTACT</th><th>ENTREPRISE</th><th>RESPONSABLE</th><th>CANAL / DURÉE</th><th>ÉCHÉANCE / RÉALISATION</th><th>PROCHAINE ACTION / RÉSULTAT</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredActions.map((action) => (

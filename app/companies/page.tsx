@@ -112,14 +112,14 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
               <div className="contacts-section-heading"><div><p className="section-index">02 · PORTFEUILLE</p><h2>Entreprises enregistrées</h2></div><span className="contacts-list-count">{filtered.length}</span></div>
               {filtered.length === 0 ? <p className="contacts-empty">Aucune entreprise ne correspond à la recherche.</p> : (
                 <div className="contacts-records-wrap">
-                  <table className="contacts-records companies-records">
+                  <table className="contacts-records companies-records contacts-data-table companies-data-table">
                     <thead><tr><th>ENTREPRISE</th><th>CONTACTS</th><th>SUIVI</th><th>ACTIONS</th></tr></thead>
                     <tbody>{filtered.map((entreprise) => (
                       <tr key={entreprise.id}>
-                        <td><b>{entreprise.nom}</b><small>{[entreprise.ville, entreprise.pays].filter(Boolean).join(" · ") || entreprise.secteur || "Coordonnées non renseignées"}</small></td>
-                        <td><b>{entreprise.contacts.length} contact{entreprise.contacts.length === 1 ? "" : "s"}</b><small>{entreprise.contacts.slice(0, 3).map(({ contact }) => contactName(contact)).join(", ")}{entreprise.contacts.length > 3 ? "…" : ""}</small></td>
-                        <td><span>{entreprise._count.activities} activité{entreprise._count.activities === 1 ? "" : "s"}</span><small>{entreprise._count.actionItems} action{entreprise._count.actionItems === 1 ? "" : "s"} · {entreprise._count.projects} projet{entreprise._count.projects === 1 ? "" : "s"}</small></td>
-                        <td><Link className="contact-profile-link" href={`/companies/${entreprise.id}`}>Ouvrir la fiche</Link></td>
+                        <td data-label="Entreprise"><b>{entreprise.nom}</b><small>{[entreprise.ville, entreprise.pays].filter(Boolean).join(" · ") || entreprise.secteur || "Coordonnées non renseignées"}</small></td>
+                        <td data-label="Contacts"><b>{entreprise.contacts.length} contact{entreprise.contacts.length === 1 ? "" : "s"}</b><small>{entreprise.contacts.slice(0, 3).map(({ contact }) => contactName(contact)).join(", ")}{entreprise.contacts.length > 3 ? "…" : ""}</small></td>
+                        <td data-label="Suivi"><span>{entreprise._count.activities} activité{entreprise._count.activities === 1 ? "" : "s"}</span><small>{entreprise._count.actionItems} action{entreprise._count.actionItems === 1 ? "" : "s"} · {entreprise._count.projects} projet{entreprise._count.projects === 1 ? "" : "s"}</small></td>
+                        <td data-label="Actions"><Link className="contact-profile-link" href={`/companies/${entreprise.id}`}>Ouvrir la fiche</Link></td>
                       </tr>
                     ))}</tbody>
                   </table>
