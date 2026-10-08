@@ -132,7 +132,6 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
 
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">01 · IDENTIFICATION</p><h2>Informations générales</h2></div></div>
-        {property ? <div className="property-system-fields"><label>Identifiant<input value={property.id} readOnly /></label>{property.legacyProjectId ? <label>Ancien identifiant projet<input value={property.legacyProjectId} readOnly /></label> : null}<label>Créé le<input value={displayDate(property.createdAt)} readOnly /></label><label>Modifié le<input value={displayDate(property.updatedAt)} readOnly /></label></div> : null}
         <div className="property-fields-grid">
           <label>Référence du projet<input name="reference" defaultValue={property?.reference ?? ""} required minLength={2} maxLength={80} /></label>
           <label>Nom du projet<input name="title" defaultValue={property?.title ?? ""} required minLength={2} maxLength={200} /></label>
@@ -277,6 +276,16 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
           {property.mandates.map((mandate) => <p key={mandate.id}><b>Mandat · {mandate.id}</b><span>{mandate.transactionType} · {mandate.mandateType} · {mandate.isActive ? "Actif" : "Inactif"}</span></p>)}
           {property.deals.map((deal) => <p key={deal.id}><b>Dossier · {deal.id}</b><span>{deal.transactionType} · {deal.stage} · {deal.currency} {displayValue(deal.finalPrice ?? deal.negotiatedPrice)}</span></p>)}
           {property.viewings.map((viewing) => <p key={viewing.id}><b>Visite · {viewing.id}</b><span>{displayDate(viewing.scheduledAt)} · Contact {viewing.contactId} · Intérêt {displayValue(viewing.interestLevel) || "—"}</span></p>)}
+        </div>
+      </section> : null}
+
+      {property ? <section className="contacts-create-section profile-section">
+        <div className="contacts-section-heading"><div><p className="section-index">10 · SYSTÈME</p><h2>Informations système</h2></div></div>
+        <div className="property-system-fields">
+          <label>Identifiant<input value={property.id} readOnly /></label>
+          {property.legacyProjectId ? <label>Ancien identifiant projet<input value={property.legacyProjectId} readOnly /></label> : null}
+          <label>Créé le<input value={displayDate(property.createdAt)} readOnly /></label>
+          <label>Modifié le<input value={displayDate(property.updatedAt)} readOnly /></label>
         </div>
       </section> : null}
 
