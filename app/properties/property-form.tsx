@@ -162,9 +162,9 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
           <label>Province<input name="province" defaultValue={property?.province ?? ""} /></label>
           <label>Code postal<input name="postalCode" defaultValue={property?.postalCode ?? ""} /></label>
           <CoordinateField label="Latitude" name="latitude" initialValue={displayValue(property?.latitude)} />
-          <CoordinateField label="Longitude" name="longitude" initialValue={displayValue(property?.longitude)} />
-          <label>Distance de la plage (km)<input name="distanceBeachKm" type="number" min="0" step="any" defaultValue={displayValue(property?.distanceBeachKm)} /></label>
           <label>Distance de l’aéroport (km)<input name="distanceAirportKm" type="number" min="0" step="any" defaultValue={displayValue(property?.distanceAirportKm)} /></label>
+          <label>Distance de la plage (km)<input name="distanceBeachKm" type="number" min="0" step="any" defaultValue={displayValue(property?.distanceBeachKm)} /></label>
+          <CoordinateField label="Longitude" name="longitude" initialValue={displayValue(property?.longitude)} />
           <label>Largeur de la voie d’accès (m)<input name="accessRoadWidthM" type="number" min="0" step="any" defaultValue={displayValue(property?.accessRoadWidthM)} /></label>
           <label>Type de voie d’accès<input name="accessRoadType" defaultValue={property?.accessRoadType ?? ""} /></label>
           <label>Vues<textarea name="views" rows={3} placeholder="Une valeur par ligne" defaultValue={property?.views.join("\n") ?? ""} /></label>
