@@ -243,6 +243,14 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .property-fields-grid input:focus, .property-fields-grid select:focus, .property-fields-grid textarea:focus { border-color: var(--green); outline: 2px solid rgba(35,99,71,.13); }
 .property-fields-grid input[type="checkbox"], .property-delete-document input[type="checkbox"] { accent-color: var(--green); height: 18px; min-height: 18px; width: 18px; }
 .property-field-wide { grid-column: 1 / -1; }
+.coordinate-field { display: grid; gap: 6px; min-width: 0; }
+.coordinate-field-title { color: #56645a; font-size: 14px; font-weight: 600; }
+.coordinate-dms-row { align-items: end; display: grid; gap: 5px; grid-template-columns: minmax(0, 1fr) auto minmax(0, .8fr) auto minmax(0, 1fr) auto minmax(80px, 1.25fr); min-width: 0; }
+.coordinate-dms-row label { font-size: 11px; gap: 4px; }
+.coordinate-dms-row label > span { color: #68756c; }
+.coordinate-dms-row input, .coordinate-dms-row select { font-size: 14px; padding: 8px 6px; }
+.coordinate-unit { align-self: end; color: #68756c; line-height: 42px; }
+.coordinate-preview { color: #68756c; font-size: 12px; }
 .property-checkbox { align-items: center; display: flex !important; gap: 10px !important; min-height: 44px; }
 .property-checkbox input { flex: 0 0 auto; }
 .property-system-fields { margin-bottom: 14px; }

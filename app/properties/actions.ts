@@ -163,6 +163,7 @@ function parseProperty(formData: FormData) {
   if (projectBudgetAmount === undefined || projectBudgetCurrency === undefined || projectBudgetRateEurUsd === undefined || projectBudgetRateEurIdr === undefined || projectBudgetRateUsdIdr === undefined || projectBudgetRateDate === undefined) return null;
   if (hasBudgetRates && (!completeBudgetRates || !projectBudgetRateDate)) return null;
   if (projectBudgetAmount !== null && (projectBudgetAmount < 0 || !projectBudgetCurrency)) return null;
+  if ((numbers.latitude !== null && numbers.latitude !== undefined && Math.abs(numbers.latitude) > 90) || (numbers.longitude !== null && numbers.longitude !== undefined && Math.abs(numbers.longitude) > 180)) return null;
   if (reference.length < 2 || reference.length > 80 || title.length < 2 || title.length > 200 || ownerId.length > 64 || entrepriseId.length > 64 || country.length > 80 || projectStatus.length > 40 || legacyProjectBudget.length > 80 || (numbers.projectProgression !== null && numbers.projectProgression !== undefined && (numbers.projectProgression < 0 || numbers.projectProgression > 100))) return null;
 
   const ratesForCalculation = completeBudgetRates && projectBudgetRateEurUsd !== null && projectBudgetRateEurIdr !== null && projectBudgetRateUsdIdr !== null
