@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { formatCurrencyAmount, formatLegacyBudget } from "@/lib/number-format";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type ProjectRecord = Prisma.PropertyGetPayload<{ include: { entreprise: true } }>;
@@ -115,7 +116,9 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                           <td data-label="Localisation">{[project.neighborhood, project.kabupaten, project.province, project.country].filter(Boolean).join(" · ") || "—"}</td>
                           <td data-label="Statut"><span className="status-pill status-active"><i />{project.projectStatus || project.status}</span></td>
                           <td data-label="Progression">{project.projectProgression === null ? "—" : `${project.projectProgression}%`}</td>
-                          <td data-label="Budget">{project.projectBudget || "—"}</td>
+                          <td data-label="Budget">{project.projectBudgetAmount !== null && project.projectBudgetCurrency
+                            ? formatCurrencyAmount(project.projectBudgetAmount.toString(), project.projectBudgetCurrency)
+                            : formatLegacyBudget(project.projectBudget)}</td>
                           <td data-label="Gestion">
                             <div className="contact-row-actions">
                               <Link className="contact-profile-link" href={`/projects/${project.id}`}>{canWrite ? "Modifier" : "Voir"}</Link>

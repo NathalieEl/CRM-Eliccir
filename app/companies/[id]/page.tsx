@@ -5,6 +5,7 @@ import { CompanyFields } from "@/app/companies/company-fields";
 import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { formatLegacyBudget } from "@/lib/number-format";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type CompanyProfile = Prisma.EntrepriseGetPayload<{
@@ -117,7 +118,7 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
 
         <section className="contacts-list-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">04 · ACTIVITÉ</p><h2>Projets associés</h2></div><span className="contacts-list-count">{entreprise.projects.length}</span></div>
-          {entreprise.projects.length ? <div className="contacts-records-wrap"><table className="contacts-records contacts-data-table company-profile-table company-projects-data-table"><thead><tr><th>PROJET</th><th>STATUT</th><th>PROGRESSION</th><th>BUDGET</th><th>CONTACTS INTÉRESSÉS</th></tr></thead><tbody>{entreprise.projects.map((project) => <tr key={project.id}><td data-label="Projet"><b>{project.nom}</b><small>{[project.ville, project.pays].filter(Boolean).join(" · ") || "—"}</small></td><td data-label="Statut">{project.statut}</td><td data-label="Progression">{project.progression}%</td><td data-label="Budget">{project.budget || "—"}</td><td data-label="Contacts intéressés">{project.contacts.map(({ contact }) => contactName(contact)).join(", ") || "—"}</td></tr>)}</tbody></table></div> : <p className="contacts-empty">Aucun projet associé.</p>}
+          {entreprise.projects.length ? <div className="contacts-records-wrap"><table className="contacts-records contacts-data-table company-profile-table company-projects-data-table"><thead><tr><th>PROJET</th><th>STATUT</th><th>PROGRESSION</th><th>BUDGET</th><th>CONTACTS INTÉRESSÉS</th></tr></thead><tbody>{entreprise.projects.map((project) => <tr key={project.id}><td data-label="Projet"><b>{project.nom}</b><small>{[project.ville, project.pays].filter(Boolean).join(" · ") || "—"}</small></td><td data-label="Statut">{project.statut}</td><td data-label="Progression">{project.progression}%</td><td data-label="Budget">{formatLegacyBudget(project.budget)}</td><td data-label="Contacts intéressés">{project.contacts.map(({ contact }) => contactName(contact)).join(", ") || "—"}</td></tr>)}</tbody></table></div> : <p className="contacts-empty">Aucun projet associé.</p>}
           <div className="company-activity-counts"><span>{entreprise.activities.length} activité{entreprise.activities.length === 1 ? "" : "s"}</span><span>{entreprise.actionItems.length} action{entreprise.actionItems.length === 1 ? "" : "s"}</span></div>
         </section>
 

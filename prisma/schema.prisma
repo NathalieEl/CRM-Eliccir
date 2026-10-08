@@ -606,6 +606,15 @@ model Property {
   country       String?
   projectStatus String?
   projectBudget String?
+  projectBudgetAmount Decimal? @db.Decimal(20, 2)
+  projectBudgetCurrency String? @db.VarChar(3)
+  projectBudgetEur Decimal? @db.Decimal(20, 2)
+  projectBudgetUsd Decimal? @db.Decimal(20, 2)
+  projectBudgetIdr Decimal? @db.Decimal(20, 2)
+  projectBudgetRateEurUsd Decimal? @db.Decimal(18, 8)
+  projectBudgetRateEurIdr Decimal? @db.Decimal(18, 8)
+  projectBudgetRateUsdIdr Decimal? @db.Decimal(18, 8)
+  projectBudgetRateDate DateTime? @db.Date
   projectProgression  Int?
   entrepriseId         String?
   legacyProjectId String?        @unique

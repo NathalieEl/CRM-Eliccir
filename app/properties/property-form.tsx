@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
+import { ProjectBudgetFields } from "@/app/properties/project-budget-fields";
+import { formatCurrencyAmount } from "@/lib/number-format";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type PropertyRecord = Prisma.PropertyGetPayload<{
@@ -144,7 +146,6 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
           <label>Entreprise<select name="entrepriseId" defaultValue={property?.entrepriseId ?? ""}><option value="">Non renseignée</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
           <label>Pays<input name="country" defaultValue={property?.country ?? ""} maxLength={80} /></label>
           <label>Statut du projet<input name="projectStatus" defaultValue={property?.projectStatus ?? "En cours"} maxLength={40} /></label>
-          <label>Budget du projet<input name="projectBudget" defaultValue={property?.projectBudget ?? ""} maxLength={80} /></label>
           <label>Progression du projet (%)<input name="projectProgression" type="number" min="0" max="100" step="1" defaultValue={displayValue(property?.projectProgression ?? 0)} /></label>
           <label className="property-field-wide">Description<textarea name="description" rows={5} defaultValue={property?.description ?? ""} /></label>
         </div>
@@ -207,7 +208,23 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       </section>
 
       <section className="contacts-create-section profile-section">
-        <div className="contacts-section-heading"><div><p className="section-index">06 · CONFORMITÉ</p><h2>Réglementation et risques</h2></div></div>
+        <div className="contacts-section-heading"><div><p className="section-index">06 · BUDGET</p><h2>Budget du projet · EUR / USD / IDR</h2></div></div>
+        <ProjectBudgetFields
+          legacyBudget={property?.projectBudget ?? null}
+          initialAmount={displayValue(property?.projectBudgetAmount) || null}
+          initialCurrency={property?.projectBudgetCurrency ?? null}
+          initialEur={displayValue(property?.projectBudgetEur) || null}
+          initialUsd={displayValue(property?.projectBudgetUsd) || null}
+          initialIdr={displayValue(property?.projectBudgetIdr) || null}
+          initialEurUsd={displayValue(property?.projectBudgetRateEurUsd) || null}
+          initialEurIdr={displayValue(property?.projectBudgetRateEurIdr) || null}
+          initialUsdIdr={displayValue(property?.projectBudgetRateUsdIdr) || null}
+          initialRateDate={property?.projectBudgetRateDate?.toISOString().slice(0, 10) ?? null}
+        />
+      </section>
+
+      <section className="contacts-create-section profile-section">
+        <div className="contacts-section-heading"><div><p className="section-index">07 · CONFORMITÉ</p><h2>Réglementation et risques</h2></div></div>
         <div className="property-fields-grid">
           <SelectField label="Zonage" name="zoning" value={property?.zoning ?? ""} options={zoningTypes} />
           <SelectField label="Permis de construire" name="buildingPermit" value={property?.buildingPermit ?? ""} options={buildingPermitStatuses} />
@@ -220,7 +237,7 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       </section>
 
       <section className="contacts-create-section profile-section">
-        <div className="contacts-section-heading"><div><p className="section-index">07 · TITRE FONCIER</p><h2>Certificat et droits fonciers</h2></div></div>
+        <div className="contacts-section-heading"><div><p className="section-index">08 · TITRE FONCIER</p><h2>Certificat et droits fonciers</h2></div></div>
         {landTitle ? <><input type="hidden" name="landTitleId" value={landTitle.id} /><div className="property-system-fields"><label>Identifiant du titre<input value={landTitle.id} readOnly /></label><label>Bien rattaché<input value={landTitle.propertyId} readOnly /></label></div><label className="property-delete-document"><input type="checkbox" name="deleteLandTitle" />Supprimer le titre foncier et ses informations</label></> : null}
         <div className="property-fields-grid">
           <SelectField label="Type de droit" name="rightType" value={landTitle?.rightType ?? ""} options={landRightTypes} />
@@ -243,7 +260,7 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       </section>
 
       <section className="contacts-create-section profile-section">
-        <div className="contacts-section-heading"><div><p className="section-index">08 · DOCUMENTS</p><h2>Documents du bien</h2></div><span className="contacts-list-count">{property?.documents.length ?? 0}</span></div>
+        <div className="contacts-section-heading"><div><p className="section-index">09 · DOCUMENTS</p><h2>Documents du bien</h2></div><span className="contacts-list-count">{property?.documents.length ?? 0}</span></div>
         {(property?.documents ?? []).map((document) => <div className="property-document-row" key={document.id}>
           <input type="hidden" name="documentId" value={document.id} />
           <div className="property-system-fields"><label>Identifiant<input value={document.id} readOnly /></label><label>Bien rattaché<input value={document.propertyId ?? "—"} readOnly /></label><label>Créé le<input value={displayDate(document.createdAt)} readOnly /></label></div>
@@ -271,16 +288,16 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       </section>
 
       {property && (property.mandates.length > 0 || property.deals.length > 0 || property.viewings.length > 0) ? <section className="contacts-create-section profile-section">
-        <div className="contacts-section-heading"><div><p className="section-index">09 · RELATIONS</p><h2>Mandats, dossiers et visites rattachés</h2></div></div>
+        <div className="contacts-section-heading"><div><p className="section-index">10 · RELATIONS</p><h2>Mandats, dossiers et visites rattachés</h2></div></div>
         <div className="property-related-list">
           {property.mandates.map((mandate) => <p key={mandate.id}><b>Mandat · {mandate.id}</b><span>{mandate.transactionType} · {mandate.mandateType} · {mandate.isActive ? "Actif" : "Inactif"}</span></p>)}
-          {property.deals.map((deal) => <p key={deal.id}><b>Dossier · {deal.id}</b><span>{deal.transactionType} · {deal.stage} · {deal.currency} {displayValue(deal.finalPrice ?? deal.negotiatedPrice)}</span></p>)}
+          {property.deals.map((deal) => <p key={deal.id}><b>Dossier · {deal.id}</b><span>{deal.transactionType} · {deal.stage} · {formatCurrencyAmount((deal.finalPrice ?? deal.negotiatedPrice)?.toString() ?? null, deal.currency)}</span></p>)}
           {property.viewings.map((viewing) => <p key={viewing.id}><b>Visite · {viewing.id}</b><span>{displayDate(viewing.scheduledAt)} · Contact {viewing.contactId} · Intérêt {displayValue(viewing.interestLevel) || "—"}</span></p>)}
         </div>
       </section> : null}
 
       {property ? <section className="contacts-create-section profile-section">
-        <div className="contacts-section-heading"><div><p className="section-index">10 · SYSTÈME</p><h2>Informations système</h2></div></div>
+        <div className="contacts-section-heading"><div><p className="section-index">11 · SYSTÈME</p><h2>Informations système</h2></div></div>
         <div className="property-system-fields">
           <label>Identifiant<input value={property.id} readOnly /></label>
           {property.legacyProjectId ? <label>Ancien identifiant projet<input value={property.legacyProjectId} readOnly /></label> : null}

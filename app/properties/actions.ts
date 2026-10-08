@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
 import { recordAudit } from "@/lib/audit";
+import { convertBudgetAmounts, formatCurrencyAmount } from "@/lib/number-format";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 const propertyTypes = ["PROJECT", "VILLA", "HOUSE", "APARTMENT", "LAND", "COMMERCIAL", "BUILDING", "WAREHOUSE", "GUESTHOUSE_HOTEL"] as const;
@@ -17,6 +18,7 @@ const buildingPermitStatuses = ["PBG_OBTAINED", "SLF_OBTAINED", "LEGACY_IMB", "N
 const landRightTypes = ["HAK_MILIK", "HGB", "HAK_PAKAI", "HAK_SEWA", "HMSRS", "GIRIK", "UNKNOWN"] as const;
 const holdingStructures = ["INDIVIDUAL", "LOCAL_COMPANY", "PT_PMA"] as const;
 const documentTypes = ["LAND_CERTIFICATE", "PBG", "SLF", "PBB_RECEIPT", "MANDATE", "PPJB", "AJB", "LEASE_AGREEMENT", "OTHER"] as const;
+const budgetCurrencies = ["EUR", "USD", "IDR"] as const;
 
 type LandTitleData = Omit<Prisma.LandTitleUncheckedCreateInput, "id" | "propertyId">;
 type PropertyDocumentInput = {
@@ -146,10 +148,30 @@ function parseProperty(formData: FormData) {
   const entrepriseId = field(formData, "entrepriseId");
   const country = field(formData, "country");
   const projectStatus = field(formData, "projectStatus");
-  const projectBudget = field(formData, "projectBudget");
+  const legacyProjectBudget = field(formData, "projectBudget");
+  const projectBudgetAmount = optionalNumber(formData, "projectBudgetAmount");
+  const projectBudgetCurrency = enumValue(formData, "projectBudgetCurrency", budgetCurrencies);
+  const projectBudgetRateEurUsd = optionalNumber(formData, "projectBudgetRateEurUsd");
+  const projectBudgetRateEurIdr = optionalNumber(formData, "projectBudgetRateEurIdr");
+  const projectBudgetRateUsdIdr = optionalNumber(formData, "projectBudgetRateUsdIdr");
+  const projectBudgetRateDate = optionalDate(formData, "projectBudgetRateDate");
+  const submittedBudgetRates = [projectBudgetRateEurUsd, projectBudgetRateEurIdr, projectBudgetRateUsdIdr];
+  const hasBudgetRates = submittedBudgetRates.some((rate) => rate !== null);
+  const completeBudgetRates = submittedBudgetRates.every((rate) => rate !== null && rate !== undefined && rate > 0);
 
   if (!type || !status || condition === undefined || furnishing === undefined || waterSource === undefined || zoning === undefined || buildingPermit === undefined || landTitle === undefined || Object.values(numbers).includes(undefined)) return null;
-  if (reference.length < 2 || reference.length > 80 || title.length < 2 || title.length > 200 || ownerId.length > 64 || entrepriseId.length > 64 || country.length > 80 || projectStatus.length > 40 || projectBudget.length > 80 || (numbers.projectProgression !== null && numbers.projectProgression !== undefined && (numbers.projectProgression < 0 || numbers.projectProgression > 100))) return null;
+  if (projectBudgetAmount === undefined || projectBudgetCurrency === undefined || projectBudgetRateEurUsd === undefined || projectBudgetRateEurIdr === undefined || projectBudgetRateUsdIdr === undefined || projectBudgetRateDate === undefined) return null;
+  if (hasBudgetRates && (!completeBudgetRates || !projectBudgetRateDate)) return null;
+  if (projectBudgetAmount !== null && (projectBudgetAmount < 0 || !projectBudgetCurrency)) return null;
+  if (reference.length < 2 || reference.length > 80 || title.length < 2 || title.length > 200 || ownerId.length > 64 || entrepriseId.length > 64 || country.length > 80 || projectStatus.length > 40 || legacyProjectBudget.length > 80 || (numbers.projectProgression !== null && numbers.projectProgression !== undefined && (numbers.projectProgression < 0 || numbers.projectProgression > 100))) return null;
+
+  const ratesForCalculation = completeBudgetRates && projectBudgetRateEurUsd !== null && projectBudgetRateEurIdr !== null && projectBudgetRateUsdIdr !== null
+    ? { eurUsd: projectBudgetRateEurUsd, eurIdr: projectBudgetRateEurIdr, usdIdr: projectBudgetRateUsdIdr }
+    : null;
+  const budgetAmounts = convertBudgetAmounts(projectBudgetAmount, projectBudgetCurrency ?? null, ratesForCalculation);
+  const projectBudget = projectBudgetAmount !== null && projectBudgetCurrency
+    ? formatCurrencyAmount(projectBudgetAmount, projectBudgetCurrency)
+    : legacyProjectBudget;
 
   const property: Prisma.PropertyUncheckedCreateInput = {
     reference,
@@ -164,6 +186,15 @@ function parseProperty(formData: FormData) {
     country: country || null,
     projectStatus: projectStatus || null,
     projectBudget: projectBudget || null,
+    projectBudgetAmount,
+    projectBudgetCurrency: projectBudgetAmount === null ? null : projectBudgetCurrency,
+    projectBudgetEur: budgetAmounts.EUR,
+    projectBudgetUsd: budgetAmounts.USD,
+    projectBudgetIdr: budgetAmounts.IDR,
+    projectBudgetRateEurUsd: projectBudgetAmount !== null ? projectBudgetRateEurUsd : null,
+    projectBudgetRateEurIdr: projectBudgetAmount !== null ? projectBudgetRateEurIdr : null,
+    projectBudgetRateUsdIdr: projectBudgetAmount !== null ? projectBudgetRateUsdIdr : null,
+    projectBudgetRateDate: projectBudgetAmount !== null ? projectBudgetRateDate : null,
     address: field(formData, "address") || null,
     kecamatan: field(formData, "kecamatan") || null,
     kabupaten: field(formData, "kabupaten") || null,
