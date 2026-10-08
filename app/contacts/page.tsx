@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createContact, deleteContact } from "@/app/contacts/actions";
+import { BirthdateAgeFields } from "@/app/contacts/birthdate-age-fields";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
 import type { Prisma } from "@/app/generated/prisma/client";
@@ -9,7 +10,7 @@ type ContactRecord = Prisma.ContactGetPayload<{
 }>;
 
 type ContactsPageProps = {
-  searchParams: Promise<{ error?: string; notice?: string; q?: string; statut?: string; secteur?: string; ville?: string; source?: string }>;
+  searchParams: Promise<{ error?: string; notice?: string; q?: string; secteur?: string; ville?: string }>;
 };
 
 const notices: Record<string, string> = {
@@ -30,7 +31,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const canWrite = hasPermission(currentUser.role, "crm.write");
   const params = await searchParams;
   const searchQuery = (params.q ?? "").trim();
-  const filters = { statut: params.statut ?? "", secteur: params.secteur ?? "", ville: params.ville ?? "", source: params.source ?? "" };
+  const filters = { secteur: params.secteur ?? "", ville: params.ville ?? "" };
   let databaseAvailable = true;
   let contacts: ContactRecord[] = [];
   let titleOptions: { value: string; label: string }[] = [];
@@ -47,10 +48,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   }
 
   const filterOptions = {
-    statut: [...new Set(contacts.map((contact) => contact.statut).filter(Boolean))].sort(),
     secteur: [...new Set(contacts.map((contact) => contact.secteur).filter(Boolean))].sort(),
     ville: [...new Set(contacts.map((contact) => contact.ville).filter(Boolean))].sort(),
-    source: [...new Set(contacts.map((contact) => contact.sourceAcquisition).filter(Boolean))].sort(),
   };
 
   const filteredContacts = searchQuery
@@ -63,8 +62,6 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           contact.telephone ?? "",
           contact.secteur ?? "",
           contact.ville ?? "",
-          contact.statut ?? "",
-          contact.sourceAcquisition ?? "",
         ]
           .join(" ")
           .toLowerCase();
@@ -73,10 +70,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       })
     : contacts;
   const visibleContacts = filteredContacts.filter((contact) =>
-    (!filters.statut || contact.statut === filters.statut) &&
     (!filters.secteur || contact.secteur === filters.secteur) &&
-    (!filters.ville || contact.ville === filters.ville) &&
-    (!filters.source || contact.sourceAcquisition === filters.source)
+    (!filters.ville || contact.ville === filters.ville)
   );
 
   return (
@@ -111,10 +106,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               autoComplete="off"
             />
             <button type="submit">Rechercher</button>
-            <select name="statut" defaultValue={filters.statut}><option value="">Tous les statuts</option>{filterOptions.statut.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
             <select name="secteur" defaultValue={filters.secteur}><option value="">Tous les secteurs</option>{filterOptions.secteur.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
             <select name="ville" defaultValue={filters.ville}><option value="">Toutes les villes</option>{filterOptions.ville.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
-            <select name="source" defaultValue={filters.source}><option value="">Toutes les sources</option>{filterOptions.source.map((value) => <option key={value} value={value ?? ""}>{value}</option>)}</select>
           </form>
           {searchQuery || Object.values(filters).some(Boolean) ? (
             <Link className="contacts-search-reset" href="/contacts">Réinitialiser</Link>
@@ -148,7 +141,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 <label>Entreprises<select name="entrepriseIds" multiple size={3}>{entrepriseOptions.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
                 <label>Secteur<input name="secteur" maxLength={80} placeholder="Secteur" /></label>
                 <label>Ville<input name="ville" maxLength={80} placeholder="Ville" /></label>
-                <label>Statut<input name="statut" maxLength={80} placeholder="Prospect" /></label>
+                <BirthdateAgeFields initialDate="" />
+                <label>Genre<select name="genre" defaultValue=""><option value="">Non renseigné</option><option value="Masculin">Masculin</option><option value="Féminin">Féminin</option><option value="Autre">Autre</option></select></label>
                 <button className="contact-primary-button" type="submit">Ajouter le contact <span>+</span></button>
               </form>
             </section>
@@ -167,8 +161,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 </p>
               ) : (
                 <div className="contacts-records-wrap">
-                  <table className="contacts-records contacts-data-table">
-                    <thead><tr><th>CONTACT</th><th>TÉLÉPHONE</th><th>ENTREPRISE / POSTE</th><th>SECTEUR</th><th>VILLE</th><th>STATUT</th><th>SOURCE</th><th>MODIFIÉ</th><th>GESTION</th></tr></thead>
+                  <table className="contacts-records contacts-data-table contacts-directory-table">
+                    <thead><tr><th>CONTACT</th><th>TÉLÉPHONE</th><th>ENTREPRISE / POSTE</th><th>SECTEUR</th><th>VILLE</th><th>MODIFIÉ</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {visibleContacts.map((contact) => (
                         <tr key={contact.id}>
@@ -177,8 +171,6 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                           <td data-label="Entreprise / poste"><b>{contact.entreprises.map(({ entreprise }) => entreprise.nom).join(", ") || "—"}</b><small>{contact.entreprises.map(({ poste }) => poste).filter(Boolean).join(", ") || "Fonction non renseignée"}</small></td>
                           <td data-label="Secteur">{contact.secteur || "—"}</td>
                           <td data-label="Ville">{[contact.ville, contact.departement].filter(Boolean).join(" · ") || "—"}</td>
-                          <td data-label="Statut"><span className="contact-status-label">{contact.statut || "Non défini"}</span></td>
-                          <td data-label="Source">{contact.sourceAcquisition || "—"}</td>
                           <td data-label="Modifié"><time dateTime={contact.updatedAt.toISOString()}>{contact.updatedAt.toLocaleDateString("fr-FR")}</time></td>
                           <td data-label="Gestion">
                             <div className="contact-row-actions">

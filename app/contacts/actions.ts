@@ -15,6 +15,13 @@ function selectedEntrepriseIds(formData: FormData) {
   return [...new Set(formData.getAll("entrepriseIds").filter((value): value is string => typeof value === "string").map((value) => value.trim()).filter(Boolean))];
 }
 
+function dateValue(value: string) {
+  if (!value) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? undefined : date;
+}
+
 function parseContact(formData: FormData) {
   const prenom = field(formData, "prenom");
   const nom = field(formData, "nom");
@@ -25,8 +32,8 @@ function parseContact(formData: FormData) {
   const ville = field(formData, "ville");
   const departement = field(formData, "departement");
   const pays = field(formData, "pays");
-  const sourceAcquisition = field(formData, "sourceAcquisition");
-  const statut = field(formData, "statut");
+  const dateNaissance = dateValue(field(formData, "dateNaissance"));
+  const genre = field(formData, "genre");
   const linkedinInput = field(formData, "linkedin");
   const linkedin = linkedinInput && !/^https?:\/\//i.test(linkedinInput) ? `https://${linkedinInput}` : linkedinInput;
 
@@ -43,8 +50,8 @@ function parseContact(formData: FormData) {
     ville.length > 80 ||
     departement.length > 20 ||
     pays.length > 80 ||
-    sourceAcquisition.length > 120 ||
-    statut.length > 80 ||
+    dateNaissance === undefined ||
+    (genre !== "" && !["Masculin", "Féminin", "Autre"].includes(genre)) ||
     linkedin.length > 254 ||
     (linkedin !== "" && !/^https?:\/\/[^\s]+$/i.test(linkedin))
   ) {
@@ -62,8 +69,8 @@ function parseContact(formData: FormData) {
       ville: ville || null,
       departement: departement || null,
       pays: pays || null,
-      sourceAcquisition: sourceAcquisition || null,
-      statut: statut || null,
+      dateNaissance,
+      genre: genre || null,
       linkedin: linkedin || null,
     },
     entrepriseIds: selectedEntrepriseIds(formData),

@@ -54,8 +54,6 @@ export async function saveContactProfile(formData: FormData) {
   const ville = field(formData, "ville");
   const departement = field(formData, "departement");
   const pays = field(formData, "pays");
-  const sourceAcquisition = field(formData, "sourceAcquisition");
-  const statut = field(formData, "statut");
   const middleName = field(formData, "deuxiemePrenom");
   const nickname = field(formData, "surnom");
   const email = field(formData, "email").toLowerCase();
@@ -69,7 +67,6 @@ export async function saveContactProfile(formData: FormData) {
   const biography = field(formData, "biographie");
   const occupation = field(formData, "metier");
   const locale = field(formData, "languePreferee");
-  const ageRange = field(formData, "trancheAge");
   const projectIds = unique(entries(formData, "projectIds"));
   const organizationRows = rows(formData, ["entrepriseId", "companyPoste", "companyService", "companyStart", "companyEnd", "companyType"])
     .filter((row) => row.entrepriseId);
@@ -92,12 +89,11 @@ export async function saveContactProfile(formData: FormData) {
     titre.length > 30 || prenom.length < 1 || prenom.length > 80 || nom.length < 1 || nom.length > 120 ||
     linkedin.length > 254 || (linkedin && !/^https?:\/\/[^\s]+$/i.test(linkedin)) ||
     secteur.length > 80 || ville.length > 80 || departement.length > 20 || pays.length > 80 ||
-    sourceAcquisition.length > 120 || statut.length > 80 ||
     middleName.length > 120 || nickname.length > 120 || birthday === undefined ||
     email.length > 254 || (email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) || telephone.length > 80 ||
     typeEmail.length > 40 || libelleEmail.length > 80 || typeTelephone.length > 40 || libelleTelephone.length > 80 ||
-    gender.length > 80 || biography.length > 20000 || occupation.length > 160 ||
-    locale.length > 40 || ageRange.length > 40 ||
+    (gender !== "" && !["Masculin", "Féminin", "Autre"].includes(gender)) || biography.length > 20000 || occupation.length > 160 ||
+    locale.length > 40 ||
     emails.some((row) => row.emailAddress.length > 254 || row.emailType.length > 40 || row.emailLabel.length > 80 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.emailAddress)) ||
     phones.some((row) => row.phoneNumber.length > 80 || row.phoneType.length > 40 || row.phoneLabel.length > 80) ||
     urls.some((row) => row.urlValue.length > 2048 || row.urlType.length > 40 || row.urlLabel.length > 80 || !/^https?:\/\/[^\s]+$/i.test(row.urlValue)) ||
@@ -140,8 +136,6 @@ export async function saveContactProfile(formData: FormData) {
         ville: ville || null,
         departement: departement || null,
         pays: pays || null,
-        sourceAcquisition: sourceAcquisition || null,
-        statut: statut || null,
         deuxiemePrenom: middleName || null,
         surnom: nickname || null,
         email: email || null,
@@ -155,7 +149,6 @@ export async function saveContactProfile(formData: FormData) {
         biographie: biography || null,
         metier: occupation || null,
         languePreferee: locale || null,
-        trancheAge: ageRange || null,
       },
     });
     await transaction.entrepriseContact.deleteMany({ where: { contactId } });

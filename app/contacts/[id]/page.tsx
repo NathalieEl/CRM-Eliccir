@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { addContactNote, deleteContactNote, deleteContactPhoto, saveContactProfile, uploadContactPhoto } from "@/app/contacts/profile-actions";
+import { BirthdateAgeFields } from "@/app/contacts/birthdate-age-fields";
 import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
@@ -58,6 +59,13 @@ function dateInput(value: Date | null) {
 
 function todayInParis() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
+}
+
+function genderOption(value: string | null) {
+  const normalized = value?.trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "") ?? "";
+  if (["masculin", "homme", "male", "m"].includes(normalized)) return "Masculin";
+  if (["feminin", "femme", "female", "f"].includes(normalized)) return "Féminin";
+  return value ? "Autre" : "";
 }
 
 export default async function ContactProfilePage({ params, searchParams }: {
@@ -141,16 +149,13 @@ export default async function ContactProfilePage({ params, searchParams }: {
               <label>Ville<input name="ville" defaultValue={contact.ville ?? ""} maxLength={80} /></label>
               <label>Région / département<input name="departement" defaultValue={contact.departement ?? ""} maxLength={20} /></label>
               <label>Pays<input name="pays" defaultValue={contact.pays ?? ""} maxLength={80} /></label>
-              <label>Source d’acquisition<input name="sourceAcquisition" defaultValue={contact.sourceAcquisition ?? ""} maxLength={120} /></label>
-              <label>Statut<input name="statut" defaultValue={contact.statut ?? ""} maxLength={80} /></label>
               <label>LinkedIn<input name="linkedin" type="url" defaultValue={contact.linkedin ?? ""} maxLength={254} /></label>
               <label>Prénom intermédiaire<input name="deuxiemePrenom" defaultValue={contact.deuxiemePrenom ?? ""} maxLength={120} /></label>
               <label>Surnom<input name="surnom" defaultValue={contact.surnom ?? ""} maxLength={120} /></label>
-              <label>Date de naissance<input name="dateNaissance" type="date" defaultValue={dateInput(contact.dateNaissance)} /></label>
-              <label>Genre<input name="genre" defaultValue={contact.genre ?? ""} maxLength={80} /></label>
+              <BirthdateAgeFields initialDate={dateInput(contact.dateNaissance)} />
+              <label>Genre<select name="genre" defaultValue={genderOption(contact.genre)}><option value="">Non renseigné</option><option value="Masculin">Masculin</option><option value="Féminin">Féminin</option><option value="Autre">Autre</option></select></label>
               <label>Métier / profession<input name="metier" defaultValue={contact.metier ?? ""} maxLength={160} /></label>
               <label>Langue préférée<input name="languePreferee" defaultValue={contact.languePreferee ?? ""} maxLength={40} placeholder="fr, en…" /></label>
-              <label>Tranche d’âge<input name="trancheAge" defaultValue={contact.trancheAge ?? ""} maxLength={40} placeholder="ex. 35–44" /></label>
             </div>
             <label>Biographie<textarea name="biographie" defaultValue={contact.biographie ?? ""} rows={4} maxLength={20000} /></label>
           </section>

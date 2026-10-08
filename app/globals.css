@@ -487,6 +487,13 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contacts-data-table th:nth-child(7), .contacts-data-table td:nth-child(7) { width: 9%; }
 .contacts-data-table th:nth-child(8), .contacts-data-table td:nth-child(8) { width: 9%; }
 .contacts-data-table th:nth-child(9), .contacts-data-table td:nth-child(9) { width: 18%; }
+.contacts-directory-table th:nth-child(1), .contacts-directory-table td:nth-child(1) { width: 20%; }
+.contacts-directory-table th:nth-child(2), .contacts-directory-table td:nth-child(2) { width: 11%; }
+.contacts-directory-table th:nth-child(3), .contacts-directory-table td:nth-child(3) { width: 22%; }
+.contacts-directory-table th:nth-child(4), .contacts-directory-table td:nth-child(4) { width: 12%; }
+.contacts-directory-table th:nth-child(5), .contacts-directory-table td:nth-child(5) { width: 13%; }
+.contacts-directory-table th:nth-child(6), .contacts-directory-table td:nth-child(6) { width: 10%; }
+.contacts-directory-table th:nth-child(7), .contacts-directory-table td:nth-child(7) { width: 12%; }
 .activities-data-table th:nth-child(1), .activities-data-table td:nth-child(1) { width: 12%; }
 .activities-data-table th:nth-child(2), .activities-data-table td:nth-child(2) { width: 8%; }
 .activities-data-table th:nth-child(3), .activities-data-table td:nth-child(3) { width: 10%; }
