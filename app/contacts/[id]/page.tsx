@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { addContactNote, deleteContactNote, deleteContactPhoto, saveContactProfile, uploadContactPhoto } from "@/app/contacts/profile-actions";
 import { BirthdateAgeFields } from "@/app/contacts/birthdate-age-fields";
 import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
+import { contactProfileOptions, investmentLevelOptions, investorTypeOptions } from "@/lib/contact-options";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
 import type { Prisma } from "@/app/generated/prisma/client";
@@ -143,6 +144,9 @@ export default async function ContactProfilePage({ params, searchParams }: {
               <label>Titre<select name="titre" defaultValue={contact.titre ?? ""}><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
               <label>Prénom<input name="prenom" autoComplete="given-name" defaultValue={contact.prenom ?? ""} required maxLength={80} /></label>
               <label>Nom<input name="nom" autoComplete="family-name" defaultValue={contact.nom} required maxLength={120} /></label>
+              <label>Type d’investisseur<select name="typeInvestisseur" defaultValue={contact.typeInvestisseur ?? ""}><option value="">Non renseigné</option>{investorTypeOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+              <label>Profil du contact<select name="profilContact" defaultValue={contact.profilContact ?? ""}><option value="">Non renseigné</option>{contactProfileOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+              <label>Niveau d’investissement<select name="niveauInvestissement" defaultValue={contact.niveauInvestissement ?? ""}><option value="">Non renseigné</option>{investmentLevelOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
               <label>E-mail principal<input name="email" type="email" defaultValue={contact.email ?? ""} maxLength={254} /></label>
               <label>Téléphone principal<input name="telephone" type="tel" defaultValue={contact.telephone ?? ""} maxLength={80} /></label>
               <label>Secteur<input name="secteur" defaultValue={contact.secteur ?? ""} maxLength={80} /></label>
@@ -181,7 +185,14 @@ export default async function ContactProfilePage({ params, searchParams }: {
 
           <section className="contacts-create-section profile-section">
             <div className="contacts-section-heading"><div><p className="section-index">04 · COORDONNÉES</p><h2>Adresses et téléphones supplémentaires</h2></div></div>
-            <div className="profile-fields-grid"><label>Type de l’e-mail principal<select name="typeEmail" defaultValue={contact.typeEmail ?? "other"}><option value="home">Personnel</option><option value="work">Travail</option><option value="other">Autre</option><option value="custom">Personnalisé</option></select></label><label>Libellé de l’e-mail principal<input name="libelleEmail" defaultValue={contact.libelleEmail ?? ""} maxLength={80} /></label><label>Type du téléphone principal<select name="typeTelephone" defaultValue={contact.typeTelephone ?? "mobile"}><option value="mobile">Mobile</option><option value="home">Personnel</option><option value="work">Travail</option><option value="fax">Fax</option><option value="other">Autre</option></select></label><label>Libellé du téléphone principal<input name="libelleTelephone" defaultValue={contact.libelleTelephone ?? ""} maxLength={80} /></label></div>
+            <div className="profile-fields-grid">
+              <label>Type de l’e-mail principal<select name="typeEmail" defaultValue={contact.typeEmail ?? "other"}><option value="home">Personnel</option><option value="work">Travail</option><option value="other">Autre</option><option value="custom">Personnalisé</option></select></label>
+              <label>Libellé de l’e-mail principal<input name="libelleEmail" defaultValue={contact.libelleEmail ?? ""} maxLength={80} /></label>
+              <div className="profile-phone-fields">
+                <label>Type du téléphone principal<select name="typeTelephone" defaultValue={contact.typeTelephone ?? "mobile"}><option value="mobile">Mobile</option><option value="home">Personnel</option><option value="work">Travail</option><option value="fax">Fax</option><option value="other">Autre</option></select></label>
+                <label>Libellé du téléphone principal<input name="libelleTelephone" defaultValue={contact.libelleTelephone ?? ""} maxLength={80} /></label>
+              </div>
+            </div>
             {contact.emails.map((entry) => <div className="profile-fields-grid profile-repeat-row" key={entry.id}><label>E-mail<input name="emailAddress" type="email" defaultValue={entry.address} /></label><label>Type<select name="emailType" defaultValue={entry.type}><option value={entry.type}>{entry.type}</option><option value="home">Personnel</option><option value="work">Travail</option><option value="other">Autre</option><option value="custom">Personnalisé</option></select></label><label>Libellé<input name="emailLabel" defaultValue={entry.label ?? ""} /></label></div>)}
             <div className="profile-fields-grid profile-repeat-row"><label>Ajouter un e-mail<input name="emailAddress" type="email" /></label><label>Type<select name="emailType" defaultValue="other"><option value="home">Personnel</option><option value="work">Travail</option><option value="other">Autre</option><option value="custom">Personnalisé</option></select></label><label>Libellé<input name="emailLabel" /></label></div>
             {contact.telephones.map((entry) => <div className="profile-fields-grid profile-repeat-row" key={entry.id}><label>Téléphone<input name="phoneNumber" type="tel" defaultValue={entry.number} /></label><label>Type<select name="phoneType" defaultValue={entry.type}><option value={entry.type}>{entry.type}</option><option value="mobile">Mobile</option><option value="home">Personnel</option><option value="work">Travail</option><option value="fax">Fax</option><option value="other">Autre</option></select></label><label>Libellé<input name="phoneLabel" defaultValue={entry.label ?? ""} /></label></div>)}

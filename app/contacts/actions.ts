@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
 import { recordAudit } from "@/lib/audit";
+import { contactProfileOptions, investmentLevelOptions, investorTypeOptions } from "@/lib/contact-options";
 
 function field(formData: FormData, name: string) {
   const value = formData.get(name);
@@ -32,6 +33,9 @@ function parseContact(formData: FormData) {
   const ville = field(formData, "ville");
   const departement = field(formData, "departement");
   const pays = field(formData, "pays");
+  const typeInvestisseur = field(formData, "typeInvestisseur");
+  const profilContact = field(formData, "profilContact");
+  const niveauInvestissement = field(formData, "niveauInvestissement");
   const dateNaissance = dateValue(field(formData, "dateNaissance"));
   const genre = field(formData, "genre");
   const linkedinInput = field(formData, "linkedin");
@@ -50,6 +54,9 @@ function parseContact(formData: FormData) {
     ville.length > 80 ||
     departement.length > 20 ||
     pays.length > 80 ||
+    (typeInvestisseur !== "" && !investorTypeOptions.some((option) => option === typeInvestisseur)) ||
+    (profilContact !== "" && !contactProfileOptions.some((option) => option === profilContact)) ||
+    (niveauInvestissement !== "" && !investmentLevelOptions.some((option) => option === niveauInvestissement)) ||
     dateNaissance === undefined ||
     (genre !== "" && !["Masculin", "Féminin", "Autre"].includes(genre)) ||
     linkedin.length > 254 ||
@@ -69,6 +76,9 @@ function parseContact(formData: FormData) {
       ville: ville || null,
       departement: departement || null,
       pays: pays || null,
+      typeInvestisseur: typeInvestisseur || null,
+      profilContact: profilContact || null,
+      niveauInvestissement: niveauInvestissement || null,
       dateNaissance,
       genre: genre || null,
       linkedin: linkedin || null,

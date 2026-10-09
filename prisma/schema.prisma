@@ -200,6 +200,9 @@ model Contact {
   pays       String?
   sourceAcquisition String?
   statut     String?
+  typeInvestisseur String?
+  profilContact String?
+  niveauInvestissement String?
   linkedin   String?
   surnoms ContactNickname[]
   emails ContactEmail[]

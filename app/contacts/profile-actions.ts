@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/permissions";
 import { recordAudit } from "@/lib/audit";
+import { contactProfileOptions, investmentLevelOptions, investorTypeOptions } from "@/lib/contact-options";
 
 const noteNatures = ["Telephonique", "Email", "WhatsApps", "Presentiel", "Autre"] as const;
 type NoteNature = (typeof noteNatures)[number];
@@ -54,6 +55,9 @@ export async function saveContactProfile(formData: FormData) {
   const ville = field(formData, "ville");
   const departement = field(formData, "departement");
   const pays = field(formData, "pays");
+  const investorType = field(formData, "typeInvestisseur");
+  const contactProfile = field(formData, "profilContact");
+  const investmentLevel = field(formData, "niveauInvestissement");
   const middleName = field(formData, "deuxiemePrenom");
   const nickname = field(formData, "surnom");
   const email = field(formData, "email").toLowerCase();
@@ -89,6 +93,9 @@ export async function saveContactProfile(formData: FormData) {
     titre.length > 30 || prenom.length < 1 || prenom.length > 80 || nom.length < 1 || nom.length > 120 ||
     linkedin.length > 254 || (linkedin && !/^https?:\/\/[^\s]+$/i.test(linkedin)) ||
     secteur.length > 80 || ville.length > 80 || departement.length > 20 || pays.length > 80 ||
+    (investorType !== "" && !investorTypeOptions.some((option) => option === investorType)) ||
+    (contactProfile !== "" && !contactProfileOptions.some((option) => option === contactProfile)) ||
+    (investmentLevel !== "" && !investmentLevelOptions.some((option) => option === investmentLevel)) ||
     middleName.length > 120 || nickname.length > 120 || birthday === undefined ||
     email.length > 254 || (email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) || telephone.length > 80 ||
     typeEmail.length > 40 || libelleEmail.length > 80 || typeTelephone.length > 40 || libelleTelephone.length > 80 ||
@@ -136,6 +143,9 @@ export async function saveContactProfile(formData: FormData) {
         ville: ville || null,
         departement: departement || null,
         pays: pays || null,
+        typeInvestisseur: investorType || null,
+        profilContact: contactProfile || null,
+        niveauInvestissement: investmentLevel || null,
         deuxiemePrenom: middleName || null,
         surnom: nickname || null,
         email: email || null,

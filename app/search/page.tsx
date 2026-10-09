@@ -115,6 +115,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         const haystack = [
           contact.prenom ?? "", contact.deuxiemePrenom ?? "", contact.nom, contact.titre ?? "", contact.surnom ?? "",
           contact.email ?? "", contact.telephone ?? "", contact.secteur ?? "", contact.ville ?? "", contact.departement ?? "", contact.pays ?? "",
+          contact.typeInvestisseur ?? "", contact.profilContact ?? "", contact.niveauInvestissement ?? "",
           contact.biographie ?? "", contact.genre ?? "", contact.metier ?? "", contact.languePreferee ?? "",
           ...contact.entreprises.map(({ entreprise }) => entreprise.nom),
           ...contact.surnoms.map(({ value }) => value),

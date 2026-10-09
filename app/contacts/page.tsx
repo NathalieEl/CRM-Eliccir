@@ -3,6 +3,7 @@ import { createContact, deleteContact } from "@/app/contacts/actions";
 import { BirthdateAgeFields } from "@/app/contacts/birthdate-age-fields";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
+import { contactProfileOptions, investmentLevelOptions, investorTypeOptions } from "@/lib/contact-options";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type ContactRecord = Prisma.ContactGetPayload<{
@@ -136,6 +137,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 <label>Titre<select name="titre" defaultValue=""><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
                 <label>Prénom<input name="prenom" autoComplete="given-name" required maxLength={80} placeholder="Ex. Camille" /></label>
                 <label>Nom<input name="nom" autoComplete="family-name" required maxLength={120} placeholder="Ex. Martin" /></label>
+                <label>Type d’investisseur<select name="typeInvestisseur" defaultValue=""><option value="">Non renseigné</option>{investorTypeOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+                <label>Profil du contact<select name="profilContact" defaultValue=""><option value="">Non renseigné</option>{contactProfileOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+                <label>Niveau d’investissement<select name="niveauInvestissement" defaultValue=""><option value="">Non renseigné</option>{investmentLevelOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
                 <label>E-mail<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
                 <label>Téléphone<input name="telephone" type="tel" autoComplete="tel" maxLength={40} placeholder="+33 6 12 34 56 78" /></label>
                 <label>Entreprises<select name="entrepriseIds" multiple size={3}>{entrepriseOptions.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>

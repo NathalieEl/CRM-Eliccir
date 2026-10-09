@@ -417,6 +417,7 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contact-profile-form { display: grid; gap: 18px; }
 .profile-section { display: grid; gap: 15px; }
 .profile-fields-grid { align-items: end; display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.profile-phone-fields { display: grid; gap: 12px; grid-column: span 2; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
 .profile-fields-grid label, .contact-note-form label { color: #56645a; display: grid; font-size: 13px; font-weight: 600; gap: 6px; }
 .profile-fields-grid input, .profile-fields-grid select, .profile-section textarea, .contact-note-form input, .contact-note-form select, .contact-note-form textarea { background: #fff; border: 1px solid #dfe4de; border-radius: 3px; color: #27362d; font: inherit; font-size: 15px; min-height: 42px; min-width: 0; padding: 8px 10px; }
 .profile-section textarea, .contact-note-form textarea { min-height: 96px; resize: vertical; }
@@ -560,6 +561,7 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 }
 @media (max-width: 480px) {
   .profile-fields-grid, .contact-note-form { grid-template-columns: minmax(0, 1fr); }
+  .profile-phone-fields { grid-column: auto; }
   .contact-note-form .note-content-field, .contact-note-form > button { grid-column: auto; }
   .contact-photo-actions form { align-items: stretch; flex-direction: column; }
   .company-profile-summary { gap: 5px 12px; grid-template-columns: minmax(0, 1fr); }
