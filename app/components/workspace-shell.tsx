@@ -6,10 +6,10 @@ import { logout } from "@/app/login/actions";
 import type { DeploymentInfo } from "@/lib/deployment-info";
 
 const navigation = [
-  { href: "/", label: "Vue d’ensemble", number: "01" },
+  { href: "/", label: "Dashboard", number: "01" },
   { href: "/companies", label: "Entreprises", number: "02" },
-  { href: "/projects", label: "Projets", number: "03" },
-  { href: "/contacts", label: "Contacts", number: "04" },
+  { href: "/contacts", label: "Contacts", number: "03" },
+  { href: "/projects", label: "Projets", number: "04" },
   { href: "/activities", label: "Activités", number: "05" },
   { href: "/actions", label: "Actions", number: "06" },
   { href: "/users", label: "Utilisateurs", number: "07" },
