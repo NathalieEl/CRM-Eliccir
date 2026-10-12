@@ -22,6 +22,47 @@ const LOOKUP_OPTIONS = [
   { category: "deal_stage", label: "Offre reçue", value: "OFFER_RECEIVED", sortOrder: 3 },
 ];
 
+const firstNames = [
+  "Alicia","Amélie","Arthur","Bastien","Camille","Caroline","Clara","Coralie","David","Élodie","Emma","Fabien","Florian","Gabriel","Hugo","Inès","Jérôme","Julie","Laura","Léo","Léa","Lucas","Manon","Margot","Mathieu","Nicolas","Paul","Perrine","Raphaël","Samuel","Sofia","Sophie","Théo","Valentin","Victor","Yasmine","Zoé",
+  "Antoine","Alexandre","Béatrice","Cédric","Dorian","Emilie","Gaëtan","Isabelle","Jade","Kenza","Marine","Nora","Océane","Romain","Sabrina","Thomas","Ulysse","Victorine",
+];
+
+const lastNames = [
+  "Martin","Bernard","Dubois","Thomas","Robert","Richard","Petit","Durand","Leroy","Moreau","Simon","Laurent","Lefebvre","Michel","Garcia","David","Bertrand","Roux","Vincent","Fournier","Morel","Girard","Andre","Lefort","Mercier","Dupont","Lambert","Bonnet","Martinez","Leclerc","Sanchez","Nguyen","Boyer","Renaud","Aubert","Guerin","Perrot","Chevalier","Faure","Perrin",
+];
+
+const cities = [
+  "Paris","Lyon","Marseille","Bordeaux","Nantes","Lille","Toulouse","Nice","Montpellier","Strasbourg","Reims","Angers","Le Havre","Grenoble","Dijon","Tours","Rennes","Annecy","Saint-Étienne","Aix-en-Provence",
+];
+
+const sectors = [
+  "Technologie","Immobilier","Finance","Retail","BTP","Transport","Tourisme","Santé","Éducation","Télécommunications","Industrie","Services",
+];
+
+const statuses = ["Lead qualifié","Prospect","Opportunité en cours","Client actif","Client inactif","Nouveau lead","Dossier chaud"];
+const acquisitionSources = ["LinkedIn","Prospection sortante","Recommandation","Salon","Webinar","Campagne email","Site web","Appel entrant"];
+const titles = ["M.","Mme","Mlle","Dr","M."];
+
+function slugify(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "contact";
+}
+
+function randomFrom<T>(items: T[]) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function randomDate(daysAgoMin: number, daysAgoMax: number) {
+  const now = Date.now();
+  const min = now - daysAgoMin * 24 * 60 * 60 * 1000;
+  const max = now - daysAgoMax * 24 * 60 * 60 * 1000;
+  return new Date(min + Math.random() * (max - min));
+}
+
 async function clearDevelopmentData() {
   console.log("Nettoyage des données métiers de l’environnement Development…");
 
@@ -88,206 +129,328 @@ async function seedUsers() {
   );
 }
 
-async function seedDemoData() {
-  const users = await seedUsers();
+async function seedContacts() {
+  const contacts = await Promise.all(
+    Array.from({ length: 120 }, (_, index) => {
+      const firstName = firstNames[index % firstNames.length];
+      const lastName = lastNames[(index * 3 + 7) % lastNames.length];
+      const city = cities[index % cities.length];
+      const sector = sectors[index % sectors.length];
+      const status = statuses[index % statuses.length];
+      const source = acquisitionSources[index % acquisitionSources.length];
+      const title = titles[index % titles.length];
+      const email = `${slugify(firstName)}.${slugify(lastName)}.${index + 1}@demo.local`;
+
+      return prisma.contact.create({
+        data: {
+          titre: title,
+          prenom: firstName,
+          nom: lastName,
+          email,
+          telephone: `+33 ${((index % 9) + 1)}${String(Math.floor(Math.random() * 100000000)).padStart(8, "0")}`,
+          ville: city,
+          pays: "France",
+          secteur: sector,
+          sourceAcquisition: source,
+          statut: status,
+          languePreferee: "Français",
+          profilContact: index % 3 === 0 ? "Investisseur" : index % 3 === 1 ? "Client" : "Prospect",
+          niveauInvestissement: index % 4 === 0 ? "Élevé" : index % 4 === 1 ? "Moyen" : "Débutant",
+          typeInvestisseur: index % 3 === 0 ? "Institutionnel" : index % 3 === 1 ? "Professionnel" : "Particulier",
+          dateNaissance: randomDate(18000, 6000),
+          biographie: `Contact de démonstration ${firstName} ${lastName}, actif dans ${sector.toLowerCase()} et suivi dans le CRM de développement.`,
+          linkedin: `https://linkedin.com/in/${slugify(firstName)}-${slugify(lastName)}-${index + 1}`,
+          createdAt: randomDate(300, 2),
+          updatedAt: randomDate(120, 1),
+        },
+      });
+    }),
+  );
+
+  return contacts;
+}
+
+async function seedCompanies() {
+  const companies = await Promise.all(
+    Array.from({ length: 28 }, (_, index) =>
+      prisma.entreprise.create({
+        data: {
+          nom: `${randomFrom(["Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Nova","Aster","Crest","Blue","North","South","Urban","Helio","Quanta","Apex","Peak","Luma","Vertex","Orbit","Harbor","Summit","Meridian","Aurelia","Boreal","Cobalt","Sierra","Vita"]) } ${randomFrom(["Group","Industries","Capital","Development","Consulting","Holding","Partners","Logistics","Works","Trading","Mobility","Services"])}`,
+          secteur: sectors[index % sectors.length],
+          ville: cities[index % cities.length],
+          pays: "France",
+          email: `contact${index + 1}@demo.local`,
+          siteWeb: `https://demo-${index + 1}.local`,
+        },
+      }),
+    ),
+  );
+
+  return companies;
+}
+
+async function seedRelationships(contacts: Awaited<ReturnType<typeof seedContacts>>, companies: Awaited<ReturnType<typeof seedCompanies>>) {
+  await Promise.all(
+    contacts.map((contact, index) => {
+      const company = companies[index % companies.length];
+      if (index % 2 === 0) {
+        return prisma.entrepriseContact.create({
+          data: {
+            contactId: contact.id,
+            entrepriseId: company.id,
+            poste: index % 4 === 0 ? "Directeur" : index % 4 === 1 ? "Responsable" : index % 4 === 2 ? "Chef de projet" : "Collaborateur",
+            type: "work",
+          },
+        });
+      }
+      return null;
+    }),
+  );
+}
+
+async function seedProjects(contacts: Awaited<ReturnType<typeof seedContacts>>, companies: Awaited<ReturnType<typeof seedCompanies>>) {
+  const projects = await Promise.all(
+    Array.from({ length: 24 }, (_, index) =>
+      prisma.project.create({
+        data: {
+          nom: `Projet ${randomFrom(["Riviera","Aster","Central","Horizon","Maison","Lumière","Nova","Atlas","Velora","Ciel","Prime","Mistral","Boreal","Soleil","Estuaire","Orchid","Eden","Cobalt","Atlantic","Nexus","Fjord","Terra","Velvet","Nouveau"]) } ${index + 1}`,
+          pays: "France",
+          ville: cities[index % cities.length],
+          statut: index % 4 === 0 ? "En cours" : index % 4 === 1 ? "Planifié" : index % 4 === 2 ? "À surveiller" : "Terminé",
+          budget: `${(1500000 + index * 350000).toLocaleString("fr-FR")} €`,
+          progression: 10 + (index * 7) % 90,
+          entrepriseId: companies[index % companies.length].id,
+        },
+      }),
+    ),
+  );
+
+  await Promise.all(
+    contacts.map((contact, index) => {
+      const projectCount = index % 3 === 0 ? 2 : 1;
+      return Promise.all(
+        Array.from({ length: projectCount }, (_, offset) => {
+          const project = projects[(index + offset) % projects.length];
+          return prisma.contactProject.create({
+            data: {
+              contactId: contact.id,
+              projectId: project.id,
+              interesse: offset % 2 === 0,
+            },
+          });
+        }),
+      );
+    }),
+  );
+
+  return projects;
+}
+
+async function seedProperties(contacts: Awaited<ReturnType<typeof seedContacts>>) {
+  const propertyTypes = ["VILLA","APARTMENT","HOUSE","LAND","COMMERCIAL","BUILDING"] as const;
+  const propertyStatuses = ["AVAILABLE","UNDER_OFFER","SOLD","RENTED","WITHDRAWN"] as const;
+
+  const properties = await Promise.all(
+    Array.from({ length: 18 }, (_, index) =>
+      prisma.property.create({
+        data: {
+          reference: `DEV-${String(index + 1).padStart(4, "0")}`,
+          title: `${randomFrom(["Villa","Maison","Appartement","Lot","Bureau","Warehouse","Residence"]).trim()} ${index + 1}`,
+          type: propertyTypes[index % propertyTypes.length],
+          status: propertyStatuses[index % propertyStatuses.length],
+          country: "Indonesia",
+          province: randomFrom(["Bali","Jakarta","Bandung","Surabaya","Yogyakarta","Medan"]),
+          kabupaten: randomFrom(["Ubud","Kuta","Seminyak","South Jakarta","Bandung Barat","Bogor","Denpasar"]),
+          address: `${index + 17} ${randomFrom(["Jl.","Jalan","Street"]).trim()} ${randomFrom(["Raya","Sudirman","Setiabudi","Gatot Subroto","Bali","Merdeka"])}`,
+          bedrooms: 1 + (index % 5),
+          bathrooms: 1 + (index % 4),
+          landAreaSqm: 50 + index * 15,
+          buildingAreaSqm: 45 + index * 10,
+          latitude: 8.5 + index * 0.15,
+          longitude: 115.2 + index * 0.12,
+          description: `Bien de démonstration ${index + 1} pour tester les vues de propriétés et les filtres du CRM.`,
+          projectStatus: "ACTIVE",
+          projectBudgetAmount: (1000000000 + index * 250000000).toFixed(0),
+          projectBudgetCurrency: "IDR",
+          ownerId: contacts[index % contacts.length].id,
+        },
+      }),
+    ),
+  );
+
+  for (const [index, property] of properties.entries()) {
+    await prisma.landTitle.create({
+      data: {
+        propertyId: property.id,
+        rightType: index % 3 === 0 ? "HAK_MILIK" : index % 3 === 1 ? "HAK_PAKAI" : "GIRIK",
+        certificateNumber: `CERT-${index + 1}`,
+        holderName: contacts[index % contacts.length].nom,
+        verifiedWithBpn: index % 2 === 0,
+        verifiedAt: randomDate(120, 10),
+        expiryDate: randomDate(450, 120),
+        notes: "Titre de démonstration pour environnement de développement.",
+      },
+    });
+  }
+
+  return properties;
+}
+
+async function seedActivities(contacts: Awaited<ReturnType<typeof seedContacts>>, companies: Awaited<ReturnType<typeof seedCompanies>>, users: Awaited<ReturnType<typeof seedUsers>>) {
+  const types = ["call","meeting","visit","email","followup"];
+  const canaux = ["Téléphone","Email","Visite","Réseau","WhatsApp"];
+  const statuses = ["Terminé","Planifié","À faire","En retard"];
+
+  await Promise.all(
+    Array.from({ length: 80 }, (_, index) => {
+      const contact = contacts[index % contacts.length];
+      const user = users[index % users.length];
+      const company = companies[index % companies.length];
+      const date = randomDate(120, 2);
+
+      return prisma.activity.create({
+        data: {
+          titre: `${randomFrom(["Appel","Suivi","Visite","Réunion","Relance","Prospection"]).trim()} ${index + 1}`,
+          type: types[index % types.length],
+          canal: canaux[index % canaux.length],
+          dureeMinutes: 20 + (index % 6) * 15,
+          resultat: `Résultat de démonstration ${index + 1}.`,
+          prochaineAction: `Action de suivi ${index + 1} prévue lors du prochain rendez-vous.`,
+          statut: statuses[index % statuses.length],
+          dateRealisation: date,
+          contactId: contact.id,
+          entrepriseId: company.id,
+          responsableId: user.id,
+          createdAt: date,
+          updatedAt: date,
+        },
+      });
+    }),
+  );
+}
+
+async function seedActions(contacts: Awaited<ReturnType<typeof seedContacts>>, companies: Awaited<ReturnType<typeof seedCompanies>>, users: Awaited<ReturnType<typeof seedUsers>>) {
+  const priorities = ["Haute","Normale","Basse"];
+  const statuses = ["À faire","En cours","Terminé"];
+
+  await Promise.all(
+    Array.from({ length: 110 }, (_, index) => {
+      const contact = contacts[index % contacts.length];
+      const user = users[index % users.length];
+      const company = companies[index % companies.length];
+      const date = randomDate(150, 3);
+
+      return prisma.actionItem.create({
+        data: {
+          titre: `${randomFrom(["Relance client","Préparer dossier","Vérifier documents","Confirmer visite","Réseau","Suivi commercial"]).trim()} ${index + 1}`,
+          priorite: priorities[index % priorities.length],
+          statut: statuses[index % statuses.length],
+          canal: randomFrom(["Téléphone","Email","Visite","Réunion"]),
+          dateRealisation: date,
+          dateEcheance: new Date(date.getTime() + 1000 * 60 * 60 * 24 * (10 + (index % 20))),
+          contactId: contact.id,
+          entrepriseId: company.id,
+          responsableId: user.id,
+          details: `Action de démonstration ${index + 1} pour tester le workflow CRM.`,
+          createdAt: date,
+          updatedAt: date,
+        },
+      });
+    }),
+  );
+}
+
+async function seedMandatesAndDeals(properties: Awaited<ReturnType<typeof seedProperties>>, contacts: Awaited<ReturnType<typeof seedContacts>>) {
+  for (let index = 0; index < 12; index += 1) {
+    const property = properties[index % properties.length];
+    const client = contacts[(index * 3) % contacts.length];
+    const mandate = await prisma.mandate.create({
+      data: {
+        propertyId: property.id,
+        transactionType: index % 3 === 0 ? "SALE" : index % 3 === 1 ? "SHORT_TERM_RENTAL" : "LONG_TERM_RENTAL",
+        mandateType: index % 2 === 0 ? "EXCLUSIVE" : "SIMPLE",
+        startDate: randomDate(180, 20),
+        endDate: randomDate(100, 20),
+        isActive: index % 2 === 0,
+        askingPrice: 100000000 + index * 2500000,
+        currency: "IDR",
+        priceUnit: index % 2 === 0 ? "TOTAL" : "PER_SQM",
+        notes: `Mandat de démonstration ${index + 1}.`,
+      },
+    });
+
+    await prisma.deal.create({
+      data: {
+        propertyId: property.id,
+        mandateId: mandate.id,
+        clientId: client.id,
+        transactionType: mandate.transactionType,
+        stage: index % 4 === 0 ? "PROSPECT" : index % 4 === 1 ? "MANDATE_SIGNED" : index % 4 === 2 ? "OFFER_RECEIVED" : "CLOSED",
+        negotiatedPrice: 90000000 + index * 4000000,
+        currency: "IDR",
+        expectedClosingDate: randomDate(40, 5),
+        notes: `Deal de démonstration ${index + 1}.`,
+      },
+    });
+  }
+
+  for (let index = 0; index < 10; index += 1) {
+    const property = properties[index % properties.length];
+    const contact = contacts[(index * 5) % contacts.length];
+    await prisma.viewing.create({
+      data: {
+        propertyId: property.id,
+        contactId: contact.id,
+        scheduledAt: randomDate(25, 2),
+        feedback: `Feedback de visite de démonstration ${index + 1}.`,
+        interestLevel: 1 + (index % 5),
+      },
+    });
+  }
+}
+
+async function seedAuditLogs(users: Awaited<ReturnType<typeof seedUsers>>) {
   const admin = users[0];
 
-  const contactSeed = [
-    { prenom: "Sophie", nom: "Durand", email: "sophie.dev@demo.local", telephone: "0600000001", ville: "Bordeaux", pays: "France", secteur: "Technologie", statut: "Lead qualifié" },
-    { prenom: "Léa", nom: "Guerin", email: "lea.dev@demo.local", telephone: "0600000002", ville: "Angers", pays: "France", secteur: "Retail", statut: "Opportunité en cours" },
-    { prenom: "Ethan", nom: "Petit", email: "ethan.dev@demo.local", telephone: "0600000003", ville: "Reims", pays: "France", secteur: "BTP", statut: "Client actif" },
-    { prenom: "Camille", nom: "Dubois", email: "camille.dev@demo.local", telephone: "0600000004", ville: "Lille", pays: "France", secteur: "Éducation", statut: "Prospect" },
-    { prenom: "Arthur", nom: "Garnier", email: "arthur.dev@demo.local", telephone: "0600000005", ville: "Marseille", pays: "France", secteur: "Transport", statut: "Lead qualifié" },
-  ];
-
-  const contacts = await Promise.all(
-    contactSeed.map((contact) =>
-      prisma.contact.create({
-        data: {
-          ...contact,
-          titre: "M.",
-          dateNaissance: new Date("1990-05-18T00:00:00.000Z"),
-          languePreferee: "Français",
-          sourceAcquisition: "Démo",
-          profilContact: "Client",
-          niveauInvestissement: "Moyen",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      }),
-    ),
-  );
-
-  const entreprises = await Promise.all([
-    prisma.entreprise.create({ data: { nom: "Alpha Développement", secteur: "Immobilier", ville: "Nice", pays: "France" } }),
-    prisma.entreprise.create({ data: { nom: "Beta Invest", secteur: "Finance", ville: "Paris", pays: "France" } }),
-    prisma.entreprise.create({ data: { nom: "Gamma Mobility", secteur: "Transport", ville: "Lyon", pays: "France" } }),
-  ]);
-
-  await Promise.all(
-    contacts.map((contact, index) =>
-      prisma.entrepriseContact.create({
-        data: {
-          contactId: contact.id,
-          entrepriseId: entreprises[index % entreprises.length].id,
-          poste: index % 2 === 0 ? "Responsable" : "Collaborateur",
-          type: "work",
-        },
-      }),
-    ),
-  );
-
-  const projects = await Promise.all([
-    prisma.project.create({ data: { nom: "Projet Riviera", statut: "En cours", pays: "France", ville: "Nice", budget: "2 500 000 €", progression: 40 } }),
-    prisma.project.create({ data: { nom: "Projet Central", statut: "En cours", pays: "France", ville: "Paris", budget: "4 000 000 €", progression: 65 } }),
-    prisma.project.create({ data: { nom: "Projet Horizon", statut: "Planifié", pays: "France", ville: "Lyon", budget: "3 000 000 €", progression: 25 } }),
-  ]);
-
-  await Promise.all(
-    contacts.slice(0, 3).map((contact, index) =>
-      prisma.contactProject.create({
-        data: {
-          contactId: contact.id,
-          projectId: projects[index % projects.length].id,
-          interesse: true,
-        },
-      }),
-    ),
-  );
-
-  const properties = await Promise.all([
-    prisma.property.create({
-      data: {
-        reference: "DEV-PR-001",
-        title: "Villa Riviera",
-        type: "VILLA",
-        status: "AVAILABLE",
-        country: "Indonesia",
-        province: "Bali",
-        kabupaten: "Ubud",
-        address: "Jl. Raya Ubud No. 12",
-        bedrooms: 4,
-        bathrooms: 3,
-        landAreaSqm: 250,
-        buildingAreaSqm: 180,
-        latitude: 8.5095,
-        longitude: 115.263,
-        description: "Villa de démonstration pour environnement de test.",
-        projectStatus: "ACTIVE",
-        projectBudgetAmount: 2500000000,
-        projectBudgetCurrency: "IDR",
-        ownerId: contacts[0].id,
-      },
-    }),
-    prisma.property.create({
-      data: {
-        reference: "DEV-PR-002",
-        title: "Appartement Skyline",
-        type: "APARTMENT",
-        status: "UNDER_OFFER",
-        country: "Indonesia",
-        province: "Jakarta",
-        kabupaten: "South Jakarta",
-        address: "Jl. Sudirman No. 88",
-        bedrooms: 2,
-        bathrooms: 2,
-        landAreaSqm: 80,
-        buildingAreaSqm: 75,
-        latitude: -6.2088,
-        longitude: 106.8456,
-        description: "Appartement de démonstration pour test CRM.",
-        projectStatus: "ACTIVE",
-        projectBudgetAmount: 1500000000,
-        projectBudgetCurrency: "IDR",
-        ownerId: contacts[1].id,
-      },
-    }),
-  ]);
-
-  await Promise.all(
-    properties.map((property, index) =>
-      prisma.landTitle.create({
-        data: {
-          propertyId: property.id,
-          rightType: index === 0 ? "HAK_MILIK" : "HAK_PAKAI",
-          certificateNumber: `DEV-${index + 1}-CERT`,
-          holderName: contacts[index].nom,
-          verifiedWithBpn: true,
-          verifiedAt: new Date(),
-          notes: "Titre de démonstration généré pour le test de développement.",
-        },
-      }),
-    ),
-  );
-
-  await Promise.all([
-    prisma.activity.create({
-      data: {
-        titre: "Appel commercial",
-        type: "call",
-        canal: "Téléphone",
-        dureeMinutes: 45,
-        statut: "Terminé",
-        dateRealisation: new Date(),
-        contactId: contacts[0].id,
-        responsableId: admin.id,
-        resultat: "Prospect qualifié et dossier transmis au service immobilier.",
-      },
-    }),
-    prisma.activity.create({
-      data: {
-        titre: "Visite du bien",
-        type: "visit",
-        canal: "Physique",
-        dureeMinutes: 90,
-        statut: "Planifié",
-        dateRealisation: new Date(Date.now() + 86400000),
-        contactId: contacts[1].id,
-        responsableId: admin.id,
-        resultat: "Visite prévue pour le prochain rendez-vous.",
-      },
-    }),
-  ]);
-
-  await Promise.all([
-    prisma.actionItem.create({
-      data: {
-        titre: "Suivi du dossier",
-        priorite: "Haute",
-        statut: "À faire",
-        responsableId: admin.id,
-        contactId: contacts[2].id,
-        dateEcheance: new Date(Date.now() + 172800000),
-        details: "Vérifier les documents et relancer le client.",
-      },
-    }),
-    prisma.actionItem.create({
-      data: {
-        titre: "Relance marketing",
-        priorite: "Normale",
-        statut: "En cours",
-        responsableId: admin.id,
-        contactId: contacts[3].id,
-        dateEcheance: new Date(Date.now() + 259200000),
-        details: "Envoyer le dossier et planifier la semaine prochaine.",
-      },
-    }),
-  ]);
-
   await prisma.auditLog.createMany({
-    data: [
-      {
-        actorId: admin.id,
-        actorUsername: admin.username,
-        action: "seed",
-        entity: "Development",
-        entityId: "seed-development",
-        details: "Données de démonstration chargées pour l’environnement de développement.",
-      },
-    ],
+    data: Array.from({ length: 30 }, (_, index) => ({
+      actorId: admin.id,
+      actorUsername: admin.username,
+      action: index % 3 === 0 ? "create" : index % 3 === 1 ? "update" : "delete",
+      entity: index % 2 === 0 ? "Contact" : "Project",
+      entityId: `demo-${index + 1}`,
+      details: `Événement de démonstration ${index + 1}.`,
+      createdAt: randomDate(200, 1),
+    })),
+  });
+}
+
+async function seedDemoData() {
+  const users = await seedUsers();
+  const contacts = await seedContacts();
+  const companies = await seedCompanies();
+  await seedRelationships(contacts, companies);
+  const projects = await seedProjects(contacts, companies);
+  const properties = await seedProperties(contacts);
+  await seedActivities(contacts, companies, users);
+  await seedActions(contacts, companies, users);
+  await seedMandatesAndDeals(properties, contacts);
+  await seedAuditLogs(users);
+
+  const admin = users[0];
+  await prisma.auditLog.create({
+    data: {
+      actorId: admin.id,
+      actorUsername: admin.username,
+      action: "seed",
+      entity: "Development",
+      entityId: "seed-development",
+      details: `Données de démonstration complètes chargées pour ${projects.length} projets, ${contacts.length} contacts, ${properties.length} biens et plus de 150 activités/actions.`,
+      createdAt: new Date(),
+    },
   });
 
-  console.log("Seed Development terminé avec comptes et données de démonstration.");
+  console.log(`Seed Development terminé : ${contacts.length} contacts, ${companies.length} entreprises, ${projects.length} projets, ${properties.length} biens, activés.`);
 }
 
 async function main() {
