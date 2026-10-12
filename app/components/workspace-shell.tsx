@@ -60,13 +60,6 @@ export function WorkspaceShell({
             Recherche globale
           </Link>
         </div>
-        <section className="sidebar-project">
-          <p>PROJET EN COURS</p>
-          <strong>Lombok</strong>
-          <span>Kuta Selatan, Indonésie</span>
-          <div className="project-progress"><i /></div>
-          <small>Parcelles suivies <b>08 / 12</b></small>
-        </section>
         <div className="sidebar-bottom">
           <span className="online-dot" /> Session sécurisée
           <div className="profile-row">
