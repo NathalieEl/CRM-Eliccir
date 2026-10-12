@@ -175,7 +175,7 @@ async function seedCompanies() {
     Array.from({ length: 28 }, (_, index) =>
       prisma.entreprise.create({
         data: {
-          nom: `${randomFrom(["Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Nova","Aster","Crest","Blue","North","South","Urban","Helio","Quanta","Apex","Peak","Luma","Vertex","Orbit","Harbor","Summit","Meridian","Aurelia","Boreal","Cobalt","Sierra","Vita"]) } ${randomFrom(["Group","Industries","Capital","Development","Consulting","Holding","Partners","Logistics","Works","Trading","Mobility","Services"])}`,
+          nom: `${randomFrom(["Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Nova","Aster","Crest","Blue","North","South","Urban","Helio","Quanta","Apex","Peak","Luma","Vertex","Orbit","Harbor","Summit","Meridian","Aurelia","Boreal","Cobalt","Sierra","Vita"]) } ${randomFrom(["Group","Industries","Capital","Development","Consulting","Holding","Partners","Logistics","Works","Trading","Mobility","Services"])} ${index + 1}`,
           secteur: sectors[index % sectors.length],
           ville: cities[index % cities.length],
           pays: "France",
