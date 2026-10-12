@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UnsavedChangesProvider } from "@/app/components/unsaved-changes-form";
 import { WorkspaceShell } from "@/app/components/workspace-shell";
+import { getDeploymentInfo } from "@/lib/deployment-info";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,12 +21,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const deploymentInfo = getDeploymentInfo();
+
   return (
     <html
       lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col"><UnsavedChangesProvider><WorkspaceShell>{children}</WorkspaceShell></UnsavedChangesProvider></body>
+      <body className="min-h-full flex flex-col"><UnsavedChangesProvider><WorkspaceShell deploymentInfo={deploymentInfo}>{children}</WorkspaceShell></UnsavedChangesProvider></body>
     </html>
   );
 }

@@ -555,6 +555,20 @@ model AuditLog {
   @@index([actorId, createdAt])
 }
 
+model DeploymentRelease {
+  id             String   @id @default(cuid())
+  environment    String
+  version        String
+  buildId        String
+  deploymentId   String
+  commitSha      String?
+  commitMessage  String?
+  deployedAt     DateTime @default(now())
+
+  @@unique([environment, deploymentId])
+  @@index([environment, deployedAt])
+}
+
 model Agent {
   id        String   @id @default(cuid())
   name      String

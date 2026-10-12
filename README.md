@@ -1,5 +1,17 @@
 Eliccir CRM est une application Next.js avec PostgreSQL. Le 2FA TOTP est en sommeil par défaut et peut être activé explicitement.
 
+## Versions et déploiements
+
+Le numéro SemVer de la plateforme est la propriété `version` de `package.json`. Depuis la branche `development`, augmente-le selon le type de changement :
+
+```bash
+npm run version:patch
+npm run version:minor
+npm run version:major
+```
+
+Ces commandes mettent à jour `package.json` et `package-lock.json`. Committe et pousse la version sur `development`, teste-la, puis promeus le commit validé vers `main` pour Production. Au démarrage, Railway enregistre automatiquement la version, l’environnement, le SHA du commit, l’identifiant du déploiement et la date dans `DeploymentRelease`. Le logo affiche la version et le build actif.
+
 ## Configuration d’authentification
 
 Dans Railway, ajoutez ces variables au service `CRM-Eliccir` :

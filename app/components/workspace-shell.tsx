@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/login/actions";
+import type { DeploymentInfo } from "@/lib/deployment-info";
 
 const navigation = [
   { href: "/", label: "Vue d’ensemble", number: "01" },
@@ -16,7 +17,13 @@ const navigation = [
   { href: "/audit", label: "Journal d’audit", number: "09" },
 ];
 
-export function WorkspaceShell({ children }: { children: React.ReactNode }) {
+export function WorkspaceShell({
+  children,
+  deploymentInfo,
+}: {
+  children: React.ReactNode;
+  deploymentInfo: DeploymentInfo;
+}) {
   const pathname = usePathname();
 
   if (pathname === "/login") return children;
@@ -27,7 +34,15 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
       <aside className="sidebar">
         <Link className="brand" href="/" aria-label="Eliccir CRM, accueil">
           <span className="brand-mark">E</span>
-          <span className="brand-name">eliccir<small>CRM</small></span>
+          <span className="brand-copy">
+            <span className="brand-name">eliccir<small>CRM</small></span>
+            <span
+              className="brand-release"
+              title={`${deploymentInfo.environment} · version ${deploymentInfo.version} · build ${deploymentInfo.buildId}${deploymentInfo.commitMessage ? ` · ${deploymentInfo.commitMessage}` : ""}`}
+            >
+              v{deploymentInfo.version} · {deploymentInfo.environmentLabel} · {deploymentInfo.buildId}
+            </span>
+          </span>
         </Link>
         <p className="workspace-label">ESPACE DE TRAVAIL</p>
         <nav className="main-nav" aria-label="Navigation principale">
