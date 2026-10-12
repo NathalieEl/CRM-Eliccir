@@ -1,6 +1,7 @@
 import { login } from "@/app/login/actions";
 import { PasswordField } from "@/app/components/password-field";
 import { isTwoFactorActive } from "@/lib/auth";
+import { getDeploymentInfo } from "@/lib/deployment-info";
 
 const messages = {
   invalid: "Identifiants invalides ou authentification incorrecte.",
@@ -13,11 +14,23 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const { error } = await searchParams;
+  const deploymentInfo = getDeploymentInfo();
 
   return (
     <main className="auth-screen">
       <section className="auth-panel">
-        <div className="auth-brand"><span className="brand-mark">E</span><span className="brand-name">eliccir<small>CRM</small></span></div>
+        <div className="auth-brand">
+          <span className="brand-mark">E</span>
+          <span className="brand-copy">
+            <span className="brand-name">eliccir<small>CRM</small></span>
+            <span
+              className="brand-release"
+              title={`${deploymentInfo.environment} · version ${deploymentInfo.version} · build ${deploymentInfo.buildId}${deploymentInfo.commitMessage ? ` · ${deploymentInfo.commitMessage}` : ""}`}
+            >
+              v{deploymentInfo.version} · {deploymentInfo.environmentLabel} · {deploymentInfo.buildId}
+            </span>
+          </span>
+        </div>
         <p className="section-index">ESPACE SÉCURISÉ</p>
         <h1>Connexion</h1>
         <p className="auth-intro">Accède à ton espace de travail.</p>

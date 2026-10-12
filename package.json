@@ -1,6 +1,6 @@
 {
   "name": "crm-eliccir",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "engines": {
     "node": "22.x"
@@ -8,10 +8,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
-    "start": "prisma migrate deploy && if [ \"$SEED_CONTACTS\" = \"true\" ]; then npm run import:contacts -- --apply contacts_fictifs.csv; fi && HOSTNAME=0.0.0.0 node .next/standalone/server.js",
+    "start": "prisma migrate deploy && if [ \"$SEED_CONTACTS\" = \"true\" ]; then npm run import:contacts -- --apply contacts_fictifs.csv; fi && npm run record:deployment && HOSTNAME=0.0.0.0 node .next/standalone/server.js",
     "lint": "eslint",
     "import:contacts": "tsx scripts/import-contacts.ts",
     "clean:production": "tsx scripts/clean-production.ts",
+    "record:deployment": "tsx scripts/record-deployment.ts",
+    "version:patch": "npm version patch --no-git-tag-version",
+    "version:minor": "npm version minor --no-git-tag-version",
+    "version:major": "npm version major --no-git-tag-version",
     "postinstall": "prisma generate"
   },
   "dependencies": {
