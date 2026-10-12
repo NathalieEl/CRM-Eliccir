@@ -11,6 +11,7 @@
     "start": "prisma migrate deploy && if [ \"$SEED_CONTACTS\" = \"true\" ]; then npm run import:contacts -- --apply contacts_fictifs.csv; fi && HOSTNAME=0.0.0.0 node .next/standalone/server.js",
     "lint": "eslint",
     "import:contacts": "tsx scripts/import-contacts.ts",
+    "clean:production": "tsx scripts/clean-production.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
