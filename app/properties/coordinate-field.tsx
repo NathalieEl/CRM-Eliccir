@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type CoordinateFieldProps = {
   label: string;
   name: "latitude" | "longitude";
   initialValue: string;
+  onDecimalValueChange?: (value: string) => void;
 };
 
 type CoordinateParts = {
@@ -59,7 +60,7 @@ function splitDecimalDegrees(value: string, name: CoordinateFieldProps["name"]):
   };
 }
 
-export function CoordinateField({ label, name, initialValue }: CoordinateFieldProps) {
+export function CoordinateField({ label, name, initialValue, onDecimalValueChange }: CoordinateFieldProps) {
   const initial = splitDecimalDegrees(initialValue, name);
   const [parts, setParts] = useState(initial.parts);
   const [direction, setDirection] = useState(initial.direction);
@@ -74,6 +75,10 @@ export function CoordinateField({ label, name, initialValue }: CoordinateFieldPr
   const decimalValue = isEmpty || !isValid ? "" : (sign * (degrees + minutes / 60 + seconds / 3600)).toFixed(6);
   const partsId = `${name}-parts`;
   const selectedDirection = directions[name].find((item) => item.value === direction)?.label ?? directions[name][0].label;
+
+  useEffect(() => {
+    onDecimalValueChange?.(decimalValue);
+  }, [decimalValue, onDecimalValueChange]);
 
   const updatePart = (part: keyof CoordinateParts, value: string) => {
     const validInput = part === "seconds" ? /^\d*(?:\.\d{0,2})?$/.test(value) : /^\d*$/.test(value);
