@@ -18,7 +18,7 @@ export default async function MaintenancePage({ searchParams }: MaintenancePageP
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord"><span className="brand-mark">E</span><span className="brand-name">eliccir<small>CRM</small></span></Link>
+        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord"><span className="brand-mark">E</span><span className="brand-name">Eliccir<small>CRM</small></span></Link>
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>
       <div className="contacts-content">

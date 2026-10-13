@@ -67,7 +67,7 @@ export default async function ActivitiesPage({ searchParams }: ActivitiesPagePro
       <header className="contacts-topbar">
         <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord">
           <span className="brand-mark">E</span>
-          <span className="brand-name">eliccir<small>CRM</small></span>
+          <span className="brand-name">Eliccir<small>CRM</small></span>
         </Link>
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>
