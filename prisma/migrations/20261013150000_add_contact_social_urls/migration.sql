@@ -1,0 +1,4 @@
+ALTER TABLE "Contact"
+ADD COLUMN "facebook" TEXT,
+ADD COLUMN "instagram" TEXT,
+ADD COLUMN "x" TEXT;

@@ -154,6 +154,9 @@ export default async function ContactProfilePage({ params, searchParams }: {
               <label>Région / département<input name="departement" defaultValue={contact.departement ?? ""} maxLength={20} /></label>
               <label>Pays<input name="pays" defaultValue={contact.pays ?? ""} maxLength={80} /></label>
               <label>LinkedIn<input name="linkedin" type="url" defaultValue={contact.linkedin ?? ""} maxLength={254} /></label>
+              <label>Facebook<input name="facebook" type="url" defaultValue={contact.facebook ?? ""} maxLength={254} placeholder="https://facebook.com/…" /></label>
+              <label>Instagram<input name="instagram" type="url" defaultValue={contact.instagram ?? ""} maxLength={254} placeholder="https://instagram.com/…" /></label>
+              <label>X<input name="x" type="url" defaultValue={contact.x ?? ""} maxLength={254} placeholder="https://x.com/…" /></label>
               <label>Prénom intermédiaire<input name="deuxiemePrenom" defaultValue={contact.deuxiemePrenom ?? ""} maxLength={120} /></label>
               <label>Surnom<input name="surnom" defaultValue={contact.surnom ?? ""} maxLength={120} /></label>
               <BirthdateAgeFields initialDate={dateInput(contact.dateNaissance)} />
