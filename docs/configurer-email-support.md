@@ -1,12 +1,12 @@
-# Activer l’envoi des signalements par Gmail sur DEV
+# Configuration de l’e-mail des signalements
 
-Cette configuration utilise Google Apps Script comme relais HTTPS. Le message reste d’abord enregistré dans le journal d’audit de DEV. PROD n’est pas concernée.
+Cette configuration utilise Google Apps Script comme relais HTTPS, compatible avec le plan Railway Trial. Le message est d’abord enregistré dans le journal d’audit de l’environnement cible, puis envoyé à `marc.issan@gmail.com` si le relais est configuré.
 
 ## 1. Créer le relais Google
 
 1. Connecte-toi avec le compte Google `marc.issan@gmail.com` et ouvre https://script.google.com.
 2. Clique sur **Nouveau projet**.
-3. Remplace le contenu de `Code.gs` par le code du fichier [google-apps-script-support.gs](google-apps-script-support.gs), puis enregistre le projet sous un nom comme `Eliccir CRM - signalements DEV`.
+3. Remplace le contenu de `Code.gs` par le code du fichier [google-apps-script-support.gs](google-apps-script-support.gs), puis enregistre le projet sous un nom comme `Eliccir CRM - signalements`.
 4. Dans **Paramètres du projet** → **Propriétés du script**, ajoute la propriété `SUPPORT_WEBHOOK_TOKEN`.
 5. Mets comme valeur un jeton aléatoire long d’au moins 32 caractères. Tu peux le générer avec un gestionnaire de mots de passe. Garde-le secret : ne le colle pas dans le chat.
 6. Dans la liste des fonctions, sélectionne `authorizeMail`, puis clique sur **Exécuter**. Google va demander l’autorisation d’envoyer des e-mails depuis ton compte; vérifie le compte affiché et accepte.
@@ -21,9 +21,11 @@ Cette configuration utilise Google Apps Script comme relais HTTPS. Le message re
 
 Ne partage pas l’URL ni le jeton publiquement. Si tu modifies le script Google ultérieurement, crée un nouveau déploiement ou mets à jour le déploiement existant.
 
-## 3. Configurer Railway DEV
+## 3. Configurer Railway pour l’environnement cible
 
-1. Dans Railway, ouvre le projet `loyal-eagerness`, sélectionne l’environnement **DEV**, puis le service **CRM-Eliccir**.
+Répète cette configuration dans chaque environnement qui doit envoyer des e-mails. Les variables de DEV ne sont pas automatiquement partagées avec PROD.
+
+1. Dans Railway, ouvre le projet `loyal-eagerness`, sélectionne **DEV** ou **PROD**, puis le service **CRM-Eliccir**.
 2. Ouvre l’onglet **Variables** et ajoute :
 
 ```text
@@ -31,15 +33,15 @@ SUPPORT_EMAIL_WEBHOOK_URL=<URL /exec copiée depuis Apps Script>
 SUPPORT_WEBHOOK_TOKEN=<le même jeton aléatoire que dans les propriétés du script>
 ```
 
-3. Enregistre les variables et attends que le redéploiement DEV soit marqué **Success**.
+3. Enregistre les variables et attends que le redéploiement de l’environnement sélectionné soit marqué **Success**.
 
 Le jeton doit être identique dans Railway et dans les propriétés du script. Ne l’envoie jamais dans une conversation ou une capture d’écran.
 
-## 4. Tester
+## 4. Tester l’environnement configuré
 
-1. Connecte-toi sur DEV.
+1. Connecte-toi à l’environnement configuré.
 2. Ouvre **Signaler un problème ou poser une question** sous **Recherche globale**.
 3. Envoie un message de test avec une des deux catégories.
-4. Vérifie sa réception dans `marc.issan@gmail.com` et sa présence dans le **Journal d’audit**.
+4. Vérifie sa réception dans `marc.issan@gmail.com` et sa présence dans le **Journal d’audit** de cet environnement.
 
 Si l’envoi échoue, la demande reste enregistrée dans l’audit avec l’état d’envoi. Vérifie l’URL `/exec`, l’égalité des jetons, l’autorisation Gmail et les quotas d’envoi Google Apps Script. Un jeton absent ou incorrect ne déclenche aucun envoi.

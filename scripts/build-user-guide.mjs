@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { marked } from "marked";
 
-const markdownUrl = new URL("../docs/guide-utilisateur-prod-1.0.0.md", import.meta.url);
-const outputUrl = new URL("../public/guide-utilisateur-prod-1.0.0.html", import.meta.url);
+const markdownUrl = new URL("../docs/guide-utilisateur-prod.md", import.meta.url);
+const outputUrl = new URL("../public/guide-utilisateur-prod.html", import.meta.url);
 const markdown = await readFile(markdownUrl, "utf8");
 const content = await marked.parse(markdown, { gfm: true });
 
@@ -12,7 +12,7 @@ const page = `<!doctype html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
-    <title>Guide d’utilisation · Eliccir CRM PROD 1.0.0</title>
+    <title>Guide d’utilisation · Eliccir CRM PROD 1.0.3</title>
     <style>
       :root { color-scheme: light; --ink: #25332b; --muted: #647168; --green: #1f3c32; --line: #e1e5df; --paper: #fff; --canvas: #f3f5f1; --accent: #d9e383; }
       * { box-sizing: border-box; }
@@ -42,7 +42,7 @@ const page = `<!doctype html>
   </head>
   <body>
     <header class="guide-topbar">
-      <div class="guide-brand"><span class="guide-mark">E</span><span>eliccir CRM · Guide PROD 1.0.0</span></div>
+      <div class="guide-brand"><span class="guide-mark">E</span><span>Eliccir CRM · Guide PROD 1.0.3</span></div>
       <a class="guide-return" href="/">Retour à Eliccir CRM</a>
     </header>
     <main>${content}</main>
@@ -51,4 +51,4 @@ const page = `<!doctype html>
 `;
 
 await writeFile(outputUrl, page, "utf8");
-console.log("Guide utilisateur généré : public/guide-utilisateur-prod-1.0.0.html");
+console.log("Guide utilisateur généré : public/guide-utilisateur-prod.html");
