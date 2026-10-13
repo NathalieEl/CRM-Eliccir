@@ -2,31 +2,6 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 
-const defaultActivities = [
-  { time: "09:30", kind: "RENDEZ-VOUS", title: "Visite du terrain avec Marc Delatour", detail: "Projet Lombok · Kuta Selatan", initials: "MD", color: "coral" },
-  { time: "11:00", kind: "APPEL", title: "Point financement · Sophie Laurent", detail: "Acquéreuse potentielle · Villa 04", initials: "SL", color: "blue" },
-  { time: "14:15", kind: "SUIVI", title: "Envoyer la présentation du projet", detail: "Thomas et Camille Moreau", initials: "TM", color: "green" },
-];
-
-const defaultActions = [
-  { title: "Rappeler Sophie Laurent", due: "Aujourd’hui · 11:00", tag: "Prioritaire" },
-  { title: "Transmettre le plan des parcelles", due: "Aujourd’hui · 16:00", tag: "Projet Lombok" },
-  { title: "Relancer Isabelle Garnier", due: "Demain · 09:00", tag: "À reprendre" },
-];
-
-const defaultContacts = [
-  { name: "Sophie Laurent", email: "sophie.laurent@example.com", interest: "Villa · Lombok", status: "Actif", tone: "active", updated: "Il y a 24 min", initials: "SL", color: "blue" },
-  { name: "Marc Delatour", email: "marc.delatour@example.com", interest: "Investissement foncier", status: "Lead", tone: "lead", updated: "Il y a 2 h", initials: "MD", color: "coral" },
-  { name: "Thomas Moreau", email: "thomas.moreau@example.com", interest: "Villa · Lombok", status: "Prospect", tone: "prospect", updated: "Hier", initials: "TM", color: "green" },
-  { name: "Isabelle Garnier", email: "isabelle.garnier@example.com", interest: "Partenariat · Indonésie", status: "Dormant", tone: "dormant", updated: "Il y a 3 jours", initials: "IG", color: "yellow" },
-];
-
-const defaultProjects = [
-  { name: "Lombok", location: "Kuta Selatan · Indonésie", progress: 35 },
-  { name: "Bali", location: "Ubud · Indonésie", progress: 68 },
-  { name: "Phuket", location: "Patong · Thaïlande", progress: 22 },
-];
-
 function formatActivityItem(activity: { titre: string; type: string; contactLabel?: string | null; contact?: { prenom: string | null; nom: string } | null; entreprise?: { nom: string } | null; responsable?: { username: string } | null; resultat?: string | null; dateRealisation?: Date | null; statut?: string | null; date?: Date | null; details?: string | null }) {
   const time = activity.date ? new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(activity.date)) : "09:00";
   const title = activity.titre;
@@ -95,9 +70,9 @@ async function getDashboardData() {
         { label: "Activités à venir", value: String(activitiesCount || 0).padStart(2, "0"), change: "À partir d’aujourd’hui", number: "03" },
         { label: "Actions en attente", value: String(pendingActionsCount || 0).padStart(2, "0"), change: `${overdueActionsCount} en retard`, number: "04", alert: overdueActionsCount > 0 },
       ],
-      activities: upcomingActivities.length > 0 ? upcomingActivities.map(formatActivityItem) : defaultActivities,
-      actions: nextActions.length > 0 ? nextActions.map(formatActionItem) : defaultActions,
-      contacts: recentContacts.length > 0 ? recentContacts.map((contact) => ({
+      activities: upcomingActivities.map(formatActivityItem),
+      actions: nextActions.map(formatActionItem),
+      contacts: recentContacts.map((contact) => ({
         name: [contact.prenom, contact.nom].filter(Boolean).join(" "),
         email: contact.email || "Aucun e-mail",
         interest: [...contact.entreprises.map(({ entreprise }) => entreprise.nom), contact.telephone].filter(Boolean).join(" · ") || "Sans renseignement",
@@ -106,8 +81,8 @@ async function getDashboardData() {
         updated: "Actualisé aujourd’hui",
         initials: [contact.prenom?.[0], contact.nom[0]].filter(Boolean).join("").toUpperCase() || "CN",
         color: "blue",
-      })) : defaultContacts,
-      projects: recentProjects.length > 0 ? recentProjects.map(formatProjectItem) : defaultProjects,
+      })),
+      projects: recentProjects.map(formatProjectItem),
       databaseMode: true,
     };
   } catch {
@@ -118,10 +93,10 @@ async function getDashboardData() {
         { label: "Activités à venir", value: "—", change: "Base indisponible", number: "03" },
         { label: "Actions en attente", value: "—", change: "Base indisponible", number: "04", alert: true },
       ],
-      activities: defaultActivities,
-      actions: defaultActions,
-      contacts: defaultContacts,
-      projects: defaultProjects,
+      activities: [],
+      actions: [],
+      contacts: [],
+      projects: [],
       databaseMode: false,
     };
   }
@@ -146,16 +121,16 @@ export default async function Home() {
             <section className="metric-grid" aria-label="Indicateurs du portefeuille">{metrics.map((metric) => <article className="metric" key={metric.number}><div className="metric-top"><span>{metric.label}</span><small>{metric.number}</small></div><strong>{metric.value}</strong><div className={`metric-foot${metric.alert ? " metric-alert" : ""}`}>{metric.change}</div></article>)}</section>
 
             <div className="dashboard-columns">
-              <section className="panel activity-panel" id="activities"><div className="section-heading"><div><p className="section-index">01 <i>·</i> AGENDA</p><h2>À venir aujourd’hui</h2></div><a href="#activities">Tout voir <span>→</span></a></div><div className="activity-list">{activities.map((activity) => <article className="activity-row" key={activity.time}><time>{activity.time}</time><span className={`avatar avatar-${activity.color}`}>{activity.initials}</span><div><small>{activity.kind}</small><h3>{activity.title}</h3><p>{activity.detail}</p></div><span className="row-arrow">↗</span></article>)}</div><p className="calendar-note"><i /> Synchronisé avec Google Agenda</p></section>
+              <section className="panel activity-panel" id="activities"><div className="section-heading"><div><p className="section-index">01 <i>·</i> AGENDA</p><h2>À venir aujourd’hui</h2></div><a href="#activities">Tout voir <span>→</span></a></div><div className="activity-list">{activities.length > 0 ? activities.map((activity) => <article className="activity-row" key={activity.time}><time>{activity.time}</time><span className={`avatar avatar-${activity.color}`}>{activity.initials}</span><div><small>{activity.kind}</small><h3>{activity.title}</h3><p>{activity.detail}</p></div><span className="row-arrow">↗</span></article>) : <p className="dashboard-empty">Aucune activité à venir.</p>}</div><p className="calendar-note"><i /> Synchronisé avec Google Agenda</p></section>
 
-              <section className="panel actions-panel" id="actions"><div className="section-heading"><div><p className="section-index">02 <i>·</i> À SUIVRE</p><h2>Tes prochaines actions</h2></div><span className="count-badge">{metrics[3].value}</span></div><div className="action-list">{actions.map((action, index) => <article className="action-row" key={action.title}><span className={`action-check${index === 0 ? " action-check-alert" : ""}`} /><div><h3>{action.title}</h3><time>{action.due}</time></div><small className={index === 0 ? "action-tag action-tag-alert" : "action-tag"}>{action.tag}</small></article>)}</div><a className="all-actions-link" href="#actions">Voir toutes les actions <span>→</span></a></section>
+              <section className="panel actions-panel" id="actions"><div className="section-heading"><div><p className="section-index">02 <i>·</i> À SUIVRE</p><h2>Tes prochaines actions</h2></div><span className="count-badge">{metrics[3].value}</span></div><div className="action-list">{actions.length > 0 ? actions.map((action, index) => <article className="action-row" key={action.title}><span className={`action-check${index === 0 ? " action-check-alert" : ""}`} /><div><h3>{action.title}</h3><time>{action.due}</time></div><small className={index === 0 ? "action-tag action-tag-alert" : "action-tag"}>{action.tag}</small></article>) : <p className="dashboard-empty">Aucune action en attente.</p>}</div><a className="all-actions-link" href="#actions">Voir toutes les actions <span>→</span></a></section>
             </div>
 
-              <section className="panel contacts-panel" id="contacts"><div className="section-heading"><div><p className="section-index">03 <i>·</i> PORTEFEUILLE</p><h2>Contacts récemment suivis</h2></div><Link href="/contacts">Tous les contacts <span>→</span></Link></div><div className="contact-table-wrap"><table><thead><tr><th>CONTACT</th><th>INTÉRÊT</th><th>STATUT</th><th>DERNIÈRE ACTIVITÉ</th><th /></tr></thead><tbody>{contacts.map((contact) => <tr key={contact.email}><td data-label="Contact"><div className="contact-identity"><span className={`avatar avatar-${contact.color}`}>{contact.initials}</span><span><b>{contact.name}</b><small>{contact.email}</small></span></div></td><td data-label="Intérêt">{contact.interest}</td><td data-label="Statut"><span className={`status-pill status-${contact.tone}`}><i />{contact.status}</span></td><td data-label="Dernière activité">{contact.updated}</td><td className="row-arrow" aria-hidden="true">↗</td></tr>)}</tbody></table></div></section>
+              <section className="panel contacts-panel" id="contacts"><div className="section-heading"><div><p className="section-index">03 <i>·</i> PORTEFEUILLE</p><h2>Contacts récemment suivis</h2></div><Link href="/contacts">Tous les contacts <span>→</span></Link></div><div className="contact-table-wrap"><table><thead><tr><th>CONTACT</th><th>INTÉRÊT</th><th>STATUT</th><th>DERNIÈRE ACTIVITÉ</th><th /></tr></thead><tbody>{contacts.length > 0 ? contacts.map((contact) => <tr key={contact.email}><td data-label="Contact"><div className="contact-identity"><span className={`avatar avatar-${contact.color}`}>{contact.initials}</span><span><b>{contact.name}</b><small>{contact.email}</small></span></div></td><td data-label="Intérêt">{contact.interest}</td><td data-label="Statut"><span className={`status-pill status-${contact.tone}`}><i />{contact.status}</span></td><td data-label="Dernière activité">{contact.updated}</td><td className="row-arrow" aria-hidden="true">↗</td></tr>) : <tr><td className="dashboard-empty-cell" colSpan={5}>Aucun contact enregistré.</td></tr>}</tbody></table></div></section>
 
-            <section className="panel projects-panel" id="projects"><div className="section-heading"><div><p className="section-index">04 <i>·</i> PROJETS</p><h2>Opportunités actives</h2></div><Link href="/projects">Tous les projets <span>→</span></Link></div><div className="project-summary-list">{projects.map((project) => <div className="project-summary-item" key={project.name}><strong>{project.name}</strong><span>{project.location}</span><em>{project.progress}%</em></div>)}</div></section>
+            <section className="panel projects-panel" id="projects"><div className="section-heading"><div><p className="section-index">04 <i>·</i> PROJETS</p><h2>Opportunités actives</h2></div><Link href="/projects">Tous les projets <span>→</span></Link></div><div className="project-summary-list">{projects.length > 0 ? projects.map((project) => <div className="project-summary-item" key={project.name}><strong>{project.name}</strong><span>{project.location}</span><em>{project.progress}%</em></div>) : <p className="dashboard-empty">Aucun projet actif.</p>}</div></section>
           </div>
-          <footer className="dashboard-footer"><b>ELICCIR CRM</b><span>{databaseMode ? "DONNÉES SYNCHRONISÉES" : "BASE DE DONNÉES INDISPONIBLE"}</span><span>LOMBOK · INDONÉSIE</span></footer>
+          <footer className="dashboard-footer"><b>ELICCIR CRM</b><span>{databaseMode ? "DONNÉES SYNCHRONISÉES" : "BASE DE DONNÉES INDISPONIBLE"}</span></footer>
       </main>
     </div>
   );
