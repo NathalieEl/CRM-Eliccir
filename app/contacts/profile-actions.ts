@@ -16,6 +16,11 @@ function field(formData: FormData, name: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function socialUrl(formData: FormData, name: string) {
+  const value = field(formData, name);
+  return value && !/^https?:\/\//i.test(value) ? `https://${value}` : value;
+}
+
 function entries(formData: FormData, name: string) {
   return formData.getAll(name).map((value) => typeof value === "string" ? value.trim() : "");
 }
@@ -49,8 +54,12 @@ export async function saveContactProfile(formData: FormData) {
   const titre = field(formData, "titre");
   const prenom = field(formData, "prenom");
   const nom = field(formData, "nom");
-  const linkedinInput = field(formData, "linkedin");
-  const linkedin = linkedinInput && !/^https?:\/\//i.test(linkedinInput) ? `https://${linkedinInput}` : linkedinInput;
+  const socialUrls = {
+    linkedin: socialUrl(formData, "linkedin"),
+    facebook: socialUrl(formData, "facebook"),
+    instagram: socialUrl(formData, "instagram"),
+    x: socialUrl(formData, "x"),
+  };
   const secteur = field(formData, "secteur");
   const ville = field(formData, "ville");
   const departement = field(formData, "departement");
@@ -91,7 +100,7 @@ export async function saveContactProfile(formData: FormData) {
 
   if (
     titre.length > 30 || prenom.length < 1 || prenom.length > 80 || nom.length < 1 || nom.length > 120 ||
-    linkedin.length > 254 || (linkedin && !/^https?:\/\/[^\s]+$/i.test(linkedin)) ||
+    Object.values(socialUrls).some((url) => url.length > 254 || (url !== "" && !/^https?:\/\/[^\s]+$/i.test(url))) ||
     secteur.length > 80 || ville.length > 80 || departement.length > 20 || pays.length > 80 ||
     (investorType !== "" && !investorTypeOptions.some((option) => option === investorType)) ||
     (contactProfile !== "" && !contactProfileOptions.some((option) => option === contactProfile)) ||
@@ -138,7 +147,10 @@ export async function saveContactProfile(formData: FormData) {
         titre: titre || null,
         prenom,
         nom,
-        linkedin: linkedin || null,
+        linkedin: socialUrls.linkedin || null,
+        facebook: socialUrls.facebook || null,
+        instagram: socialUrls.instagram || null,
+        x: socialUrls.x || null,
         secteur: secteur || null,
         ville: ville || null,
         departement: departement || null,

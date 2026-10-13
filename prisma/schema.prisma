@@ -204,6 +204,9 @@ model Contact {
   profilContact String?
   niveauInvestissement String?
   linkedin   String?
+  facebook   String?
+  instagram  String?
+  x          String?
   surnoms ContactNickname[]
   emails ContactEmail[]
   telephones ContactPhone[]

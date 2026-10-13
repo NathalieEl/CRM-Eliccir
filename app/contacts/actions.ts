@@ -12,6 +12,11 @@ function field(formData: FormData, name: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function socialUrl(formData: FormData, name: string) {
+  const value = field(formData, name);
+  return value && !/^https?:\/\//i.test(value) ? `https://${value}` : value;
+}
+
 function selectedEntrepriseIds(formData: FormData) {
   return [...new Set(formData.getAll("entrepriseIds").filter((value): value is string => typeof value === "string").map((value) => value.trim()).filter(Boolean))];
 }
@@ -38,8 +43,12 @@ function parseContact(formData: FormData) {
   const niveauInvestissement = field(formData, "niveauInvestissement");
   const dateNaissance = dateValue(field(formData, "dateNaissance"));
   const genre = field(formData, "genre");
-  const linkedinInput = field(formData, "linkedin");
-  const linkedin = linkedinInput && !/^https?:\/\//i.test(linkedinInput) ? `https://${linkedinInput}` : linkedinInput;
+  const socialUrls = {
+    linkedin: socialUrl(formData, "linkedin"),
+    facebook: socialUrl(formData, "facebook"),
+    instagram: socialUrl(formData, "instagram"),
+    x: socialUrl(formData, "x"),
+  };
 
   if (
     prenom.length < 1 ||
@@ -59,8 +68,7 @@ function parseContact(formData: FormData) {
     (niveauInvestissement !== "" && !investmentLevelOptions.some((option) => option === niveauInvestissement)) ||
     dateNaissance === undefined ||
     (genre !== "" && !["Masculin", "Féminin", "Autre"].includes(genre)) ||
-    linkedin.length > 254 ||
-    (linkedin !== "" && !/^https?:\/\/[^\s]+$/i.test(linkedin))
+    Object.values(socialUrls).some((url) => url.length > 254 || (url !== "" && !/^https?:\/\/[^\s]+$/i.test(url)))
   ) {
     return null;
   }
@@ -81,7 +89,10 @@ function parseContact(formData: FormData) {
       niveauInvestissement: niveauInvestissement || null,
       dateNaissance,
       genre: genre || null,
-      linkedin: linkedin || null,
+      linkedin: socialUrls.linkedin || null,
+      facebook: socialUrls.facebook || null,
+      instagram: socialUrls.instagram || null,
+      x: socialUrls.x || null,
     },
     entrepriseIds: selectedEntrepriseIds(formData),
   };
