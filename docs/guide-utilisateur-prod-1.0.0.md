@@ -27,7 +27,6 @@
 16. [Bonnes pratiques d’utilisation](#16-bonnes-pratiques-dutilisation)
 17. [Dépannage et erreurs fréquentes](#17-dépannage-et-erreurs-fréquentes)
 18. [Support et procédure de remontée d’incidents](#18-support-et-procédure-de-remontée-dincidents)
-19. [Évolutions prévues du système](#19-évolutions-prévues-du-système)
 
 ## 1. Présentation générale du système
 
@@ -281,16 +280,3 @@ Fournis les informations suivantes :
 4. Page concernée et action effectuée juste avant l’erreur.
 5. Message d’erreur exact et étapes permettant de reproduire le problème.
 6. Capture d’écran expurgée des données personnelles non nécessaires.
-
-Ne transmets jamais de mot de passe, code 2FA, secret, jeton, `DATABASE_URL` ou export de base par e-mail ou capture d’écran. Si tu soupçonnes une fuite ou une suppression accidentelle, arrête les modifications et préviens immédiatement l’administrateur.
-
-## 19. Évolutions prévues du système
-
-Les points connus de la feuille de route sont :
-
-- conserver le menu latéral à droite sur ordinateur lors des évolutions responsive;
-- augmenter la taille des caractères sur téléphone;
-- décider explicitement de l’activation du 2FA et vérifier son fonctionnement avant de généraliser cette mesure;
-- étudier un véritable module de rapports/export et une éventuelle intégration calendrier : ils ne sont pas disponibles dans PROD 1.0.0.
-
-Ces évolutions ne doivent pas être considérées comme disponibles tant qu’elles ne sont pas annoncées dans une version ultérieure.
