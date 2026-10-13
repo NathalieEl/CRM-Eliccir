@@ -7,10 +7,12 @@ const actionLabels: Record<string, string> = {
   updated: "Modification",
   deleted: "Suppression",
   reset_2fa: "Réinitialisation 2FA",
+  support_request: "Signalement utilisateur",
 };
 
 const entityLabels: Record<string, string> = {
   user: "Utilisateur",
+  support_request: "Demande de support",
 };
 
 export default async function AuditPage() {
