@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
-    <title>Guide d’utilisation · Eliccir CRM PROD 1.0.4</title>
+    <title>Guide d’utilisation · Eliccir CRM PROD 1.0.3</title>
     <style>
       :root { color-scheme: light; --ink: #25332b; --muted: #647168; --green: #1f3c32; --line: #e1e5df; --paper: #fff; --canvas: #f3f5f1; --accent: #d9e383; }
       * { box-sizing: border-box; }
@@ -34,14 +34,14 @@
   </head>
   <body>
     <header class="guide-topbar">
-      <div class="guide-brand"><span class="guide-mark">E</span><span>Eliccir CRM · Guide PROD 1.0.4</span></div>
+      <div class="guide-brand"><span class="guide-mark">E</span><span>Eliccir CRM · Guide PROD 1.0.3</span></div>
       <a class="guide-return" href="/">Retour à Eliccir CRM</a>
     </header>
-    <main><h1>Guide d’utilisation — Eliccir CRM PROD 1.0.4</h1>
-<p><strong>Version du guide :</strong> 1.0.4<br>
+    <main><h1>Guide d’utilisation — Eliccir CRM PROD 1.0.3</h1>
+<p><strong>Version du guide :</strong> 1.0.3<br>
 <strong>Plateforme :</strong> PROD<br><strong>Adresse :</strong> <a href="https://crm-eliccir-production.up.railway.app">https://crm-eliccir-production.up.railway.app</a><br><strong>Public concerné :</strong> administrateurs, direction, opérations commerciales et membres de l’équipe</p>
 <blockquote>
-<p>Ce guide décrit les fonctions présentes dans PROD 1.0.4. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.</p>
+<p>Ce guide décrit les fonctions présentes dans PROD 1.0.3. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.</p>
 </blockquote>
 <h2>Table des matières</h2>
 <ol>
@@ -66,7 +66,7 @@
 </ol>
 <h2>1. Présentation générale du système</h2>
 <p>Eliccir CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.</p>
-<p>L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. À la rédaction du guide, PROD est en <strong>v1.0.4</strong>.</p>
+<p>L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. À la rédaction du guide, PROD est en <strong>v1.0.3</strong>.</p>
 <p>L’interface est organisée autour d’un tableau de bord et de pages de gestion dédiées. Les données affichées dépendent du contenu réel de la base ; les messages « Aucun… » indiquent qu’aucun enregistrement correspondant n’existe.</p>
 <h2>2. Mission et objectifs du CRM</h2>
 <p>Le CRM a pour objectif de centraliser le suivi commercial et immobilier :</p>
@@ -98,7 +98,7 @@
 <li>Ne partage jamais ton mot de passe avec le support ou dans une capture d’écran.</li>
 </ul>
 <h3>Double authentification (2FA)</h3>
-<p>Dans la configuration PROD vérifiée pour la version 1.0.4, <code>TWO_FACTOR_STATUS</code> n’est pas configuré : le 2FA est donc <strong>en sommeil</strong>, et l’écran de connexion demande uniquement le nom d’utilisateur et le mot de passe.</p>
+<p>Dans la configuration PROD vérifiée pour la version 1.0.3, <code>TWO_FACTOR_STATUS</code> n’est pas configuré : le 2FA est donc <strong>en sommeil</strong>, et l’écran de connexion demande uniquement le nom d’utilisateur et le mot de passe.</p>
 <p>Le code sait demander un code TOTP à six chiffres lorsque <code>TWO_FACTOR_STATUS</code> est défini sur <code>Active</code> et que les secrets nécessaires sont configurés. Cette activation relève d’une décision et d’une opération d’administration, pas d’un réglage individuel de l’utilisateur.</p>
 <p>Si le 2FA est activé ultérieurement, ajoute le secret fourni par l’administrateur à une application d’authentification. Un secret TOTP est confidentiel : ne le partage pas. Si ton code est refusé, vérifie l’heure automatique du téléphone et demande à un administrateur de vérifier la configuration avant toute réinitialisation.</p>
 <h2>5. Rôles et droits des utilisateurs</h2>
@@ -107,7 +107,7 @@
 <thead>
 <tr>
 <th>Profil affiché</th>
-<th>Droits dans PROD 1.0.4</th>
+<th>Droits dans PROD 1.0.3</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -140,7 +140,7 @@
 <li>des liens vers les listes correspondantes.</li>
 </ul>
 <p>Les sections vides affichent un message, par exemple <strong>Aucune activité à venir</strong>, <strong>Aucune action en attente</strong>, <strong>Aucun contact enregistré</strong> ou <strong>Aucun projet actif</strong>. Ces messages ne sont pas des données et n’ajoutent aucun enregistrement à la base.</p>
-<p><strong>À propos du calendrier :</strong> le tableau de bord affiche une mention de synchronisation avec Google Agenda. Dans la version 1.0.4, cette mention est un texte d’interface ; aucune synchronisation Google Agenda configurable n’est intégrée au CRM. Ne t’y fie pas pour vérifier qu’un rendez-vous a été transmis à Google.</p>
+<p><strong>À propos du calendrier :</strong> le tableau de bord affiche une mention de synchronisation avec Google Agenda. Dans la version 1.0.3, cette mention est un texte d’interface ; aucune synchronisation Google Agenda configurable n’est intégrée au CRM. Ne t’y fie pas pour vérifier qu’un rendez-vous a été transmis à Google.</p>
 <h2>7. Gestion des contacts</h2>
 <p>Ouvre <strong>Contacts</strong> pour consulter le carnet. La liste comprend une recherche par mot-clé ainsi que des filtres par secteur et par ville. La fiche complète s’ouvre avec <strong>Profil complet</strong>.</p>
 <h3>Créer un contact</h3>
@@ -195,17 +195,17 @@
 <p>Certaines listes ont leur propre recherche : les contacts permettent aussi de filtrer par secteur et ville; les projets et entreprises acceptent également une recherche locale.</p>
 <p>Si une recherche ne retourne rien, vérifie l’orthographe, retire les filtres et réessaie avec un terme plus court.</p>
 <h2>12. Lecture des indicateurs et analytics</h2>
-<p>PROD 1.0.4 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :</p>
+<p>PROD 1.0.3 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :</p>
 <ul>
 <li><strong>Contacts suivis</strong> : nombre total de contacts; le complément indique les nouveaux contacts du mois.</li>
 <li><strong>Projets actifs</strong> : nombre de fiches immobilières dont le statut n’est pas <code>SOLD</code>.</li>
 <li><strong>Activités à venir</strong> : activités dont la date est maintenant ou dans le futur.</li>
-<li><strong>Actions en attente</strong> : actions dont le statut n’est pas <strong>Terminée</strong>. Dans le code 1.0.4, cela peut aussi inclure une action <strong>Annulée</strong>; vérifie la liste détaillée avant d’interpréter le chiffre.</li>
+<li><strong>Actions en attente</strong> : actions dont le statut n’est pas <strong>Terminée</strong>. Dans le code 1.0.3, cela peut aussi inclure une action <strong>Annulée</strong>; vérifie la liste détaillée avant d’interpréter le chiffre.</li>
 <li><strong>En retard</strong> : actions non terminées avec une échéance antérieure à l’heure actuelle.</li>
 </ul>
 <p>Les indicateurs se recalculent à partir des données enregistrées. Les compteurs affichant <code>0</code> ou <code>00</code> signifient qu’aucun enregistrement correspondant n’a été trouvé selon ces règles.</p>
 <h2>13. Les rapports</h2>
-<p>Il n’existe pas de rubrique <strong>Rapports</strong>, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.0.4. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.</p>
+<p>Il n’existe pas de rubrique <strong>Rapports</strong>, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.0.3. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.</p>
 <p>Pour transmettre une information, utilise les données visibles dans les fiches et respecte les règles internes de confidentialité. Ne considère pas une capture d’écran comme un rapport officiel ou un export exhaustif.</p>
 <h2>14. Création, modification et suppression des données</h2>
 <h3>Création</h3>
@@ -249,7 +249,7 @@
 <li>Avant une suppression, vérifie les relations et lis le message de confirmation.</li>
 <li>Utilise le journal d’audit pour rechercher les opérations récentes d’administration si tu es administrateur.</li>
 <li>Le menu Maintenance modifie les valeurs proposées dans certains menus déroulants : réserve cette fonction aux administrateurs.</li>
-<li>La mention Google Agenda du tableau de bord n’est pas la preuve d’une synchronisation réelle dans la version 1.0.4.</li>
+<li>La mention Google Agenda du tableau de bord n’est pas la preuve d’une synchronisation réelle dans la version 1.0.3.</li>
 </ul>
 <h2>17. Dépannage et erreurs fréquentes</h2>
 <table>
@@ -304,7 +304,7 @@
 <p>Fournis les informations suivantes :</p>
 <ol>
 <li>Environnement : <strong>PROD</strong>.</li>
-<li>Version et build affichés près du logo (pour la release initiale : <code>v1.0.4</code>, puis le SHA court du build actif).</li>
+<li>Version et build affichés près du logo (pour la release initiale : <code>v1.0.3</code>, puis le SHA court du build actif).</li>
 <li>Date et heure avec fuseau horaire.</li>
 <li>Page concernée et action effectuée juste avant l’erreur.</li>
 <li>Message d’erreur exact et étapes permettant de reproduire le problème.</li>
