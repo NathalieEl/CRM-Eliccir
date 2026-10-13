@@ -57,7 +57,7 @@ export async function submitSupportRequest(formData: FormData) {
 
   const emailStatusLabel = {
     sent: "envoyé",
-    "not-configured": "en attente : SMTP non configuré",
+    "not-configured": "en attente : service e-mail non configuré",
     failed: "échec de l’envoi",
   }[emailStatus];
 

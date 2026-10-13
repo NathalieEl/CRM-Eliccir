@@ -30,7 +30,7 @@ export default async function SupportPage({ searchParams }: SupportPageProps) {
 
         {params.error === "invalid" ? <p className="contacts-message contacts-message-error" role="alert">Choisis une catégorie et saisis les détails de ta demande.</p> : null}
         {params.notice === "sent" ? <p className="contacts-message" role="status">Ta demande est enregistrée et envoyée par e-mail à marc.issan@gmail.com.</p> : null}
-        {params.notice === "email-pending" ? <p className="contacts-message contacts-message-error" role="alert">Ta demande est enregistrée, mais l’e-mail n’a pas pu être envoyé. L’administrateur doit vérifier la configuration SMTP.</p> : null}
+        {params.notice === "email-pending" ? <p className="contacts-message contacts-message-error" role="alert">Ta demande est enregistrée, mais l’e-mail n’a pas pu être envoyé. L’administrateur doit vérifier la configuration du service e-mail.</p> : null}
 
         <section className="contacts-create-section">
           <form action={submitSupportRequest} className="contact-form support-form">
