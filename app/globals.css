@@ -264,6 +264,10 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 .coordinate-dms-row input, .coordinate-dms-row select { font-size: 14px; padding: 8px 6px; }
 .coordinate-unit { align-self: end; color: #68756c; line-height: 42px; }
 .coordinate-preview { color: #68756c; font-size: 12px; }
+.property-coordinate-map { display: grid; gap: 8px; grid-column: 1 / -1; min-width: 0; }
+.property-coordinate-fields { display: grid; gap: 13px; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+.property-coordinate-map-link { color: var(--green); font-size: 13px; font-weight: 600; justify-self: start; text-underline-offset: 3px; }
+.property-coordinate-map-hint { color: #68756c; font-size: 12px; }
 .property-checkbox { align-items: center; display: flex !important; gap: 10px !important; min-height: 44px; }
 .property-checkbox input { flex: 0 0 auto; }
 .property-system-fields { margin-bottom: 14px; }
@@ -287,6 +291,7 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 }
 @media (max-width: 480px) {
   .property-fields-grid, .property-system-fields { grid-template-columns: minmax(0, 1fr); }
+  .property-coordinate-fields { grid-template-columns: minmax(0, 1fr); }
   .property-field-wide { grid-column: auto; }
 }
 
