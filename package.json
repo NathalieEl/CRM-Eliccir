@@ -7,12 +7,13 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
+    "build": "npm run build:user-guide && next build && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
     "start": "prisma migrate deploy && if [ \"$SEED_CONTACTS\" = \"true\" ]; then npm run import:contacts -- --apply contacts_fictifs.csv; fi && npm run record:deployment && HOSTNAME=0.0.0.0 node .next/standalone/server.js",
     "lint": "eslint",
     "import:contacts": "tsx scripts/import-contacts.ts",
     "clean:production": "tsx scripts/clean-production.ts",
     "record:deployment": "tsx scripts/record-deployment.ts",
+    "build:user-guide": "node scripts/build-user-guide.mjs",
     "version:patch": "npm version patch --no-git-tag-version",
     "version:minor": "npm version minor --no-git-tag-version",
     "version:major": "npm version major --no-git-tag-version",
@@ -41,6 +42,7 @@
     "dotenv": "18.0.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
+    "marked": "^18.1.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5"

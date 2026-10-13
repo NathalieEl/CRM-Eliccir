@@ -44,6 +44,9 @@ export function WorkspaceShell({
             </span>
           </span>
         </Link>
+        <Link className="guide-link" href="/guide-utilisateur-prod-1.0.0.html" target="_blank" rel="noreferrer">
+          Guide d’utilisation
+        </Link>
         <p className="workspace-label">ESPACE DE TRAVAIL</p>
         <nav className="main-nav" aria-label="Navigation principale">
           {navigation.map(({ href, label, number }) => {

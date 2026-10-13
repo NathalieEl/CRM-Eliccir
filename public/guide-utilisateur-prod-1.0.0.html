@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Guide d’utilisation · Eliccir CRM PROD 1.0.0</title>
+    <style>
+      :root { color-scheme: light; --ink: #25332b; --muted: #647168; --green: #1f3c32; --line: #e1e5df; --paper: #fff; --canvas: #f3f5f1; --accent: #d9e383; }
+      * { box-sizing: border-box; }
+      body { background: var(--canvas); color: var(--ink); font: 16px/1.65 "Avenir Next", Avenir, sans-serif; margin: 0; }
+      .guide-topbar { align-items: center; background: var(--green); color: #f4f3ec; display: flex; justify-content: space-between; padding: 14px max(20px, calc((100% - 980px) / 2)); }
+      .guide-brand { align-items: center; display: flex; font-weight: 700; gap: 10px; }
+      .guide-mark { align-items: center; background: var(--accent); border-radius: 3px 10px 3px 10px; color: var(--green); display: inline-flex; font: 22px Georgia, serif; height: 38px; justify-content: center; width: 38px; }
+      .guide-return { border: 1px solid rgba(217, 227, 131, .45); border-radius: 4px; color: #edf3b5; font-size: 13px; padding: 7px 11px; }
+      .guide-return:hover { background: rgba(217, 227, 131, .12); }
+      main { background: var(--paper); border: 1px solid var(--line); margin: 28px auto 64px; max-width: 980px; padding: clamp(22px, 5vw, 58px); width: calc(100% - 32px); }
+      h1, h2, h3 { color: var(--green); font-family: Georgia, "Times New Roman", serif; font-weight: 500; line-height: 1.25; }
+      h1 { border-bottom: 1px solid var(--line); font-size: 34px; padding-bottom: 18px; }
+      h2 { border-top: 1px solid var(--line); font-size: 25px; margin-top: 42px; padding-top: 22px; }
+      h3 { font-size: 19px; margin-top: 28px; }
+      p, li { color: #435148; }
+      a { color: #236347; text-underline-offset: 3px; }
+      blockquote { background: #f3f6e4; border-left: 3px solid #a7b94d; margin: 20px 0; padding: 10px 18px; }
+      table { border-collapse: collapse; display: block; margin: 18px 0; max-width: 100%; overflow-x: auto; width: max-content; }
+      th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: left; vertical-align: top; }
+      th { background: #f3f5f1; color: #354139; }
+      code { background: #f1f3ef; border-radius: 3px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; padding: 2px 5px; overflow-wrap: anywhere; }
+      pre { background: #1f3028; border-radius: 4px; color: #f4f3ec; overflow-x: auto; padding: 16px; }
+      pre code { background: transparent; color: inherit; padding: 0; }
+      @media (max-width: 600px) { body { font-size: 15px; } .guide-topbar { padding: 10px 16px; } .guide-brand { font-size: 14px; } .guide-return { font-size: 12px; } main { margin-top: 14px; width: calc(100% - 20px); } h1 { font-size: 28px; } h2 { font-size: 22px; } }
+      @media print { body { background: #fff; } .guide-topbar { display: none; } main { border: 0; margin: 0 auto; max-width: none; width: 100%; } a { color: inherit; text-decoration: none; } }
+    </style>
+  </head>
+  <body>
+    <header class="guide-topbar">
+      <div class="guide-brand"><span class="guide-mark">E</span><span>eliccir CRM · Guide PROD 1.0.0</span></div>
+      <a class="guide-return" href="/">Retour à Eliccir CRM</a>
+    </header>
+    <main><h1>Guide d’utilisation — Eliccir CRM PROD 1.0.0</h1>
+<p><strong>Version du guide :</strong> 1.0.0<br><strong>Plateforme :</strong> PROD<br><strong>Adresse :</strong> <a href="https://crm-eliccir-production.up.railway.app">https://crm-eliccir-production.up.railway.app</a><br><strong>Public concerné :</strong> administrateurs, direction, opérations commerciales et membres de l’équipe</p>
+<blockquote>
+<p>Ce guide décrit les fonctions présentes dans PROD 1.0.0. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.</p>
+</blockquote>
+<h2>Table des matières</h2>
+<ol>
+<li><a href="#1-pr%C3%A9sentation-g%C3%A9n%C3%A9rale-du-syst%C3%A8me">Présentation générale du système</a></li>
+<li><a href="#2-mission-et-objectifs-du-crm">Mission et objectifs du CRM</a></li>
+<li><a href="#3-acc%C3%A8s-%C3%A0-la-plateforme">Accès à la plateforme</a></li>
+<li><a href="#4-connexion-mot-de-passe-et-double-authentification">Connexion, mot de passe et double authentification</a></li>
+<li><a href="#5-r%C3%B4les-et-droits-des-utilisateurs">Rôles et droits des utilisateurs</a></li>
+<li><a href="#6-pr%C3%A9sentation-du-tableau-de-bord">Présentation du tableau de bord</a></li>
+<li><a href="#7-gestion-des-contacts">Gestion des contacts</a></li>
+<li><a href="#8-gestion-des-projets">Gestion des projets</a></li>
+<li><a href="#9-gestion-des-activit%C3%A9s-et-rendez-vous">Gestion des activités et rendez-vous</a></li>
+<li><a href="#10-gestion-des-actions-et-%C3%A9ch%C3%A9ances">Gestion des actions et échéances</a></li>
+<li><a href="#11-recherche-et-navigation-dans-lapplication">Recherche et navigation dans l’application</a></li>
+<li><a href="#12-lecture-des-indicateurs-et-analytics">Lecture des indicateurs et analytics</a></li>
+<li><a href="#13-les-rapports">Les rapports</a></li>
+<li><a href="#14-cr%C3%A9ation-modification-et-suppression-des-donn%C3%A9es">Création, modification et suppression des données</a></li>
+<li><a href="#15-r%C3%A8gles-de-qualit%C3%A9-et-de-confidentialit%C3%A9-des-donn%C3%A9es">Règles de qualité et de confidentialité des données</a></li>
+<li><a href="#16-bonnes-pratiques-dutilisation">Bonnes pratiques d’utilisation</a></li>
+<li><a href="#17-d%C3%A9pannage-et-erreurs-fr%C3%A9quentes">Dépannage et erreurs fréquentes</a></li>
+<li><a href="#18-support-et-proc%C3%A9dure-de-remont%C3%A9e-dincidents">Support et procédure de remontée d’incidents</a></li>
+<li><a href="#19-%C3%A9volutions-pr%C3%A9vues-du-syst%C3%A8me">Évolutions prévues du système</a></li>
+</ol>
+<h2>1. Présentation générale du système</h2>
+<p>Eliccir CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.</p>
+<p>L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. À la rédaction du guide, PROD est en <strong>v1.0.0</strong>.</p>
+<p>L’interface est organisée autour d’un tableau de bord et de pages de gestion dédiées. Les données affichées dépendent du contenu réel de la base ; les messages « Aucun… » indiquent qu’aucun enregistrement correspondant n’existe.</p>
+<h2>2. Mission et objectifs du CRM</h2>
+<p>Le CRM a pour objectif de centraliser le suivi commercial et immobilier :</p>
+<ul>
+<li>conserver les coordonnées et profils des contacts;</li>
+<li>organiser les contacts par entreprise et par projet;</li>
+<li>suivre les projets et leurs informations immobilières, foncières et financières;</li>
+<li>consigner les rendez-vous, appels et autres activités;</li>
+<li>attribuer des actions avec des responsables, des priorités et des échéances;</li>
+<li>retrouver rapidement des informations dans l’ensemble du CRM;</li>
+<li>conserver un journal de certaines opérations d’administration.</li>
+</ul>
+<p>Le CRM est un outil de suivi. Il ne remplace pas les documents juridiques, comptables ou les systèmes externes auxquels l’entreprise pourrait recourir.</p>
+<h2>3. Accès à la plateforme</h2>
+<ol>
+<li>Ouvre <a href="https://crm-eliccir-production.up.railway.app">https://crm-eliccir-production.up.railway.app</a> dans un navigateur récent.</li>
+<li>La page <strong>Connexion</strong> demande ton nom d’utilisateur et ton mot de passe.</li>
+<li>Après connexion, le tableau de bord s’affiche. Le menu principal est situé à droite sur ordinateur.</li>
+<li>Pour terminer ta session, utilise <strong>Se déconnecter</strong> dans le menu.</li>
+</ol>
+<p>Le badge près du logo indique l’environnement, la version et le build. Avant de saisir des données, vérifie qu’il affiche <strong>PROD</strong>. Si le badge indique <strong>DEV</strong>, tu es sur l’environnement de test : ne l’utilise pas pour enregistrer des données métier de production.</p>
+<p>La session expire au bout d’environ huit heures. Il faut alors se reconnecter.</p>
+<h2>4. Connexion, mot de passe et double authentification</h2>
+<h3>Mot de passe</h3>
+<ul>
+<li>Utilise le nom d’utilisateur et le mot de passe qui t’ont été communiqués par l’administrateur.</li>
+<li>Le CRM ne présente pas de procédure de réinitialisation en libre-service. En cas d’oubli, demande à un administrateur de modifier le mot de passe dans <strong>Utilisateurs</strong>.</li>
+<li>Lors de la création d’un compte, le mot de passe temporaire doit contenir au moins huit caractères. Change-le selon les règles internes de sécurité dès que la procédure de l’équipe le permet.</li>
+<li>Ne partage jamais ton mot de passe avec le support ou dans une capture d’écran.</li>
+</ul>
+<h3>Double authentification (2FA)</h3>
+<p>Dans la configuration PROD vérifiée pour la version 1.0.0, <code>TWO_FACTOR_STATUS</code> n’est pas configuré : le 2FA est donc <strong>en sommeil</strong>, et l’écran de connexion demande uniquement le nom d’utilisateur et le mot de passe.</p>
+<p>Le code sait demander un code TOTP à six chiffres lorsque <code>TWO_FACTOR_STATUS</code> est défini sur <code>Active</code> et que les secrets nécessaires sont configurés. Cette activation relève d’une décision et d’une opération d’administration, pas d’un réglage individuel de l’utilisateur.</p>
+<p>Si le 2FA est activé ultérieurement, ajoute le secret fourni par l’administrateur à une application d’authentification. Un secret TOTP est confidentiel : ne le partage pas. Si ton code est refusé, vérifie l’heure automatique du téléphone et demande à un administrateur de vérifier la configuration avant toute réinitialisation.</p>
+<h2>5. Rôles et droits des utilisateurs</h2>
+<p>Les droits sont attribués au compte par un administrateur.</p>
+<table>
+<thead>
+<tr>
+<th>Profil affiché</th>
+<th>Droits dans PROD 1.0.0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Administrateur (<code>admin</code>)</td>
+<td>Lecture et écriture du CRM; gestion des utilisateurs; maintenance des options; accès au journal d’audit.</td>
+</tr>
+<tr>
+<td>Direction (<code>management</code>)</td>
+<td>Lecture et écriture des données CRM. Pas de gestion des utilisateurs, de la maintenance ou du journal d’audit.</td>
+</tr>
+<tr>
+<td>Opérations commerciales (<code>sales</code>)</td>
+<td>Même périmètre applicatif que Direction : lecture et écriture du CRM.</td>
+</tr>
+<tr>
+<td>Membre (<code>member</code>)</td>
+<td>Lecture seule des données CRM. Les commandes de création, modification et suppression ne sont pas disponibles.</td>
+</tr>
+</tbody></table>
+<p>Un administrateur crée les comptes et choisit le profil. Il peut aussi désactiver un compte ou modifier son profil. L’administrateur ne peut pas désactiver ni rétrograder son propre compte depuis l’écran Utilisateurs.</p>
+<p>Si un menu ou un bouton de modification te manque, il peut s’agir d’une restriction de rôle. Demande à l’administrateur de vérifier ton profil plutôt que d’utiliser le compte d’une autre personne.</p>
+<h2>6. Présentation du tableau de bord</h2>
+<p>Le tableau de bord est la page <strong>Dashboard</strong>. Il présente :</p>
+<ul>
+<li>quatre indicateurs : contacts suivis, projets actifs, activités à venir et actions en attente;</li>
+<li>les prochaines activités;</li>
+<li>les prochaines actions;</li>
+<li>les contacts récemment modifiés;</li>
+<li>les projets récemment modifiés;</li>
+<li>des liens vers les listes correspondantes.</li>
+</ul>
+<p>Les sections vides affichent un message, par exemple <strong>Aucune activité à venir</strong>, <strong>Aucune action en attente</strong>, <strong>Aucun contact enregistré</strong> ou <strong>Aucun projet actif</strong>. Ces messages ne sont pas des données et n’ajoutent aucun enregistrement à la base.</p>
+<p><strong>À propos du calendrier :</strong> le tableau de bord affiche une mention de synchronisation avec Google Agenda. Dans la version 1.0.0, cette mention est un texte d’interface ; aucune synchronisation Google Agenda configurable n’est intégrée au CRM. Ne t’y fie pas pour vérifier qu’un rendez-vous a été transmis à Google.</p>
+<h2>7. Gestion des contacts</h2>
+<p>Ouvre <strong>Contacts</strong> pour consulter le carnet. La liste comprend une recherche par mot-clé ainsi que des filtres par secteur et par ville. La fiche complète s’ouvre avec <strong>Profil complet</strong>.</p>
+<h3>Créer un contact</h3>
+<p>Dans <strong>Contacts</strong>, utilise <strong>Ajouter un contact</strong>. Le prénom et le nom sont obligatoires. Les autres renseignements peuvent être laissés vides s’ils sont inconnus : titre, profil et type d’investisseur, niveau d’investissement, e-mail, téléphone, entreprise, secteur, ville, date de naissance et genre.</p>
+<p>Le contact est créé après validation du formulaire. Une adresse e-mail déjà utilisée par un autre contact est refusée.</p>
+<h3>Fiche complète</h3>
+<p>La fiche permet de compléter, selon les besoins :</p>
+<ul>
+<li>identité, coordonnées principales, biographie, métier, langue et profil d’investissement;</li>
+<li>entreprises, postes, services et dates de rattachement;</li>
+<li>adresses et coordonnées supplémentaires;</li>
+<li>projets intéressants pour le contact;</li>
+<li>dates importantes et relations;</li>
+<li>liens web, messageries, groupes, compétences, centres d’intérêt et champs personnalisés;</li>
+<li>photo de profil;</li>
+<li>notes de rencontre datées et signées par leur auteur.</li>
+</ul>
+<p>Les photos acceptées sont au format JPEG, PNG ou WebP et doivent faire moins de 10 Mo. Le système les redimensionne et les convertit avant stockage.</p>
+<p>Pour ajouter une note, ouvre la fiche, va à <strong>Notes de rencontre</strong>, indique la date, la nature de l’échange et le compte rendu, puis enregistre. Une note peut ensuite être supprimée avec confirmation.</p>
+<h2>8. Gestion des projets</h2>
+<p>Dans l’interface, <strong>Projets</strong> correspond au suivi de biens et projets immobiliers. Une fiche réunit plusieurs groupes d’informations :</p>
+<ul>
+<li>référence unique, nom, type, statut, état, propriétaire et entreprise;</li>
+<li>pays, adresse, quartier, district, province, code postal et coordonnées;</li>
+<li>description, progression, surfaces, chambres, salles de bains, étages et équipements;</li>
+<li>accès, réseaux, services, gestion locative, rendement et occupation;</li>
+<li>budget en EUR, USD ou IDR et taux de conversion;</li>
+<li>zonage, permis, risques, droit foncier et informations du titre;</li>
+<li>documents, mandats, dossiers de transaction et visites associés.</li>
+</ul>
+<h3>Créer et modifier un projet</h3>
+<p>Dans <strong>Projets</strong>, utilise <strong>Ajouter un projet</strong>. La référence, le nom, le type et le statut sont requis. Les champs numériques, dates, listes et coordonnées doivent respecter leur format. Enregistre le formulaire en bas de page.</p>
+<p>Pour modifier un projet, ouvre sa fiche, change les champs nécessaires puis <strong>Enregistrer le projet</strong>. Une référence déjà utilisée ne peut pas être réutilisée.</p>
+<h3>Supprimer un projet</h3>
+<p>La suppression demande une confirmation. Elle supprime le bien/projet ainsi que les données immobilières et le projet historique liés selon les relations de l’application. Vérifie les titres, documents, mandats, dossiers et visites avant de confirmer : cette action n’a pas de corbeille de restauration dans l’interface.</p>
+<h2>9. Gestion des activités et rendez-vous</h2>
+<p>Ouvre <strong>Activités</strong> pour planifier ou consigner un rendez-vous, un appel, un suivi ou une autre interaction.</p>
+<p>Le formulaire comprend le titre, le type, le contact et l’entreprise associés, la date, le canal, la durée, le responsable, le statut, la date de réalisation, la prochaine action, les détails et le résultat. Le titre et le type sont requis. Les statuts proposés sont <strong>Planifiée</strong>, <strong>En cours</strong>, <strong>Réalisée</strong> et <strong>Annulée</strong>.</p>
+<p>Les activités apparaissent dans <strong>Activités enregistrées</strong> et, si leur date est à venir, dans le tableau de bord. Pour corriger une fiche, ouvre <strong>Modifier</strong>, enregistre tes changements puis vérifie le résultat dans la liste. La suppression demande une confirmation.</p>
+<p>Une activité associée simultanément à un contact et à une entreprise doit respecter le rattachement du contact à cette entreprise. Sinon, le formulaire est refusé.</p>
+<h2>10. Gestion des actions et échéances</h2>
+<p>Ouvre <strong>Actions</strong> pour suivre les tâches à effectuer. Chaque action peut contenir un titre, une priorité, un statut, un contact, une entreprise, une échéance, un canal, une durée, un responsable, une date de réalisation, une prochaine action, des détails et un résultat.</p>
+<ul>
+<li>Priorités disponibles : <strong>Prioritaire</strong>, <strong>Importante</strong>, <strong>Normale</strong>.</li>
+<li>Statuts disponibles : <strong>À faire</strong>, <strong>En cours</strong>, <strong>En attente</strong>, <strong>Terminée</strong>, <strong>Annulée</strong>.</li>
+<li>Renseigne une échéance et un responsable lorsque l’action doit être suivie par une personne à une date précise.</li>
+</ul>
+<p>Le tableau de bord affiche les actions et échéances à venir. Pour terminer une action, modifie son statut en <strong>Terminée</strong> puis enregistre. Modifier ou supprimer une action est réservé aux profils ayant les droits d’écriture; la suppression nécessite une confirmation.</p>
+<h2>11. Recherche et navigation dans l’application</h2>
+<p>Le menu principal donne accès à <strong>Dashboard</strong>, <strong>Entreprises</strong>, <strong>Contacts</strong>, <strong>Projets</strong>, <strong>Activités</strong>, <strong>Actions</strong>, <strong>Utilisateurs</strong>, <strong>Maintenance</strong> et <strong>Journal d’audit</strong>. <strong>Recherche globale</strong> se trouve sous le menu.</p>
+<p>La recherche globale porte sur les contacts, entreprises, projets, activités, actions et notes de contact. Saisis un mot-clé puis clique sur <strong>Rechercher</strong>. Pour revenir à la liste complète, utilise <strong>Réinitialiser</strong> lorsqu’il apparaît.</p>
+<p>Certaines listes ont leur propre recherche : les contacts permettent aussi de filtrer par secteur et ville; les projets et entreprises acceptent également une recherche locale.</p>
+<p>Si une recherche ne retourne rien, vérifie l’orthographe, retire les filtres et réessaie avec un terme plus court.</p>
+<h2>12. Lecture des indicateurs et analytics</h2>
+<p>PROD 1.0.0 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :</p>
+<ul>
+<li><strong>Contacts suivis</strong> : nombre total de contacts; le complément indique les nouveaux contacts du mois.</li>
+<li><strong>Projets actifs</strong> : nombre de fiches immobilières dont le statut n’est pas <code>SOLD</code>.</li>
+<li><strong>Activités à venir</strong> : activités dont la date est maintenant ou dans le futur.</li>
+<li><strong>Actions en attente</strong> : actions dont le statut n’est pas <strong>Terminée</strong>. Dans le code 1.0.0, cela peut aussi inclure une action <strong>Annulée</strong>; vérifie la liste détaillée avant d’interpréter le chiffre.</li>
+<li><strong>En retard</strong> : actions non terminées avec une échéance antérieure à l’heure actuelle.</li>
+</ul>
+<p>Les indicateurs se recalculent à partir des données enregistrées. Les compteurs affichant <code>0</code> ou <code>00</code> signifient qu’aucun enregistrement correspondant n’a été trouvé selon ces règles.</p>
+<h2>13. Les rapports</h2>
+<p>Il n’existe pas de rubrique <strong>Rapports</strong>, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.0.0. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.</p>
+<p>Pour transmettre une information, utilise les données visibles dans les fiches et respecte les règles internes de confidentialité. Ne considère pas une capture d’écran comme un rapport officiel ou un export exhaustif.</p>
+<h2>14. Création, modification et suppression des données</h2>
+<h3>Création</h3>
+<ol>
+<li>Ouvre la rubrique correspondante.</li>
+<li>Clique sur <strong>Ajouter</strong> ou utilise le formulaire de création affiché dans la page.</li>
+<li>Complète les champs obligatoires et les associations utiles.</li>
+<li>Vérifie les noms, dates, références et liens avant de valider.</li>
+<li>Vérifie le message de confirmation et la présence de la fiche dans la liste.</li>
+</ol>
+<h3>Modification</h3>
+<p>Ouvre la fiche ou la commande <strong>Modifier</strong>, change uniquement les informations nécessaires puis clique sur <strong>Enregistrer</strong>. Si tu quittes une fiche modifiée sans enregistrer, l’application peut afficher un avertissement de modifications non enregistrées.</p>
+<h3>Suppression</h3>
+<p>Les commandes de suppression demandent généralement de cocher une case de confirmation. Lis le message avant de valider. Il n’y a pas de corbeille dans l’application : une suppression peut être définitive et les données liées peuvent être supprimées avec leur parent.</p>
+<ul>
+<li>Supprimer un contact n’est pas la même opération que le détacher d’une entreprise.</li>
+<li>Supprimer un projet peut supprimer les données immobilières, documents et relations associés.</li>
+<li>Ne supprime jamais un compte utilisateur pour retirer seulement ses droits : demande à un administrateur de le désactiver ou de modifier son profil.</li>
+</ul>
+<p>En cas de doute, annule l’opération et demande à un administrateur avant de confirmer.</p>
+<h2>15. Règles de qualité et de confidentialité des données</h2>
+<ul>
+<li>Crée un seul contact par personne et utilise une adresse e-mail exacte; les e-mails de contact sont uniques.</li>
+<li>Renseigne prénom et nom correctement. Le prénom et le nom sont obligatoires.</li>
+<li>Utilise une référence unique et explicite pour chaque projet.</li>
+<li>Vérifie les unités et devises avant de saisir une surface, un budget, une distance ou un rendement.</li>
+<li>N’invente pas les informations manquantes : laisse les champs facultatifs vides ou utilise <strong>Non renseigné</strong>.</li>
+<li>Ne saisis pas de mots de passe, codes TOTP, coordonnées bancaires ou secrets techniques dans une fiche, une note ou une action.</li>
+<li>Limite les informations personnelles à ce qui est utile au suivi professionnel et respecte les règles internes de conservation et de consentement.</li>
+<li>Vérifie les destinataires avant d’associer un contact, une entreprise, un projet ou un responsable.</li>
+<li>Les pages sont protégées par une session et des permissions. Les mots de passe sont hachés par l’application; le cookie de session est configuré <code>HttpOnly</code>, <code>Secure</code> en production et limité à huit heures.</li>
+<li>N’envoie jamais <code>AUTH_SECRET</code>, <code>DATABASE_URL</code>, mot de passe ou secret TOTP au support.</li>
+</ul>
+<h2>16. Bonnes pratiques d’utilisation</h2>
+<ul>
+<li>Vérifie le badge <strong>PROD</strong> avant chaque saisie métier.</li>
+<li>Associe les activités et actions au bon contact, à la bonne entreprise et au bon responsable.</li>
+<li>Donne aux actions un titre décrivant une tâche vérifiable, un statut correct et une échéance réaliste.</li>
+<li>Après une rencontre, consigne une activité et, si nécessaire, une note sur la fiche contact.</li>
+<li>Mets à jour une fiche existante plutôt que de créer un doublon.</li>
+<li>Avant une suppression, vérifie les relations et lis le message de confirmation.</li>
+<li>Utilise le journal d’audit pour rechercher les opérations récentes d’administration si tu es administrateur.</li>
+<li>Le menu Maintenance modifie les valeurs proposées dans certains menus déroulants : réserve cette fonction aux administrateurs.</li>
+<li>La mention Google Agenda du tableau de bord n’est pas la preuve d’une synchronisation réelle dans la version 1.0.0.</li>
+</ul>
+<h2>17. Dépannage et erreurs fréquentes</h2>
+<table>
+<thead>
+<tr>
+<th>Symptôme</th>
+<th>Vérification / action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Identifiants invalides</td>
+<td>Vérifie le nom d’utilisateur et le mot de passe; respecte les majuscules/minuscules. Après plusieurs échecs, demande à l’administrateur de vérifier que le compte est actif.</td>
+</tr>
+<tr>
+<td>Code 2FA demandé ou refusé</td>
+<td>Le 2FA est en sommeil dans la configuration PROD vérifiée. Si l’écran le demande après un changement de configuration, utilise le code à six chiffres de l’application associée au bon compte; vérifie l’heure automatique du téléphone. Ne partage pas le secret.</td>
+</tr>
+<tr>
+<td>Page inaccessible ou message base de données inaccessible</td>
+<td>Recharge la page une fois. Si l’erreur persiste, note l’heure, la page et le message puis contacte le support. Ne modifie pas la configuration PostgreSQL toi-même.</td>
+</tr>
+<tr>
+<td>Aucune donnée ou aucun résultat</td>
+<td>Vérifie la recherche et les filtres. Les compteurs et listes reflètent la base réelle; un état vide ne signifie pas nécessairement une panne.</td>
+</tr>
+<tr>
+<td>Adresse e-mail déjà utilisée</td>
+<td>Recherche le contact existant et mets sa fiche à jour au lieu de créer un doublon.</td>
+</tr>
+<tr>
+<td>Projet refusé</td>
+<td>Vérifie la référence unique, le nom, le type, le statut, les champs numériques, les dates et la cohérence des informations de budget.</td>
+</tr>
+<tr>
+<td>Suppression refusée</td>
+<td>Coche la case de confirmation demandée. Si tu as un doute sur les données liées, annule et consulte un administrateur.</td>
+</tr>
+<tr>
+<td>Tu ne vois pas les commandes d’écriture</td>
+<td>Ton profil peut être <strong>Membre</strong>, qui est en lecture seule. Demande à un administrateur de vérifier les droits.</td>
+</tr>
+<tr>
+<td>Le badge ne correspond pas à l’environnement attendu</td>
+<td>Vérifie le libellé <code>PROD</code> et la version/build près du logo; actualise avec <code>⌘R</code> sur Mac ou <code>Ctrl+R</code> sur Windows/Linux.</td>
+</tr>
+</tbody></table>
+<h2>18. Support et procédure de remontée d’incidents</h2>
+<p>Il n’y a pas de formulaire de support intégré dans PROD 1.0.0. Adresse le problème à l’administrateur CRM ou au responsable technique selon la procédure interne.</p>
+<p>Fournis les informations suivantes :</p>
+<ol>
+<li>Environnement : <strong>PROD</strong>.</li>
+<li>Version et build affichés près du logo (pour la release initiale : <code>v1.0.0</code>, puis le SHA court du build actif).</li>
+<li>Date et heure avec fuseau horaire.</li>
+<li>Page concernée et action effectuée juste avant l’erreur.</li>
+<li>Message d’erreur exact et étapes permettant de reproduire le problème.</li>
+<li>Capture d’écran expurgée des données personnelles non nécessaires.</li>
+</ol>
+<p>Ne transmets jamais de mot de passe, code 2FA, secret, jeton, <code>DATABASE_URL</code> ou export de base par e-mail ou capture d’écran. Si tu soupçonnes une fuite ou une suppression accidentelle, arrête les modifications et préviens immédiatement l’administrateur.</p>
+<h2>19. Évolutions prévues du système</h2>
+<p>Les points connus de la feuille de route sont :</p>
+<ul>
+<li>conserver le menu latéral à droite sur ordinateur lors des évolutions responsive;</li>
+<li>augmenter la taille des caractères sur téléphone;</li>
+<li>décider explicitement de l’activation du 2FA et vérifier son fonctionnement avant de généraliser cette mesure;</li>
+<li>étudier un véritable module de rapports/export et une éventuelle intégration calendrier : ils ne sont pas disponibles dans PROD 1.0.0.</li>
+</ul>
+<p>Ces évolutions ne doivent pas être considérées comme disponibles tant qu’elles ne sont pas annoncées dans une version ultérieure.</p>
+</main>
+  </body>
+</html>
