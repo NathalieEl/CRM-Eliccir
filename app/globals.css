@@ -197,8 +197,8 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contacts-section-heading .section-index { margin-bottom: 5px; }
 .contacts-section-heading h2 { font-size: 18px; }
 form label, form legend { color: var(--green); }
-form label:has(> textarea) { display: grid; gap: 6px; grid-column: 1 / -1; min-width: 0; }
-form label:has(> textarea) > textarea { box-sizing: border-box; width: 100%; }
+form label:has(> textarea, > select[multiple]) { display: grid; gap: 6px; grid-column: 1 / -1; min-width: 0; }
+form label:has(> textarea) > textarea, form label:has(> select[multiple]) > select[multiple] { box-sizing: border-box; width: 100%; }
 .contact-form { align-items: end; display: grid; gap: 13px; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
 .contact-form label, .contact-edit-form label { display: grid; font-size: 14px; font-weight: 600; gap: 6px; }
 .contact-form input, .contact-form select, .contact-edit-form input, .contact-edit-form select { background: #fff; border: 1px solid #dfe4de; border-radius: 3px; color: #27362d; font: inherit; font-size: 16px; height: 44px; min-width: 0; padding: 0 10px; }
