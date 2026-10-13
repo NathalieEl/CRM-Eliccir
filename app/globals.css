@@ -1,3 +1,5 @@
+.dashboard-empty { color: #737e76; font-size: 11px; margin: 0; padding: 16px 0; }
+.dashboard-empty-cell { color: #737e76; font-size: 11px; padding: 18px 0; }
 @import "tailwindcss";
 
 :root {
