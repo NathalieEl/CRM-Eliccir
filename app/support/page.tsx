@@ -29,7 +29,8 @@ export default async function SupportPage({ searchParams }: SupportPageProps) {
         </section>
 
         {params.error === "invalid" ? <p className="contacts-message contacts-message-error" role="alert">Choisis une catégorie et saisis les détails de ta demande.</p> : null}
-        {params.notice === "sent" ? <p className="contacts-message" role="status">Ton message a été transmis aux administrateurs et ajouté au journal d’audit.</p> : null}
+        {params.notice === "sent" ? <p className="contacts-message" role="status">Ta demande est enregistrée et envoyée par e-mail à marc.issan@gmail.com.</p> : null}
+        {params.notice === "email-pending" ? <p className="contacts-message contacts-message-error" role="alert">Ta demande est enregistrée, mais l’e-mail n’a pas pu être envoyé. L’administrateur doit vérifier la configuration SMTP.</p> : null}
 
         <section className="contacts-create-section">
           <form action={submitSupportRequest} className="contact-form support-form">
@@ -39,7 +40,7 @@ export default async function SupportPage({ searchParams }: SupportPageProps) {
               <label><input name="category" type="radio" value="improvement" required />Modifications/Améliorations</label>
             </fieldset>
             <label className="support-details-field">Détails<textarea name="details" rows={8} maxLength={10000} required placeholder="Décris le problème rencontré ou l’amélioration souhaitée…" /></label>
-            <p className="support-privacy-note">Ton nom d’utilisateur et la date/heure d’envoi seront ajoutés automatiquement. N’inscris aucun mot de passe ni code de sécurité dans le message.</p>
+            <p className="support-privacy-note">Ton nom d’utilisateur et la date/heure d’envoi seront ajoutés automatiquement. Ta demande sera conservée dans le journal d’audit. N’inscris aucun mot de passe ni code de sécurité dans le message.</p>
             <button className="contact-primary-button" type="submit">Envoyer le message <span>↗</span></button>
           </form>
         </section>
