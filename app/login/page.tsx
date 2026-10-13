@@ -22,7 +22,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="auth-brand">
           <span className="brand-mark">E</span>
           <span className="brand-copy">
-            <span className="brand-name">eliccir<small>CRM</small></span>
+            <span className="brand-name">Eliccir<small>CRM</small></span>
             <span
               className="brand-release"
               title={`${deploymentInfo.environment} · version ${deploymentInfo.version} · build ${deploymentInfo.buildId}${deploymentInfo.commitMessage ? ` · ${deploymentInfo.commitMessage}` : ""}`}
