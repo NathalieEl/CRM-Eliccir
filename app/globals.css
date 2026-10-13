@@ -435,6 +435,24 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 .profile-fields-grid label, .contact-note-form label { color: #56645a; display: grid; font-size: 13px; font-weight: 600; gap: 6px; }
 .profile-fields-grid input, .profile-fields-grid select, .profile-section textarea, .contact-note-form input, .contact-note-form select, .contact-note-form textarea { background: #fff; border: 1px solid #dfe4de; border-radius: 3px; color: #27362d; font: inherit; font-size: 15px; min-height: 42px; min-width: 0; padding: 8px 10px; }
 .profile-section textarea, .contact-note-form textarea { min-height: 96px; resize: vertical; }
+.project-photo-upload-form { align-items: end; display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)) auto; }
+.project-photo-upload-form .support-privacy-note { grid-column: 1 / -1; }
+.project-photo-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.project-photo-card { align-content: start; background: #f8f9f6; border: 1px solid #e5e9e3; border-radius: 4px; display: grid; gap: 10px; min-width: 0; padding: 10px; }
+.project-photo-image { aspect-ratio: 4 / 3; background: #e8ece7; height: auto; object-fit: cover; width: 100%; }
+.project-photo-cover-label { color: var(--green); font-size: 12px; font-weight: 650; }
+.project-photo-caption { color: #48564d; font-size: 14px; margin: 0; overflow-wrap: anywhere; }
+.project-photo-caption-form { display: grid; gap: 8px; }
+.project-photo-caption-form label { display: grid; font-size: 12px; font-weight: 600; gap: 5px; }
+.project-photo-caption-form input { background: #fff; border: 1px solid #dfe4de; border-radius: 3px; color: #27362d; font: inherit; min-height: 38px; min-width: 0; padding: 7px 9px; width: 100%; }
+.project-photo-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 7px; }
+.project-photo-actions form { margin: 0; }
+.project-photo-actions button, .project-photo-caption-form button, .project-photo-delete summary { background: transparent; border: 1px solid #dfe4de; border-radius: 3px; color: var(--green); cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; padding: 7px 9px; }
+.project-photo-actions button:hover, .project-photo-caption-form button:hover { background: #eef3ee; }
+.project-photo-actions button:disabled { cursor: not-allowed; opacity: .45; }
+.project-photo-delete summary { color: #a44d3c; list-style-position: inside; }
+.project-photo-delete form { display: grid; gap: 8px; }
+.project-photo-delete p { color: #68756c; font-size: 12px; margin: 8px 0 0; }
 .profile-repeat-row { border-top: 1px solid #e9ece7; padding-top: 12px; }
 .profile-form-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; }
 .profile-save-button { min-width: 200px; }
