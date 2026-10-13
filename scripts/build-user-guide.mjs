@@ -12,7 +12,7 @@ const page = `<!doctype html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
-    <title>Guide d’utilisation · Eliccir CRM PROD 1.0.3</title>
+    <title>Guide d’utilisation · Eliccir CRM PROD 1.1.0</title>
     <style>
       :root { color-scheme: light; --ink: #25332b; --muted: #647168; --green: #1f3c32; --line: #e1e5df; --paper: #fff; --canvas: #f3f5f1; --accent: #d9e383; }
       * { box-sizing: border-box; }
@@ -42,7 +42,7 @@ const page = `<!doctype html>
   </head>
   <body>
     <header class="guide-topbar">
-      <div class="guide-brand"><span class="guide-mark">E</span><span>Eliccir CRM · Guide PROD 1.0.3</span></div>
+      <div class="guide-brand"><span class="guide-mark">E</span><span>Eliccir CRM · Guide PROD 1.1.0</span></div>
       <a class="guide-return" href="/">Retour à Eliccir CRM</a>
     </header>
     <main>${content}</main>
