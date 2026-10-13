@@ -63,6 +63,11 @@ export function WorkspaceShell({
             Recherche globale
           </Link>
         </div>
+        <div className="sidebar-support-link-wrap">
+          <Link className={`sidebar-support-link${pathname === "/support" ? " nav-link-active" : ""}`} href="/support" aria-current={pathname === "/support" ? "page" : undefined}>
+            Signaler un problème ou poser une question
+          </Link>
+        </div>
         <div className="sidebar-bottom">
           <span className="online-dot" /> Session sécurisée
           <div className="profile-row">
