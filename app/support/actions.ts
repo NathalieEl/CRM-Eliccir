@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requirePermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
+import { sendSupportRequestEmail } from "@/lib/support-email";
 
 const categories = {
   problem: "Problèmes/Bugs",
@@ -27,18 +28,44 @@ export async function submitSupportRequest(formData: FormData) {
     timeStyle: "short",
     timeZone: "Europe/Paris",
   }).format(createdAt);
+  const requestDetails = `Utilisateur : ${displayName} (${user.username})\nDate/heure : ${formattedDate} (Europe/Paris)\nCatégorie : ${category}\n\n${details}`;
 
-  await prisma.auditLog.create({
+  const request = await prisma.auditLog.create({
     data: {
       actorId: user.id,
       actorUsername: user.username,
       action: "support_request",
       entity: "support_request",
-      details: `Utilisateur : ${displayName} (${user.username})\nDate/heure : ${formattedDate} (Europe/Paris)\nCatégorie : ${category}\n\n${details}`,
+      details: `${requestDetails}\n\nÉtat e-mail : en attente`,
       createdAt,
     },
   });
 
+  let emailStatus: "sent" | "not-configured" | "failed" = "not-configured";
+  try {
+    emailStatus = await sendSupportRequestEmail({
+      displayName,
+      username: user.username,
+      formattedDate,
+      category,
+      details,
+    });
+  } catch (error) {
+    emailStatus = "failed";
+    console.error("Unable to send support request email", error);
+  }
+
+  const emailStatusLabel = {
+    sent: "envoyé",
+    "not-configured": "en attente : SMTP non configuré",
+    failed: "échec de l’envoi",
+  }[emailStatus];
+
+  await prisma.auditLog.update({
+    where: { id: request.id },
+    data: { details: `${requestDetails}\n\nÉtat e-mail : ${emailStatusLabel}` },
+  });
+
   revalidatePath("/audit");
-  redirect("/support?notice=sent");
+  redirect(emailStatus === "sent" ? "/support?notice=sent" : "/support?notice=email-pending");
 }

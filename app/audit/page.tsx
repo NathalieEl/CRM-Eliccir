@@ -7,7 +7,7 @@ const actionLabels: Record<string, string> = {
   updated: "Modification",
   deleted: "Suppression",
   reset_2fa: "Réinitialisation 2FA",
-  support_request: "Signalement utilisateur",
+  support_request: "Demande utilisateur",
 };
 
 const entityLabels: Record<string, string> = {
