@@ -1,11 +1,11 @@
-# Guide d’utilisation — Eliccir CRM PROD 1.0.3
+# Guide d’utilisation — Eliccir CRM PROD 1.0.4
 
-**Version du guide :** 1.0.3<br>
+**Version du guide :** 1.0.4<br>
 **Plateforme :** PROD  
 **Adresse :** https://crm-eliccir-production.up.railway.app  
 **Public concerné :** administrateurs, direction, opérations commerciales et membres de l’équipe
 
-> Ce guide décrit les fonctions présentes dans PROD 1.0.3. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.
+> Ce guide décrit les fonctions présentes dans PROD 1.0.4. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.
 
 ## Table des matières
 
@@ -32,7 +32,7 @@
 
 Eliccir CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.
 
-L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. À la rédaction du guide, PROD est en **v1.0.3**.
+L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. À la rédaction du guide, PROD est en **v1.0.4**.
 
 L’interface est organisée autour d’un tableau de bord et de pages de gestion dédiées. Les données affichées dépendent du contenu réel de la base ; les messages « Aucun… » indiquent qu’aucun enregistrement correspondant n’existe.
 
@@ -72,7 +72,7 @@ La session expire au bout d’environ huit heures. Il faut alors se reconnecter.
 
 ### Double authentification (2FA)
 
-Dans la configuration PROD vérifiée pour la version 1.0.3, `TWO_FACTOR_STATUS` n’est pas configuré : le 2FA est donc **en sommeil**, et l’écran de connexion demande uniquement le nom d’utilisateur et le mot de passe.
+Dans la configuration PROD vérifiée pour la version 1.0.4, `TWO_FACTOR_STATUS` n’est pas configuré : le 2FA est donc **en sommeil**, et l’écran de connexion demande uniquement le nom d’utilisateur et le mot de passe.
 
 Le code sait demander un code TOTP à six chiffres lorsque `TWO_FACTOR_STATUS` est défini sur `Active` et que les secrets nécessaires sont configurés. Cette activation relève d’une décision et d’une opération d’administration, pas d’un réglage individuel de l’utilisateur.
 
@@ -82,7 +82,7 @@ Si le 2FA est activé ultérieurement, ajoute le secret fourni par l’administr
 
 Les droits sont attribués au compte par un administrateur.
 
-| Profil affiché | Droits dans PROD 1.0.3 |
+| Profil affiché | Droits dans PROD 1.0.4 |
 |---|---|
 | Administrateur (`admin`) | Lecture et écriture du CRM; gestion des utilisateurs; maintenance des options; accès au journal d’audit. |
 | Direction (`management`) | Lecture et écriture des données CRM. Pas de gestion des utilisateurs, de la maintenance ou du journal d’audit. |
@@ -106,7 +106,7 @@ Le tableau de bord est la page **Dashboard**. Il présente :
 
 Les sections vides affichent un message, par exemple **Aucune activité à venir**, **Aucune action en attente**, **Aucun contact enregistré** ou **Aucun projet actif**. Ces messages ne sont pas des données et n’ajoutent aucun enregistrement à la base.
 
-**À propos du calendrier :** le tableau de bord affiche une mention de synchronisation avec Google Agenda. Dans la version 1.0.3, cette mention est un texte d’interface ; aucune synchronisation Google Agenda configurable n’est intégrée au CRM. Ne t’y fie pas pour vérifier qu’un rendez-vous a été transmis à Google.
+**À propos du calendrier :** le tableau de bord affiche une mention de synchronisation avec Google Agenda. Dans la version 1.0.4, cette mention est un texte d’interface ; aucune synchronisation Google Agenda configurable n’est intégrée au CRM. Ne t’y fie pas pour vérifier qu’un rendez-vous a été transmis à Google.
 
 ## 7. Gestion des contacts
 
@@ -189,19 +189,19 @@ Si une recherche ne retourne rien, vérifie l’orthographe, retire les filtres 
 
 ## 12. Lecture des indicateurs et analytics
 
-PROD 1.0.3 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :
+PROD 1.0.4 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :
 
 - **Contacts suivis** : nombre total de contacts; le complément indique les nouveaux contacts du mois.
 - **Projets actifs** : nombre de fiches immobilières dont le statut n’est pas `SOLD`.
 - **Activités à venir** : activités dont la date est maintenant ou dans le futur.
-- **Actions en attente** : actions dont le statut n’est pas **Terminée**. Dans le code 1.0.3, cela peut aussi inclure une action **Annulée**; vérifie la liste détaillée avant d’interpréter le chiffre.
+- **Actions en attente** : actions dont le statut n’est pas **Terminée**. Dans le code 1.0.4, cela peut aussi inclure une action **Annulée**; vérifie la liste détaillée avant d’interpréter le chiffre.
 - **En retard** : actions non terminées avec une échéance antérieure à l’heure actuelle.
 
 Les indicateurs se recalculent à partir des données enregistrées. Les compteurs affichant `0` ou `00` signifient qu’aucun enregistrement correspondant n’a été trouvé selon ces règles.
 
 ## 13. Les rapports
 
-Il n’existe pas de rubrique **Rapports**, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.0.3. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.
+Il n’existe pas de rubrique **Rapports**, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.0.4. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.
 
 Pour transmettre une information, utilise les données visibles dans les fiches et respecte les règles internes de confidentialité. Ne considère pas une capture d’écran comme un rapport officiel ou un export exhaustif.
 
@@ -252,7 +252,7 @@ En cas de doute, annule l’opération et demande à un administrateur avant de 
 - Avant une suppression, vérifie les relations et lis le message de confirmation.
 - Utilise le journal d’audit pour rechercher les opérations récentes d’administration si tu es administrateur.
 - Le menu Maintenance modifie les valeurs proposées dans certains menus déroulants : réserve cette fonction aux administrateurs.
-- La mention Google Agenda du tableau de bord n’est pas la preuve d’une synchronisation réelle dans la version 1.0.3.
+- La mention Google Agenda du tableau de bord n’est pas la preuve d’une synchronisation réelle dans la version 1.0.4.
 
 ## 17. Dépannage et erreurs fréquentes
 
@@ -281,7 +281,7 @@ Si le formulaire est inaccessible ou si l’envoi reste en attente, adresse le p
 Fournis les informations suivantes :
 
 1. Environnement : **PROD**.
-2. Version et build affichés près du logo (pour la release initiale : `v1.0.3`, puis le SHA court du build actif).
+2. Version et build affichés près du logo (pour la release initiale : `v1.0.4`, puis le SHA court du build actif).
 3. Date et heure avec fuseau horaire.
 4. Page concernée et action effectuée juste avant l’erreur.
 5. Message d’erreur exact et étapes permettant de reproduire le problème.
