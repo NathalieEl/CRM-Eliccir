@@ -1,6 +1,5 @@
-import nodemailer from "nodemailer";
-
 const SUPPORT_RECIPIENT = "marc.issan@gmail.com";
+const MINIMUM_WEBHOOK_TOKEN_LENGTH = 32;
 
 type SupportRequestEmail = {
   displayName: string;
@@ -11,40 +10,40 @@ type SupportRequestEmail = {
 };
 
 export async function sendSupportRequestEmail(request: SupportRequestEmail): Promise<"sent" | "not-configured"> {
-  const host = process.env.SMTP_HOST?.trim();
-  const username = process.env.SMTP_USER?.trim();
-  const password = process.env.SMTP_PASSWORD;
-  const port = Number(process.env.SMTP_PORT || 465);
-  const from = process.env.SMTP_FROM?.trim() || username;
+  const endpoint = process.env.SUPPORT_EMAIL_WEBHOOK_URL?.trim();
+  const token = process.env.SUPPORT_WEBHOOK_TOKEN?.trim();
 
-  if (!host || !username || !password || !from || !Number.isInteger(port) || port < 1 || port > 65535) {
+  if (!endpoint || !token || token.length < MINIMUM_WEBHOOK_TOKEN_LENGTH) {
     return "not-configured";
   }
 
-  const secureSetting = process.env.SMTP_SECURE?.trim().toLowerCase();
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: secureSetting ? secureSetting === "true" : port === 465,
-    auth: { user: username, pass: password },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+  let endpointUrl: URL;
+  try {
+    endpointUrl = new URL(endpoint);
+  } catch {
+    return "not-configured";
+  }
+  if (endpointUrl.protocol !== "https:") return "not-configured";
+
+  const response = await fetch(endpointUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token,
+      recipient: SUPPORT_RECIPIENT,
+      displayName: request.displayName,
+      username: request.username,
+      formattedDate: request.formattedDate,
+      category: request.category,
+      details: request.details,
+    }),
+    signal: AbortSignal.timeout(15000),
   });
 
-  await transporter.sendMail({
-    from,
-    to: SUPPORT_RECIPIENT,
-    subject: `[Eliccir CRM] ${request.category}`,
-    text: [
-      "Nouvelle demande envoyée depuis Eliccir CRM",
-      `Utilisateur : ${request.displayName} (${request.username})`,
-      `Date/heure : ${request.formattedDate} (Europe/Paris)`,
-      `Catégorie : ${request.category}`,
-      "",
-      request.details,
-    ].join("\n"),
-  });
+  const result = await response.json().catch(() => null) as { ok?: boolean } | null;
+  if (!response.ok || result?.ok !== true) {
+    throw new Error(`Google Apps Script support mail failed (${response.status})`);
+  }
 
   return "sent";
 }
