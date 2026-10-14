@@ -614,6 +614,7 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
   .contacts-data-table tbody { display: grid; gap: 12px; }
   .contacts-data-table tbody tr { background: #fff; border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 0 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 6px; }
   .contacts-data-table tbody td { border-bottom: 1px solid #f0f1ee; display: grid; font-size: 13px; gap: 4px; min-width: 0; padding: 9px 7px; }
+  .contacts-data-table tbody td:nth-child(n) { max-width: 100%; min-width: 0; width: auto; }
   .contacts-data-table tbody td::before { color: #68756c; content: attr(data-label); font-size: 10px; font-weight: 650; }
   .contacts-data-table tbody td:first-child { padding-left: 7px; }
   .contacts-data-table tbody td:last-child { border-bottom: 0; }
