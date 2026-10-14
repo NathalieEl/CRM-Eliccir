@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createAction, deleteAction, updateAction } from "@/app/actions/actions";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
-import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
+import { CancelEditButton, UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import type { Prisma } from "@/app/generated/prisma/client";
 
 type ActionRecord = Prisma.ActionItemGetPayload<{ include: { contact: true; entreprise: true; responsable: true } }>;
@@ -200,7 +200,7 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                                   <label>Prochaine action<input name="prochaineAction" defaultValue={action.prochaineAction ?? ""} maxLength={1000} /></label>
                                   <label>Détails<input name="details" defaultValue={action.details ?? ""} maxLength={500} /></label>
                                   <label>Résultat<textarea name="resultat" defaultValue={action.resultat ?? ""} maxLength={10000} rows={3} /></label>
-                                  <Link className="contact-cancel-link" href="/actions">Annuler</Link>
+                                  <CancelEditButton />
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
                                 </UnsavedChangesForm>
                               </details>

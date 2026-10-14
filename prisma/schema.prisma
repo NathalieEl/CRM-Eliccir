@@ -532,7 +532,13 @@ model User {
   id              String    @id @default(cuid())
   username        String    @unique
   prenom          String?
+  nom             String?
+  email           String?   @db.VarChar(254)
   passwordHash    String
+  mustChangePassword Boolean @default(false)
+  passwordSetupTokenHash String? @unique
+  passwordSetupExpiresAt DateTime?
+  sessionVersion  Int       @default(0)
   twoFactorSecret String
   role            String    @default("member")
   active          Boolean   @default(true)

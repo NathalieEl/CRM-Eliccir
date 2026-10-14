@@ -37,6 +37,19 @@ SUPPORT_WEBHOOK_TOKEN=<le même jeton aléatoire que dans les propriétés du sc
 
 Le jeton doit être identique dans Railway et dans les propriétés du script. Ne l’envoie jamais dans une conversation ou une capture d’écran.
 
+## 5. Activer les invitations et réinitialisations de mot de passe
+
+Le même relais peut envoyer aux utilisateurs un lien HTTPS à usage unique pour définir leur mot de passe. Il n’envoie jamais de mot de passe temporaire en clair.
+
+Après avoir mis à jour `docs/google-apps-script-support.gs`, redéploie l’application Web Apps Script :
+
+1. Dans Apps Script, ouvre **Déployer** → **Gérer les déploiements**.
+2. Modifie le déploiement de l’application Web existant, sélectionne **Nouvelle version**, puis redéploie-le. L’URL `/exec` reste celle configurée dans Railway.
+3. Vérifie que l’accès reste réglé sur **Tout le monde** et que la propriété `SUPPORT_WEBHOOK_TOKEN` n’a pas changé.
+
+Les nouvelles créations et réinitialisations de mot de passe enverront l’identifiant et un lien valable 24 heures. Le compte ne pourra pas ouvrir le CRM tant que le mot de passe n’aura pas été défini depuis ce lien.
+Le compte administrateur principal configuré par `ADMIN_USERNAME` et `ADMIN_PASSWORD` reste géré dans Railway ; il n’utilise pas le lien de setup du CRM.
+
 ## 4. Tester l’environnement configuré
 
 1. Connecte-toi à l’environnement configuré.

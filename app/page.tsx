@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 function formatActivityItem(activity: { titre: string; type: string; contactLabel?: string | null; contact?: { prenom: string | null; nom: string } | null; entreprise?: { nom: string } | null; responsable?: { username: string } | null; resultat?: string | null; dateRealisation?: Date | null; statut?: string | null; date?: Date | null; details?: string | null }) {
   const time = activity.date ? new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(activity.date)) : "09:00";
@@ -103,6 +104,7 @@ async function getDashboardData() {
 }
 
 export default async function Home() {
+  await requirePermission("crm.read");
   const [dashboard, currentUser] = await Promise.all([getDashboardData(), getCurrentUser()]);
   const greetingName = currentUser?.prenom?.trim() || currentUser?.username || "bienvenue";
   const metrics = dashboard.metrics;

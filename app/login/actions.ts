@@ -23,7 +23,7 @@ export async function login(formData: FormData) {
 
   if (!valid) redirect("/login?error=invalid");
   const user = await prisma.user.findUnique({ where: { username } });
-  if (!user) redirect("/login?error=invalid");
+  if (!user || user.mustChangePassword) redirect("/login?error=invalid");
   await createSession(user.id);
 
   redirect("/");

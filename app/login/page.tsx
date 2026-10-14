@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { login } from "@/app/login/actions";
 import { PasswordField } from "@/app/components/password-field";
 import { isTwoFactorActive } from "@/lib/auth";
@@ -6,14 +7,24 @@ import { getDeploymentInfo } from "@/lib/deployment-info";
 const messages = {
   invalid: "Identifiants invalides ou authentification incorrecte.",
   unavailable: "Le service d’authentification est momentanément indisponible.",
+  "password-setup-required": "Définis ton mot de passe depuis le lien reçu par e-mail avant de te connecter.",
+  "session-expired": "Ta session a expiré ou ton mot de passe a été réinitialisé. Reconnecte-toi.",
+};
+
+const notices = {
+  "password-set": "Ton mot de passe a été défini. Tu peux maintenant te connecter.",
+};
+
+export const metadata: Metadata = {
+  referrer: "no-referrer",
 };
 
 type LoginPageProps = {
-  searchParams: Promise<{ error?: keyof typeof messages }>;
+  searchParams: Promise<{ error?: keyof typeof messages; notice?: keyof typeof notices }>;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const { error } = await searchParams;
+  const { error, notice } = await searchParams;
   const deploymentInfo = getDeploymentInfo();
 
   return (
@@ -34,6 +45,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <p className="section-index">ESPACE SÉCURISÉ</p>
         <h1>Connexion</h1>
         <p className="auth-intro">Accède à ton espace de travail.</p>
+        {notice && notices[notice] ? <p className="contacts-message" role="status">{notices[notice]}</p> : null}
         {error && messages[error] ? <p className="auth-error" role="alert">{messages[error]}</p> : null}
         <form action={login} className="auth-form">
           <label>Nom d’utilisateur<input name="username" autoComplete="username" required /></label>

@@ -241,7 +241,8 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 .contact-edit-details summary::-webkit-details-marker, .contact-delete-details summary::-webkit-details-marker { display: none; }
 .contact-delete-details summary { color: #ad5946; }
 .contact-edit-form, .contact-delete-form { background: #fff; border: 1px solid #e1e6e0; border-radius: 4px; box-shadow: 0 8px 24px rgba(32,41,35,.12); display: grid; gap: 11px; min-width: 260px; padding: 16px; position: absolute; right: 0; top: 24px; z-index: 2; }
-.contact-delete-form { min-width: 225px; }
+.contact-edit-form { max-height: min(72dvh, 700px); min-width: 0; overflow-y: auto; overscroll-behavior: contain; width: min(420px, calc(100vw - 24px)); }
+.contact-delete-form { max-height: min(72dvh, 600px); min-width: 225px; overflow-y: auto; overscroll-behavior: contain; }
 .contact-delete-form label { align-items: center; color: #56645a; display: flex; font-size: 13px; gap: 7px; }
 .contact-delete-form button { background: #a84938; border: 0; border-radius: 3px; color: white; cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; min-height: 44px; }
 .contacts-empty { border-top: 1px solid #eff0ed; color: #59665d; font-size: 15px; margin: 0; padding: 22px 0 7px; }
@@ -400,13 +401,13 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 .user-row-actions { display: flex; align-items: center; gap: 12px; }
 .user-row-actions details { position: relative; }
 .user-row-actions summary { cursor: pointer; color: var(--green); font-size: 12px; }
-.user-edit-form { position: absolute; z-index: 2; right: 0; top: 28px; display: grid; gap: 10px; width: 220px; padding: 14px; background: #fff; border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(32, 41, 35, .14); }
+.user-edit-form { position: absolute; z-index: 2; right: 0; top: 28px; display: grid; gap: 10px; width: min(380px, calc(100vw - 24px)); max-height: min(72dvh, 700px); overflow-y: auto; overscroll-behavior: contain; padding: 14px; background: #fff; border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(32, 41, 35, .14); }
 .user-edit-form label { display: grid; gap: 5px; color: #4e5b52; font-size: 11px; font-weight: 700; }
 .user-edit-form input:not([type="checkbox"]), .user-edit-form select { width: 100%; border: 1px solid #dfe4dc; background: #fafbf9; padding: 8px; font: inherit; font-size: 12px; }
 .user-edit-form .contact-primary-button { padding: 9px 10px; font-size: 11px; }
 .user-active-toggle { display: flex !important; grid-template-columns: auto 1fr; align-items: center; }
 .user-delete-button { border: 0; background: transparent; color: var(--coral); cursor: pointer; font: inherit; font-size: 12px; }
-.user-delete-form { position: absolute; z-index: 2; right: 0; top: 28px; display: grid; gap: 10px; width: 220px; padding: 14px; background: #fff; border: 1px solid #f0d6ce; box-shadow: 0 12px 30px rgba(32, 41, 35, .14); }
+.user-delete-form { position: absolute; z-index: 2; right: 0; top: 28px; display: grid; gap: 10px; width: min(320px, calc(100vw - 24px)); max-height: min(72dvh, 600px); overflow-y: auto; overscroll-behavior: contain; padding: 14px; background: #fff; border: 1px solid #f0d6ce; box-shadow: 0 12px 30px rgba(32, 41, 35, .14); }
 .user-delete-form label { display: flex; align-items: center; gap: 7px; color: #69756d; font-size: 11px; }
 .user-delete-form button { border: 0; border-radius: 3px; background: #a84938; color: #fff; cursor: pointer; font: inherit; font-size: 11px; font-weight: 600; padding: 9px 10px; }
 .maintenance-action { border: 0; background: transparent; color: var(--green); cursor: pointer; font: inherit; font-size: 11px; }
@@ -464,6 +465,7 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 .profile-form-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; }
 .profile-save-button { min-width: 200px; }
 .contact-cancel-link { color: #536158; display: inline-flex; font-size: 14px; font-weight: 600; min-height: 40px; align-items: center; text-decoration: underline; text-underline-offset: 3px; }
+.contact-cancel-link[type="button"] { background: transparent; border: 0; cursor: pointer; font: inherit; padding: 0; text-align: left; }
 .contact-photo-row { align-items: center; display: flex; flex-wrap: wrap; gap: 20px; }
 .contact-profile-photo, .contact-profile-photo-placeholder { background: #e8eee5; border: 1px solid #dfe4de; border-radius: 50%; color: #236347; height: 144px; object-fit: cover; width: 144px; }
 .contact-profile-photo-placeholder { align-items: center; display: flex; font-size: 34px; justify-content: center; }
@@ -625,6 +627,30 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 @media (max-width: 520px) {
   .auth-panel { padding: 28px 22px; }
   .auth-brand { margin-bottom: 40px; }
+}
+
+@media (max-width: 600px) {
+  .contact-edit-details[open]::before, .contact-delete-details[open]::before,
+  .user-row-actions details[open]::before {
+    background: rgba(24, 37, 30, .38);
+    content: "";
+    inset: 0;
+    position: fixed;
+    z-index: 1000;
+  }
+  .contact-edit-form, .contact-delete-form, .user-edit-form, .user-delete-form {
+    box-sizing: border-box;
+    inset: 50% auto auto 50%;
+    margin: 0;
+    max-height: 84dvh;
+    min-width: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    width: min(92vw, 520px);
+    z-index: 1001;
+  }
 }
 
 @media (max-width: 600px) {
