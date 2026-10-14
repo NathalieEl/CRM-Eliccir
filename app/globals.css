@@ -258,11 +258,13 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 .property-field-wide { grid-column: 1 / -1; }
 .coordinate-field { display: grid; gap: 6px; min-width: 0; }
 .coordinate-field-title { color: #56645a; font-size: 14px; font-weight: 600; }
-.coordinate-dms-row { align-items: end; display: grid; gap: 5px; grid-template-columns: minmax(0, 1fr) auto minmax(0, .8fr) auto minmax(0, 1fr) auto minmax(80px, 1.25fr); min-width: 0; }
-.coordinate-dms-row label { font-size: 11px; gap: 4px; }
+.coordinate-dms-row { display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(0, 1fr)); min-width: 0; }
+.coordinate-dms-row label { font-size: 11px; gap: 4px; min-width: 0; }
 .coordinate-dms-row label > span { color: #68756c; }
-.coordinate-dms-row input, .coordinate-dms-row select { font-size: 14px; padding: 8px 6px; }
-.coordinate-unit { align-self: end; color: #68756c; line-height: 42px; }
+.coordinate-dms-input-with-unit { align-items: center; display: flex; gap: 4px; min-width: 0; }
+.coordinate-dms-input-with-unit input { flex: 1 1 0; font-size: 14px; min-width: 0; padding: 8px 6px; }
+.coordinate-dms-row select { font-size: 14px; min-width: 0; padding: 8px 6px; width: 100%; }
+.coordinate-unit { color: #68756c; flex: 0 0 auto; line-height: 1; }
 .coordinate-preview { color: #68756c; font-size: 12px; }
 .property-coordinate-map { display: grid; gap: 8px; grid-column: 1 / -1; min-width: 0; }
 .property-coordinate-fields { display: grid; gap: 13px; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
@@ -622,4 +624,24 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 @media (max-width: 520px) {
   .auth-panel { padding: 28px 22px; }
   .auth-brand { margin-bottom: 40px; }
+}
+
+@media (max-width: 600px) {
+  .contact-form, .maintenance-form, .property-fields-grid, .property-system-fields,
+  .profile-fields-grid, .profile-phone-fields, .contact-note-form,
+  .company-link-form, .company-edit-form, .company-link-form-full,
+  .project-photo-upload-form { grid-template-columns: minmax(0, 1fr); }
+  .profile-phone-fields { grid-column: auto; }
+  .contact-note-form .note-content-field, .contact-note-form > button { grid-column: auto; }
+  .contact-primary-button { grid-column: 1 / -1; width: 100%; }
+  .property-field-wide { grid-column: auto; }
+  .property-coordinate-fields { grid-template-columns: minmax(0, 1fr); }
+  .coordinate-dms-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  form label { min-width: 0; overflow-wrap: normal; white-space: normal; word-break: normal; }
+  form label > input:not([type="checkbox"]):not([type="radio"]), form label > select, form label > textarea {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
 }
