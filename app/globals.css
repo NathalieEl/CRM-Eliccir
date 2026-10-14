@@ -397,7 +397,7 @@ form label:has(> textarea) > textarea, form label:has(> select[multiple]) > sele
 .users-setup-note h2 { margin: 0 0 8px; font-size: 17px; }
 .users-setup-note p { margin: 0 0 12px; color: #536359; font-size: 13px; }
 .users-setup-note code { display: block; overflow-wrap: anywhere; padding: 10px; background: #fff; color: var(--green); font-size: 12px; }
-.user-field-title { align-items: center; border: 1px solid var(--green); border-radius: 2px; color: var(--green); display: inline-flex; font-size: 12px; font-weight: 600; line-height: 1.2; max-width: 100%; padding: 2px 4px; width: fit-content; }
+.user-field-title { align-items: center; background: var(--green); border: 1px solid var(--green); border-radius: 2px; color: #fff; display: inline-flex; font-size: 12px; font-weight: 600; line-height: 1.2; max-width: 100%; padding: 2px 4px; width: fit-content; }
 .user-profile-summary { display: grid; gap: 10px 16px; grid-template-columns: minmax(0, 180px) minmax(0, 1fr); margin: 0; }
 .user-profile-summary dt { align-self: start; }
 .user-profile-summary dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
