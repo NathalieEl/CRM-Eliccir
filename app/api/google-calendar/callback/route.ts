@@ -1,12 +1,13 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { googleCalendarRedirectUri, saveGoogleCalendarConnection } from "@/lib/google-calendar";
+import { googleCalendarPublicOrigin, googleCalendarRedirectUri, saveGoogleCalendarConnection } from "@/lib/google-calendar";
 
 const stateCookieName = "google_calendar_oauth_state";
 
 function redirectToActivities(request: NextRequest, query: string) {
-  const response = NextResponse.redirect(new URL(`/activities?${query}`, request.url));
+  const origin = googleCalendarPublicOrigin(request.nextUrl.origin);
+  const response = NextResponse.redirect(new URL(`/activities?${query}`, origin));
   response.cookies.delete(stateCookieName);
   return response;
 }

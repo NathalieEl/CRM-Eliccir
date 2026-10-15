@@ -34,6 +34,10 @@ export function googleCalendarRedirectUri(origin: string) {
   return process.env.GOOGLE_CALENDAR_REDIRECT_URI?.trim() || new URL("/api/google-calendar/callback", origin).toString();
 }
 
+export function googleCalendarPublicOrigin(origin: string) {
+  return new URL(googleCalendarRedirectUri(origin)).origin;
+}
+
 export function googleCalendarAuthorizationUrl(redirectUri: string, state: string) {
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   url.search = new URLSearchParams({
