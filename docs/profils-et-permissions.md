@@ -1,6 +1,6 @@
 # Profils et permissions
 
-Les profils définissent les permissions disponibles dans Eliccir CRM :
+Les profils définissent les permissions disponibles dans MANTA CRM :
 
 | Profil | Lire les fiches CRM | Créer, modifier et supprimer | Gérer les utilisateurs | Gérer les options de maintenance |
 | --- | --- | --- | --- | --- |

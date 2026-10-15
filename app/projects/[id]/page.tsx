@@ -76,7 +76,7 @@ export default async function ProjectProfilePage({ params, searchParams }: {
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord"><span className="brand-mark">E</span><span className="brand-name">Eliccir<small>CRM</small></span></Link>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord"><span className="brand-mark">M</span><span className="brand-name">MANTA<small>CRM</small></span></Link>
         <Link className="contacts-back" href="/projects">← Projets</Link>
       </header>
 
@@ -105,8 +105,8 @@ export default async function ProjectProfilePage({ params, searchParams }: {
           {canWrite && isProjectPhotoStorageConfigured() ? (
             <form action={uploadProjectPhoto} className="project-photo-upload-form" encType="multipart/form-data">
               <input type="hidden" name="propertyId" value={property.id} />
-              <label>Image du projet<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required /></label>
-              <label>Légende (facultative)<input name="caption" maxLength={240} placeholder="Ex. Vue principale du projet" /></label>
+              <label><span className="field-title">Image du projet</span><input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required /></label>
+              <label><span className="field-title">Légende (facultative)</span><input name="caption" maxLength={240} placeholder="Ex. Vue principale du projet" /></label>
               <button className="contact-primary-button" type="submit">Ajouter la photo</button>
               <p className="support-privacy-note">JPEG, PNG ou WebP · 10 Mo maximum · 20 photos par projet</p>
             </form>
@@ -128,7 +128,7 @@ export default async function ProjectProfilePage({ params, searchParams }: {
                         <form action={updateProjectPhotoCaption} className="project-photo-caption-form">
                           <input type="hidden" name="propertyId" value={property.id} />
                           <input type="hidden" name="photoId" value={photo.id} />
-                          <label>Légende<input name="caption" defaultValue={photo.caption ?? ""} maxLength={240} /></label>
+                          <label><span className="field-title">Légende</span><input name="caption" defaultValue={photo.caption ?? ""} maxLength={240} /></label>
                           <button type="submit" className="contact-cancel-link">Enregistrer</button>
                         </form>
                         <div className="project-photo-actions">

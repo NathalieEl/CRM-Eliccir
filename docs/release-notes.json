@@ -1,0 +1,66 @@
+{
+  "1.1.12": [
+    {
+      "title": "Nouvelle identité MANTA",
+      "text": "Le CRM adopte le nom MANTA et son nouveau logo dans la navigation, les pages de connexion et les guides."
+    },
+    {
+      "title": "Planification plus précise des activités",
+      "text": "Les activités et prochaines actions peuvent être enregistrées avec une date, une heure et une durée. Chaque élément peut être sélectionné séparément pour une synchronisation avec Google Agenda lorsque la connexion Google de l’environnement est configurée."
+    },
+    {
+      "title": "Libellés plus lisibles",
+      "text": "Les libellés des formulaires utilisent un fond vert et un texte blanc pour faciliter le repérage des champs."
+    }
+  ],
+  "1.1.13": [
+    {
+      "title": "Fiches utilisateur et sécurité des comptes",
+      "text": "Les comptes disposent de champs d’identité et de profil plus complets, avec un parcours sécurisé par lien pour définir ou réinitialiser un mot de passe."
+    },
+    {
+      "title": "Contacts et projets enrichis",
+      "text": "Les fiches contacts incluent des informations de profil supplémentaires et des liens vers les réseaux sociaux. Les projets prennent en charge les coordonnées, les budgets et les galeries de photos."
+    },
+    {
+      "title": "Planification des activités",
+      "text": "Les activités et prochaines actions peuvent inclure une date, une heure et une durée pour faciliter le suivi des rendez-vous et de leur suite."
+    },
+    {
+      "title": "Identité MANTA et guide versionné",
+      "text": "Le CRM utilise le nom et le logo MANTA. Le guide utilisateur affiche la version publiée et ses nouveautés."
+    },
+    {
+      "title": "Annonce des mises à jour par e-mail",
+      "text": "Lors d’une nouvelle version PROD, les utilisateurs actifs ayant une adresse e-mail reçoivent les nouveautés, avec un titre et un texte explicatif pour chaque changement."
+    }
+  ],
+  "1.1.15": [
+    {
+      "title": "Fiches utilisateur et sécurité des comptes",
+      "text": "Les comptes disposent de champs d’identité et de profil plus complets, avec un parcours sécurisé par lien pour définir ou réinitialiser un mot de passe."
+    },
+    {
+      "title": "Contacts et projets enrichis",
+      "text": "Les fiches contacts incluent des informations de profil supplémentaires et des liens vers les réseaux sociaux. Les projets prennent en charge les coordonnées, les budgets et les galeries de photos."
+    },
+    {
+      "title": "Planification des activités",
+      "text": "Les activités et prochaines actions peuvent inclure une date, une heure et une durée pour faciliter le suivi des rendez-vous et de leur suite."
+    },
+    {
+      "title": "Identité MANTA et guide versionné",
+      "text": "Le CRM utilise le nom et le logo MANTA. Le guide utilisateur affiche la version publiée et ses nouveautés."
+    },
+    {
+      "title": "Annonce des mises à jour par e-mail",
+      "text": "Lors d’une nouvelle version PROD, les utilisateurs actifs ayant une adresse e-mail reçoivent les nouveautés, avec un titre et un texte explicatif pour chaque changement."
+    }
+  ],
+  "1.1.16": [
+    {
+      "title": "Test Google Agenda sans créer d’activité",
+      "text": "Quand ton agenda Google est connecté, tu peux créer un événement de test temporaire directement depuis la rubrique Activités, sans ajouter d’activité au CRM. Un lien permet de l’ouvrir et de le supprimer après vérification."
+    }
+  ]
+}

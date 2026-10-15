@@ -1,4 +1,4 @@
-Eliccir CRM est une application Next.js avec PostgreSQL. Le 2FA TOTP est en sommeil par défaut et peut être activé explicitement.
+MANTA CRM est une application Next.js avec PostgreSQL. Le 2FA TOTP est en sommeil par défaut et peut être activé explicitement.
 
 ## Versions et déploiements
 
@@ -10,7 +10,7 @@ npm run version:minor
 npm run version:major
 ```
 
-Ces commandes mettent à jour `package.json` et `package-lock.json`. Committe et pousse la version sur `development`, teste-la, puis promeus le commit validé vers `main` pour Production. Au démarrage, Railway enregistre automatiquement la version, l’environnement, le SHA du commit, l’identifiant du déploiement et la date dans `DeploymentRelease`. Le logo affiche la version et le build actif.
+Ces commandes mettent à jour `package.json` et `package-lock.json`. Committe et pousse la version sur `development`, teste-la, puis promeus le commit validé vers `main` pour Production. Au démarrage, Railway enregistre automatiquement la version, l’environnement, le SHA du commit, l’identifiant du déploiement et la date dans `DeploymentRelease`. Le guide affiche la version du package et les changements de `docs/release-notes.json`. Lorsqu’une release démarre en PROD, le relais envoie ces changements aux utilisateurs actifs avec une adresse e-mail, une seule fois par identifiant de déploiement. Consulte [docs/configurer-email-support.md](docs/configurer-email-support.md) avant la première annonce PROD.
 
 ## Configuration d’authentification
 
@@ -25,6 +25,10 @@ TWO_FACTOR_STATUS=Inactive
 ```
 
 `AUTH_SECRET` doit contenir au moins 32 caractères. `ADMIN_FIRST_NAME` permet de renseigner le prénom affiché à l’accueil pour le compte administrateur provisionné. Le prénom de chaque compte peut aussi être modifié dans **Utilisateurs**. Le 2FA reste inactif tant que `TWO_FACTOR_STATUS` n’est pas défini sur `Active`. Pour le réactiver, définissez `TWO_FACTOR_STATUS=Active` et configurez `ADMIN_TOTP_SECRET` avec un secret Base32 dans une application d’authentification. Le premier accès crée automatiquement le compte administrateur; il exige un code TOTP uniquement lorsque le statut est `Active`.
+
+## Google Agenda
+
+La connexion des agendas individuels et les URI de redirection sont décrites dans [docs/configurer-google-agenda.md](docs/configurer-google-agenda.md). Configurez les identifiants OAuth dans chaque environnement Railway séparément. Chaque utilisateur doit ensuite relier son compte Google depuis **Activités**.
 
 ## Getting Started
 

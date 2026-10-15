@@ -32,7 +32,7 @@ function webhookConfig() {
   }
 }
 
-async function postMailWebhook(endpointUrl: URL, payload: Record<string, string>) {
+async function postMailWebhook(endpointUrl: URL, payload: Record<string, unknown>) {
   const response = await fetch(endpointUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

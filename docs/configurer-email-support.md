@@ -6,7 +6,7 @@ Cette configuration utilise Google Apps Script comme relais HTTPS, compatible av
 
 1. Connecte-toi avec le compte Google `marc.issan@gmail.com` et ouvre https://script.google.com.
 2. Clique sur **Nouveau projet**.
-3. Remplace le contenu de `Code.gs` par le code du fichier [google-apps-script-support.gs](google-apps-script-support.gs), puis enregistre le projet sous un nom comme `Eliccir CRM - signalements`.
+3. Remplace le contenu de `Code.gs` par le code du fichier [google-apps-script-support.gs](google-apps-script-support.gs), puis enregistre le projet sous un nom comme `MANTA CRM - signalements`.
 4. Dans **Paramètres du projet** → **Propriétés du script**, ajoute la propriété `SUPPORT_WEBHOOK_TOKEN`.
 5. Mets comme valeur un jeton aléatoire long d’au moins 32 caractères. Tu peux le générer avec un gestionnaire de mots de passe. Garde-le secret : ne le colle pas dans le chat.
 6. Dans la liste des fonctions, sélectionne `authorizeMail`, puis clique sur **Exécuter**. Google va demander l’autorisation d’envoyer des e-mails depuis ton compte; vérifie le compte affiché et accepte.
@@ -58,3 +58,20 @@ Le compte administrateur principal configuré par `ADMIN_USERNAME` et `ADMIN_PAS
 4. Vérifie sa réception dans `marc.issan@gmail.com` et sa présence dans le **Journal d’audit** de cet environnement.
 
 Si l’envoi échoue, la demande reste enregistrée dans l’audit avec l’état d’envoi. Vérifie l’URL `/exec`, l’égalité des jetons, l’autorisation Gmail et les quotas d’envoi Google Apps Script. Un jeton absent ou incorrect ne déclenche aucun envoi.
+
+## 6. Annonces de nouvelle version en PROD
+
+Les annonces de release réutilisent ce relais. Après la mise à jour de `Code.gs` avec `docs/google-apps-script-support.gs`, redéploie l’application Web Apps Script avec **Nouvelle version**. Cette étape est nécessaire une seule fois pour activer le type `release_announcement`.
+
+Avant chaque release, ajoute dans `docs/release-notes.json` une entrée dont la clé correspond exactement à la version de `package.json`. Pour chaque changement destiné aux utilisateurs, renseigne :
+
+```json
+{
+	"titre": "Titre de la fonctionnalité",
+	"text": "Texte qui détaille le changement pour les utilisateurs."
+}
+```
+
+Le guide généré affiche automatiquement cette version et ces nouveautés. Au démarrage de la release **Production** seulement, MANTA CRM envoie un message en copie cachée aux comptes actifs ayant une adresse e-mail. Le sujet indique la version ; chaque nouveauté apparaît avec son titre et son texte. Les adresses ne sont pas exposées aux autres destinataires.
+
+L’identifiant du déploiement et l’état de l’annonce sont conservés dans `DeploymentRelease`. Si le relais ou les notes manquent, aucun message n’est envoyé et l’erreur est enregistrée ; le démarrage du CRM n’est pas bloqué. Une nouvelle tentative est possible au prochain démarrage du même déploiement après correction. Les déploiements DEV n’envoient jamais ces annonces.

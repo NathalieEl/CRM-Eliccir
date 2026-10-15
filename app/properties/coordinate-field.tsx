@@ -89,12 +89,12 @@ export function CoordinateField({ label, name, initialValue, onDecimalValueChang
 
   return (
     <div className="coordinate-field" role="group" aria-labelledby={`${partsId}-label`}>
-      <span className="coordinate-field-title" id={`${partsId}-label`}>{label}</span>
+      <span className="coordinate-field-title field-title" id={`${partsId}-label`}>{label}</span>
       <div className="coordinate-dms-row" id={partsId}>
-        <label><span>Degrés</span><div className="coordinate-dms-input-with-unit"><input aria-label={`${label}, degrés`} inputMode="numeric" type="number" min="0" max={maxDegrees} step="1" value={parts.degrees} onChange={(event) => updatePart("degrees", event.target.value)} placeholder="0" /><span className="coordinate-unit" aria-hidden="true">°</span></div></label>
-        <label><span>Minutes</span><div className="coordinate-dms-input-with-unit"><input aria-label={`${label}, minutes`} inputMode="numeric" type="number" min="0" max="59" step="1" value={parts.minutes} onChange={(event) => updatePart("minutes", event.target.value)} placeholder="0" /><span className="coordinate-unit" aria-hidden="true">′</span></div></label>
-        <label><span>Secondes</span><div className="coordinate-dms-input-with-unit"><input aria-label={`${label}, secondes`} inputMode="decimal" type="number" min="0" max="59.99" step="0.01" value={parts.seconds} onChange={(event) => updatePart("seconds", event.target.value)} placeholder="0" /><span className="coordinate-unit" aria-hidden="true">″</span></div></label>
-        <label><span>Hémisphère</span><select aria-label={`${label}, hémisphère`} value={direction} onChange={(event) => setDirection(event.target.value)}>
+        <label><span className="field-title">Degrés</span><div className="coordinate-dms-input-with-unit"><input aria-label={`${label}, degrés`} inputMode="numeric" type="number" min="0" max={maxDegrees} step="1" value={parts.degrees} onChange={(event) => updatePart("degrees", event.target.value)} placeholder="0" /><span className="coordinate-unit" aria-hidden="true">°</span></div></label>
+        <label><span className="field-title">Minutes</span><div className="coordinate-dms-input-with-unit"><input aria-label={`${label}, minutes`} inputMode="numeric" type="number" min="0" max="59" step="1" value={parts.minutes} onChange={(event) => updatePart("minutes", event.target.value)} placeholder="0" /><span className="coordinate-unit" aria-hidden="true">′</span></div></label>
+        <label><span className="field-title">Secondes</span><div className="coordinate-dms-input-with-unit"><input aria-label={`${label}, secondes`} inputMode="decimal" type="number" min="0" max="59.99" step="0.01" value={parts.seconds} onChange={(event) => updatePart("seconds", event.target.value)} placeholder="0" /><span className="coordinate-unit" aria-hidden="true">″</span></div></label>
+        <label><span className="field-title">Hémisphère</span><select aria-label={`${label}, hémisphère`} value={direction} onChange={(event) => setDirection(event.target.value)}>
           {directions[name].map((item) => <option value={item.value} key={item.value}>{item.label}</option>)}
         </select></label>
       </div>

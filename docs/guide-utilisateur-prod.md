@@ -1,11 +1,11 @@
-# Guide d’utilisation — Eliccir CRM PROD 1.1.0
+# Guide d’utilisation — MANTA CRM PROD {{RELEASE_VERSION}}
 
-**Version du guide :** 1.1.0<br>
+**Version du guide :** {{RELEASE_VERSION}}<br>
 **Plateforme :** PROD  
 **Adresse :** https://crm-eliccir-production.up.railway.app  
 **Public concerné :** administrateurs, direction, opérations commerciales et membres de l’équipe
 
-> Ce guide décrit les fonctions présentes dans PROD 1.1.0. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.
+> Ce guide décrit les fonctions présentes dans PROD {{RELEASE_VERSION}}. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.
 
 ## Table des matières
 
@@ -30,9 +30,9 @@
 
 ## 1. Présentation générale du système
 
-Eliccir CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.
+MANTA CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.
 
-L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. À la rédaction du guide, PROD est en **v1.1.0**.
+L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. Cette édition du guide correspond à **v{{RELEASE_VERSION}}**.
 
 L’interface est organisée autour d’un tableau de bord et de pages de gestion dédiées. Les données affichées dépendent du contenu réel de la base ; les messages « Aucun… » indiquent qu’aucun enregistrement correspondant n’existe.
 

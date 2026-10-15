@@ -32,10 +32,10 @@ export function WorkspaceShell({
     <div className="workspace-layout">
       <div className="workspace-page">{children}</div>
       <aside className="sidebar">
-        <Link className="brand" href="/" aria-label="Eliccir CRM, accueil">
-          <span className="brand-mark">E</span>
+        <Link className="brand" href="/" aria-label="MANTA CRM, accueil">
+          <span className="brand-mark" aria-hidden="true">M</span>
           <span className="brand-copy">
-            <span className="brand-name">Eliccir<small>CRM</small></span>
+            <span className="brand-name">MANTA<small>CRM</small></span>
             <span
               className="brand-release"
               title={`${deploymentInfo.environment} · version ${deploymentInfo.version} · build ${deploymentInfo.buildId}${deploymentInfo.commitMessage ? ` · ${deploymentInfo.commitMessage}` : ""}`}

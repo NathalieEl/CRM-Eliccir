@@ -78,9 +78,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord">
-          <span className="brand-mark">E</span>
-          <span className="brand-name">Eliccir<small>CRM</small></span>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord">
+          <span className="brand-mark">M</span>
+          <span className="brand-name">MANTA<small>CRM</small></span>
         </Link>
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>
@@ -134,19 +134,19 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                 <div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Ajouter un contact</h2></div>
               </div>
               <form action={createContact} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
-                <label>Titre<select name="titre" defaultValue=""><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
-                <label>Prénom<input name="prenom" autoComplete="given-name" required maxLength={80} placeholder="Ex. Camille" /></label>
-                <label>Nom<input name="nom" autoComplete="family-name" required maxLength={120} placeholder="Ex. Martin" /></label>
-                <label>Type d’investisseur<select name="typeInvestisseur" defaultValue=""><option value="">Non renseigné</option>{investorTypeOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
-                <label>Profil du contact<select name="profilContact" defaultValue=""><option value="">Non renseigné</option>{contactProfileOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
-                <label>Niveau d’investissement<select name="niveauInvestissement" defaultValue=""><option value="">Non renseigné</option>{investmentLevelOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
-                <label>E-mail<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
-                <label>Téléphone<input name="telephone" type="tel" autoComplete="tel" maxLength={40} placeholder="+33 6 12 34 56 78" /></label>
-                <label>Entreprises<select name="entrepriseIds" multiple size={3}>{entrepriseOptions.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-                <label>Secteur<input name="secteur" maxLength={80} placeholder="Secteur" /></label>
-                <label>Ville<input name="ville" maxLength={80} placeholder="Ville" /></label>
+                <label><span className="field-title">Titre</span><select name="titre" defaultValue=""><option value="">Sans titre</option>{titleOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+                <label><span className="field-title">Prénom</span><input name="prenom" autoComplete="given-name" required maxLength={80} placeholder="Ex. Camille" /></label>
+                <label><span className="field-title">Nom</span><input name="nom" autoComplete="family-name" required maxLength={120} placeholder="Ex. Martin" /></label>
+                <label><span className="field-title">Type d’investisseur</span><select name="typeInvestisseur" defaultValue=""><option value="">Non renseigné</option>{investorTypeOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+                <label><span className="field-title">Profil du contact</span><select name="profilContact" defaultValue=""><option value="">Non renseigné</option>{contactProfileOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+                <label><span className="field-title">Niveau d’investissement</span><select name="niveauInvestissement" defaultValue=""><option value="">Non renseigné</option>{investmentLevelOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+                <label><span className="field-title">E-mail</span><input name="email" type="email" autoComplete="email" maxLength={254} placeholder="camille@exemple.com" /></label>
+                <label><span className="field-title">Téléphone</span><input name="telephone" type="tel" autoComplete="tel" maxLength={40} placeholder="+33 6 12 34 56 78" /></label>
+                <label><span className="field-title">Entreprises</span><select name="entrepriseIds" multiple size={3}>{entrepriseOptions.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
+                <label><span className="field-title">Secteur</span><input name="secteur" maxLength={80} placeholder="Secteur" /></label>
+                <label><span className="field-title">Ville</span><input name="ville" maxLength={80} placeholder="Ville" /></label>
                 <BirthdateAgeFields initialDate="" />
-                <label>Genre<select name="genre" defaultValue=""><option value="">Non renseigné</option><option value="Masculin">Masculin</option><option value="Féminin">Féminin</option><option value="Autre">Autre</option></select></label>
+                <label><span className="field-title">Genre</span><select name="genre" defaultValue=""><option value="">Non renseigné</option><option value="Masculin">Masculin</option><option value="Féminin">Féminin</option><option value="Autre">Autre</option></select></label>
                 <button className="contact-primary-button" type="submit">Ajouter le contact <span>+</span></button>
               </form>
             </section>

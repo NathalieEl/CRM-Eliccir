@@ -16,5 +16,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!login|set-password|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!login|set-password|_next/static|_next/image|favicon.ico|manta-logo[.]png).*)"],
 };

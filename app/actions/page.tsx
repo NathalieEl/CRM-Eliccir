@@ -71,9 +71,9 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord">
-          <span className="brand-mark">E</span>
-          <span className="brand-name">Eliccir<small>CRM</small></span>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord">
+          <span className="brand-mark">M</span>
+          <span className="brand-name">MANTA<small>CRM</small></span>
         </Link>
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>
@@ -115,29 +115,29 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
               </div>
 
               <form action={createAction} className={`contact-form${canWrite ? "" : " permission-hidden"}`}>
-                <label>Titre<input name="titre" required minLength={2} maxLength={160} placeholder="Ex. Relancer Sophie Laurent" /></label>
-                <label>Priorité<select name="priorite" defaultValue="Normale">
+                <label><span className="field-title">Titre</span><input name="titre" required minLength={2} maxLength={160} placeholder="Ex. Relancer Sophie Laurent" /></label>
+                <label><span className="field-title">Priorité</span><select name="priorite" defaultValue="Normale">
                   <option value="Prioritaire">Prioritaire</option>
                   <option value="Importante">Importante</option>
                   <option value="Normale">Normale</option>
                 </select></label>
-                <label>Statut<select name="statut" defaultValue="À faire">
+                <label><span className="field-title">Statut</span><select name="statut" defaultValue="À faire">
                   <option value="À faire">À faire</option>
                   <option value="En cours">En cours</option>
                   <option value="En attente">En attente</option>
                   <option value="Terminée">Terminée</option>
                   <option value="Annulée">Annulée</option>
                 </select></label>
-                <label>Contact<select name="contactId" defaultValue=""><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
-                <label>Entreprise<select name="entrepriseId" defaultValue=""><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-                <label>Date d’échéance<input name="dateEcheance" type="date" /></label>
-                <label>Canal<input name="canal" maxLength={80} placeholder="Téléphone, e-mail…" /></label>
-                <label>Durée (minutes)<input name="dureeMinutes" type="number" min={0} max={1440} step={5} /></label>
-                <label>Responsable<select name="responsableId" defaultValue=""><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
-                <label>Date de réalisation<input name="dateRealisation" type="date" /></label>
-                <label>Prochaine action<input name="prochaineAction" maxLength={1000} /></label>
-                <label style={{ gridColumn: "1 / -1" }}>Détails<input name="details" maxLength={500} placeholder="Informations complémentaires..." /></label>
-                <label style={{ gridColumn: "1 / -1" }}>Résultat<textarea name="resultat" maxLength={10000} rows={3} /></label>
+                <label><span className="field-title">Contact</span><select name="contactId" defaultValue=""><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
+                <label><span className="field-title">Entreprise</span><select name="entrepriseId" defaultValue=""><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
+                <label><span className="field-title">Date d’échéance</span><input name="dateEcheance" type="date" /></label>
+                <label><span className="field-title">Canal</span><input name="canal" maxLength={80} placeholder="Téléphone, e-mail…" /></label>
+                <label><span className="field-title">Durée (minutes)</span><input name="dureeMinutes" type="number" min={0} max={1440} step={5} /></label>
+                <label><span className="field-title">Responsable</span><select name="responsableId" defaultValue=""><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
+                <label><span className="field-title">Date de réalisation</span><input name="dateRealisation" type="date" /></label>
+                <label><span className="field-title">Prochaine action</span><input name="prochaineAction" maxLength={1000} /></label>
+                <label style={{ gridColumn: "1 / -1" }}><span className="field-title">Détails</span><input name="details" maxLength={500} placeholder="Informations complémentaires..." /></label>
+                <label style={{ gridColumn: "1 / -1" }}><span className="field-title">Résultat</span><textarea name="resultat" maxLength={10000} rows={3} /></label>
                 <button className="contact-primary-button" type="submit">Ajouter l’action <span>+</span></button>
               </form>
             </section>
@@ -177,29 +177,29 @@ export default async function ActionsPage({ searchParams }: ActionsPageProps) {
                                 <UnsavedChangesForm action={updateAction} className="contact-edit-form">
                                   <input type="hidden" name="id" value={action.id} />
                                   <input type="hidden" name="legacyContact" value={action.contactLabel ?? ""} />
-                                  <label>Titre<input name="titre" defaultValue={action.titre} required minLength={2} maxLength={160} /></label>
-                                  <label>Priorité<select name="priorite" defaultValue={action.priorite}>
+                                  <label><span className="field-title">Titre</span><input name="titre" defaultValue={action.titre} required minLength={2} maxLength={160} /></label>
+                                  <label><span className="field-title">Priorité</span><select name="priorite" defaultValue={action.priorite}>
                                     <option value="Prioritaire">Prioritaire</option>
                                     <option value="Importante">Importante</option>
                                     <option value="Normale">Normale</option>
                                   </select></label>
-                                  <label>Statut<select name="statut" defaultValue={action.statut}>
+                                  <label><span className="field-title">Statut</span><select name="statut" defaultValue={action.statut}>
                                     <option value="À faire">À faire</option>
                                     <option value="En cours">En cours</option>
                                     <option value="En attente">En attente</option>
                                     <option value="Terminée">Terminée</option>
                                     <option value="Annulée">Annulée</option>
                                   </select></label>
-                                  <label>Contact<select name="contactId" defaultValue={action.contactId ?? ""}><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
-                                  <label>Entreprise<select name="entrepriseId" defaultValue={action.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-                                  <label>Date d’échéance<input name="dateEcheance" type="date" defaultValue={action.dateEcheance ? new Date(action.dateEcheance).toISOString().slice(0, 10) : ""} /></label>
-                                  <label>Canal<input name="canal" defaultValue={action.canal ?? ""} maxLength={80} /></label>
-                                  <label>Durée (minutes)<input name="dureeMinutes" type="number" min={0} max={1440} step={5} defaultValue={action.dureeMinutes ?? ""} /></label>
-                                  <label>Responsable<select name="responsableId" defaultValue={action.responsableId ?? ""}><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
-                                  <label>Date de réalisation<input name="dateRealisation" type="date" defaultValue={action.dateRealisation ? new Date(action.dateRealisation).toISOString().slice(0, 10) : ""} /></label>
-                                  <label>Prochaine action<input name="prochaineAction" defaultValue={action.prochaineAction ?? ""} maxLength={1000} /></label>
-                                  <label>Détails<input name="details" defaultValue={action.details ?? ""} maxLength={500} /></label>
-                                  <label>Résultat<textarea name="resultat" defaultValue={action.resultat ?? ""} maxLength={10000} rows={3} /></label>
+                                  <label><span className="field-title">Contact</span><select name="contactId" defaultValue={action.contactId ?? ""}><option value="">Aucun contact</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
+                                  <label><span className="field-title">Entreprise</span><select name="entrepriseId" defaultValue={action.entrepriseId ?? ""}><option value="">Aucune entreprise</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
+                                  <label><span className="field-title">Date d’échéance</span><input name="dateEcheance" type="date" defaultValue={action.dateEcheance ? new Date(action.dateEcheance).toISOString().slice(0, 10) : ""} /></label>
+                                  <label><span className="field-title">Canal</span><input name="canal" defaultValue={action.canal ?? ""} maxLength={80} /></label>
+                                  <label><span className="field-title">Durée (minutes)</span><input name="dureeMinutes" type="number" min={0} max={1440} step={5} defaultValue={action.dureeMinutes ?? ""} /></label>
+                                  <label><span className="field-title">Responsable</span><select name="responsableId" defaultValue={action.responsableId ?? ""}><option value="">Non attribué</option>{users.map((item) => <option key={item.id} value={item.id}>{item.username}</option>)}</select></label>
+                                  <label><span className="field-title">Date de réalisation</span><input name="dateRealisation" type="date" defaultValue={action.dateRealisation ? new Date(action.dateRealisation).toISOString().slice(0, 10) : ""} /></label>
+                                  <label><span className="field-title">Prochaine action</span><input name="prochaineAction" defaultValue={action.prochaineAction ?? ""} maxLength={1000} /></label>
+                                  <label><span className="field-title">Détails</span><input name="details" defaultValue={action.details ?? ""} maxLength={500} /></label>
+                                  <label><span className="field-title">Résultat</span><textarea name="resultat" defaultValue={action.resultat ?? ""} maxLength={10000} rows={3} /></label>
                                   <CancelEditButton />
                                   <button className="contact-primary-button" type="submit">Enregistrer</button>
                                 </UnsavedChangesForm>

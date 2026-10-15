@@ -29,7 +29,7 @@ export default async function SetPasswordPage({ searchParams }: {
   return (
     <main className="auth-screen">
       <section className="auth-panel">
-        <Link className="contacts-brand auth-brand" href="/login" aria-label="Eliccir CRM, connexion"><span className="brand-mark">E</span><span className="brand-name">Eliccir<small>CRM</small></span></Link>
+        <Link className="contacts-brand auth-brand" href="/login" aria-label="MANTA CRM, connexion"><span className="brand-mark">M</span><span className="brand-name">MANTA<small>CRM</small></span></Link>
         <p className="section-index">SÉCURISATION DU COMPTE</p>
         <h1>Choisir un mot de passe</h1>
         {user ? (

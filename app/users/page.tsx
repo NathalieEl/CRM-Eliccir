@@ -15,7 +15,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord"><span className="brand-mark">E</span><span className="brand-name">Eliccir<small>CRM</small></span></Link>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord"><span className="brand-mark">M</span><span className="brand-name">MANTA<small>CRM</small></span></Link>
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>
       <div className="contacts-content">
@@ -42,11 +42,11 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         <section className="contacts-create-section">
           <div className="contacts-section-heading"><div><p className="section-index">01 <i>·</i> NOUVEAU</p><h2>Créer un accès</h2></div></div>
           <form action={createUser} className="contact-form">
-            <label><span className="user-field-title">Prénom</span><input name="prenom" required maxLength={80} autoComplete="given-name" placeholder="ex. Sophie" /></label>
-            <label><span className="user-field-title">Nom</span><input name="nom" required maxLength={120} autoComplete="family-name" placeholder="ex. Martin" /></label>
-            <label><span className="user-field-title">E-mail</span><input name="email" type="email" required maxLength={254} autoComplete="email" placeholder="sophie.martin@example.com" /></label>
-            <label><span className="user-field-title">Nom d’utilisateur</span><input name="username" required minLength={3} maxLength={40} pattern="[A-Za-z0-9._-]+" placeholder="ex. sophie.laurent" /></label>
-            <label><span className="user-field-title">Profil</span><select name="role" defaultValue="member"><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label>
+            <label><span className="field-title">Prénom</span><input name="prenom" required maxLength={80} autoComplete="given-name" placeholder="ex. Sophie" /></label>
+            <label><span className="field-title">Nom</span><input name="nom" required maxLength={120} autoComplete="family-name" placeholder="ex. Martin" /></label>
+            <label><span className="field-title">E-mail</span><input name="email" type="email" required maxLength={254} autoComplete="email" placeholder="sophie.martin@example.com" /></label>
+            <label><span className="field-title">Nom d’utilisateur</span><input name="username" required minLength={3} maxLength={40} pattern="[A-Za-z0-9._-]+" placeholder="ex. sophie.laurent" /></label>
+            <label><span className="field-title">Profil</span><select name="role" defaultValue="member"><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label>
             <button className="contact-primary-button" type="submit">Créer et envoyer le lien <span>+</span></button>
           </form>
         </section>
@@ -84,11 +84,11 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                       <summary>Modifier</summary>
                       <UnsavedChangesForm action={updateUser} className="user-edit-form">
                         <input type="hidden" name="id" value={user.id} />
-                        <label><span className="user-field-title">Prénom</span><input name="prenom" defaultValue={user.prenom ?? ""} maxLength={80} autoComplete="given-name" /></label>
-                        <label><span className="user-field-title">Nom</span><input name="nom" defaultValue={user.nom ?? ""} maxLength={120} autoComplete="family-name" /></label>
-                        <label><span className="user-field-title">E-mail</span><input name="email" type="email" defaultValue={user.email ?? ""} maxLength={254} autoComplete="email" /></label>
-                        <label><span className="user-field-title">Profil</span><select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label>
-                        <label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /><span className="user-field-title">Compte actif</span></label>
+                        <label><span className="field-title">Prénom</span><input name="prenom" defaultValue={user.prenom ?? ""} maxLength={80} autoComplete="given-name" /></label>
+                        <label><span className="field-title">Nom</span><input name="nom" defaultValue={user.nom ?? ""} maxLength={120} autoComplete="family-name" /></label>
+                        <label><span className="field-title">E-mail</span><input name="email" type="email" defaultValue={user.email ?? ""} maxLength={254} autoComplete="email" /></label>
+                        <label><span className="field-title">Profil</span><select name="role" defaultValue={user.role}><option value="member">Membre</option><option value="sales">Opérations commerciales</option><option value="management">Direction</option><option value="admin">Administrateur</option></select></label>
+                        <label className="user-active-toggle"><input name="active" type="checkbox" defaultChecked={user.active} /><span className="field-title">Compte actif</span></label>
                         <div className="profile-form-actions"><CancelEditButton /><button className="contact-primary-button" type="submit">Enregistrer</button></div>
                       </UnsavedChangesForm>
                     </details>

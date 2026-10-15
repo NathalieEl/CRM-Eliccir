@@ -13,9 +13,9 @@ export default async function SupportPage({ searchParams }: SupportPageProps) {
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord">
-          <span className="brand-mark">E</span>
-          <span className="brand-name">Eliccir<small>CRM</small></span>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord">
+          <span className="brand-mark">M</span>
+          <span className="brand-name">MANTA<small>CRM</small></span>
         </Link>
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>
@@ -35,11 +35,11 @@ export default async function SupportPage({ searchParams }: SupportPageProps) {
         <section className="contacts-create-section">
           <form action={submitSupportRequest} className="contact-form support-form">
             <fieldset className="support-category-set">
-              <legend>Type de demande</legend>
+              <legend><span className="field-title">Type de demande</span></legend>
               <label><input name="category" type="radio" value="problem" required />Problèmes/Bugs</label>
               <label><input name="category" type="radio" value="improvement" required />Modifications/Améliorations</label>
             </fieldset>
-            <label className="support-details-field">Détails<textarea name="details" rows={8} maxLength={10000} required placeholder="Décris le problème rencontré ou l’amélioration souhaitée…" /></label>
+            <label className="support-details-field"><span className="field-title">Détails</span><textarea name="details" rows={8} maxLength={10000} required placeholder="Décris le problème rencontré ou l’amélioration souhaitée…" /></label>
             <p className="support-privacy-note">Ton nom d’utilisateur et la date/heure d’envoi seront ajoutés automatiquement. Ta demande sera conservée dans le journal d’audit. N’inscris aucun mot de passe ni code de sécurité dans le message.</p>
             <button className="contact-primary-button" type="submit">Envoyer le message <span>↗</span></button>
           </form>

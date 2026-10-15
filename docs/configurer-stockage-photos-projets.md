@@ -4,7 +4,7 @@ Les images sont stockées dans un bucket Cloudflare R2 privé. PostgreSQL ne con
 
 ## Préparer Cloudflare R2
 
-1. Crée un bucket privé pour DEV et un autre pour PROD. Par exemple : `eliccir-crm-dev-photos` et `eliccir-crm-prod-photos`.
+1. Crée un bucket privé pour DEV et un autre pour PROD. Par exemple : `manta-crm-dev-photos` et `manta-crm-prod-photos`.
 2. Crée un jeton API R2 limité à la lecture, l’écriture et la suppression d’objets dans ces buckets. Ne rends pas les buckets publics.
 3. Dans Railway, ouvre le service `CRM-Eliccir`, sélectionne l’environnement **Development**, puis ajoute ces variables :
 

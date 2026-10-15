@@ -20,7 +20,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord"><span className="brand-mark">E</span><span className="brand-name">Eliccir<small>CRM</small></span></Link>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord"><span className="brand-mark">M</span><span className="brand-name">MANTA<small>CRM</small></span></Link>
         <Link className="contacts-back" href="/users">← Utilisateurs</Link>
       </header>
       <div className="contacts-content contact-profile-page">
@@ -28,15 +28,15 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
         <section className="contacts-create-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">IDENTITÉ</p><h2>Informations du compte</h2></div></div>
           <dl className="user-profile-summary">
-            <dt><span className="user-field-title">Prénom</span></dt><dd>{user.prenom || "—"}</dd>
-            <dt><span className="user-field-title">Nom</span></dt><dd>{user.nom || "—"}</dd>
-            <dt><span className="user-field-title">E-mail</span></dt><dd>{user.email || "—"}</dd>
-            <dt><span className="user-field-title">Nom d’utilisateur</span></dt><dd>{user.username}</dd>
-            <dt><span className="user-field-title">Profil</span></dt><dd>{roleLabels[user.role as UserRole] ?? roleLabels.member}</dd>
-            <dt><span className="user-field-title">État</span></dt><dd>{user.active ? "Actif" : "Désactivé"}</dd>
-            <dt><span className="user-field-title">Mot de passe</span></dt><dd>{user.mustChangePassword ? "À définir via le lien reçu par e-mail" : "Défini"}</dd>
-            <dt><span className="user-field-title">Créé le</span></dt><dd>{formatDate(user.createdAt)}</dd>
-            <dt><span className="user-field-title">Modifié le</span></dt><dd>{formatDate(user.updatedAt)}</dd>
+            <dt><span className="field-title">Prénom</span></dt><dd>{user.prenom || "—"}</dd>
+            <dt><span className="field-title">Nom</span></dt><dd>{user.nom || "—"}</dd>
+            <dt><span className="field-title">E-mail</span></dt><dd>{user.email || "—"}</dd>
+            <dt><span className="field-title">Nom d’utilisateur</span></dt><dd>{user.username}</dd>
+            <dt><span className="field-title">Profil</span></dt><dd>{roleLabels[user.role as UserRole] ?? roleLabels.member}</dd>
+            <dt><span className="field-title">État</span></dt><dd>{user.active ? "Actif" : "Désactivé"}</dd>
+            <dt><span className="field-title">Mot de passe</span></dt><dd>{user.mustChangePassword ? "À définir via le lien reçu par e-mail" : "Défini"}</dd>
+            <dt><span className="field-title">Créé le</span></dt><dd>{formatDate(user.createdAt)}</dd>
+            <dt><span className="field-title">Modifié le</span></dt><dd>{formatDate(user.updatedAt)}</dd>
           </dl>
         </section>
       </div>

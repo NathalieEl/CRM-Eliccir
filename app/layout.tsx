@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eliccir CRM | Vue d’ensemble",
-  description: "Suivi des contacts, activités et projets immobiliers Eliccir.",
+  title: "MANTA CRM | Vue d’ensemble",
+  description: "Suivi des contacts, activités et projets immobiliers MANTA.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
