@@ -473,31 +473,43 @@ model ContactNote {
 }
 
 model Activity {
-  id             String    @id @default(cuid())
-  titre          String
-  type           String
-  canal          String?
-  dureeMinutes   Int?
-  resultat       String?   @db.Text
-  prochaineAction String?  @db.Text
-  statut         String?
-  dateRealisation DateTime? @db.Date
-  contactLabel   String?   @map("contact")
-  contactId      String?
-  entrepriseId   String?
-  responsableId  String?
-  date           DateTime?
-  details        String?
-  contact        Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
-  entreprise     Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
-  responsable    User?     @relation("ActivityResponsible", fields: [responsableId], references: [id], onDelete: SetNull)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                           String    @id @default(cuid())
+  titre                        String
+  type                         String
+  canal                        String?
+  dureeMinutes                 Int?
+  resultat                     String?   @db.Text
+  prochaineAction              String?   @db.Text
+  prochaineActionDate          DateTime?
+  prochaineActionDureeMinutes  Int?
+  pushActivityToGoogle         Boolean   @default(false)
+  pushNextActionToGoogle       Boolean   @default(false)
+  googleActivityEventId        String?
+  googleActivityCalendarUserId String?
+  googleNextActionEventId      String?
+  googleNextActionCalendarUserId String?
+  statut                       String?
+  dateRealisation              DateTime? @db.Date
+  contactLabel                 String?   @map("contact")
+  contactId                    String?
+  entrepriseId                 String?
+  responsableId                String?
+  date                         DateTime?
+  details                      String?
+  contact                      Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  entreprise                   Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
+  responsable                  User?     @relation("ActivityResponsible", fields: [responsableId], references: [id], onDelete: SetNull)
+  googleActivityCalendarUser   User?     @relation("ActivityGoogleCalendarUser", fields: [googleActivityCalendarUserId], references: [id], onDelete: SetNull)
+  googleNextActionCalendarUser User?     @relation("ActivityGoogleNextActionUser", fields: [googleNextActionCalendarUserId], references: [id], onDelete: SetNull)
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime  @updatedAt
 
   @@index([contactId])
   @@index([entrepriseId])
   @@index([responsableId])
   @@index([statut, dateRealisation])
+  @@index([googleActivityCalendarUserId])
+  @@index([googleNextActionCalendarUserId])
 }
 
 model ActionItem {
@@ -532,15 +544,34 @@ model User {
   id              String    @id @default(cuid())
   username        String    @unique
   prenom          String?
+  nom             String?
+  email           String?   @db.VarChar(254)
   passwordHash    String
+  mustChangePassword Boolean @default(false)
+  passwordSetupTokenHash String? @unique
+  passwordSetupExpiresAt DateTime?
+  sessionVersion  Int       @default(0)
   twoFactorSecret String
   role            String    @default("member")
   active          Boolean   @default(true)
   authoredContactNotes ContactNote[]
   activitiesAssigned Activity[] @relation("ActivityResponsible")
+  calendarActivities Activity[] @relation("ActivityGoogleCalendarUser")
+  calendarNextActions Activity[] @relation("ActivityGoogleNextActionUser")
   actionsAssigned    ActionItem[] @relation("ActionResponsible")
+  googleCalendarConnection GoogleCalendarConnection?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+}
+
+model GoogleCalendarConnection {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  googleEmail           String?
+  encryptedRefreshToken String   @db.Text
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
@@ -559,17 +590,21 @@ model AuditLog {
 }
 
 model DeploymentRelease {
-  id             String   @id @default(cuid())
-  environment    String
-  version        String
-  buildId        String
-  deploymentId   String
-  commitSha      String?
-  commitMessage  String?
-  deployedAt     DateTime @default(now())
+  id                     String    @id @default(cuid())
+  environment            String
+  version                String
+  buildId                String
+  deploymentId           String
+  commitSha              String?
+  commitMessage          String?
+  releaseEmailSentAt     DateTime?
+  releaseEmailClaimedAt  DateTime?
+  releaseEmailError      String?   @db.Text
+  deployedAt             DateTime  @default(now())
 
   @@unique([environment, deploymentId])
   @@index([environment, deployedAt])
+  @@index([environment, releaseEmailSentAt])
 }
 
 model Agent {

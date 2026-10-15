@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 function formatActivityItem(activity: { titre: string; type: string; contactLabel?: string | null; contact?: { prenom: string | null; nom: string } | null; entreprise?: { nom: string } | null; responsable?: { username: string } | null; resultat?: string | null; dateRealisation?: Date | null; statut?: string | null; date?: Date | null; details?: string | null }) {
   const time = activity.date ? new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(activity.date)) : "09:00";
@@ -103,6 +104,7 @@ async function getDashboardData() {
 }
 
 export default async function Home() {
+  await requirePermission("crm.read");
   const [dashboard, currentUser] = await Promise.all([getDashboardData(), getCurrentUser()]);
   const greetingName = currentUser?.prenom?.trim() || currentUser?.username || "bienvenue";
   const metrics = dashboard.metrics;
@@ -121,7 +123,7 @@ export default async function Home() {
             <section className="metric-grid" aria-label="Indicateurs du portefeuille">{metrics.map((metric) => <article className="metric" key={metric.number}><div className="metric-top"><span>{metric.label}</span><small>{metric.number}</small></div><strong>{metric.value}</strong><div className={`metric-foot${metric.alert ? " metric-alert" : ""}`}>{metric.change}</div></article>)}</section>
 
             <div className="dashboard-columns">
-              <section className="panel activity-panel" id="activities"><div className="section-heading"><div><p className="section-index">01 <i>·</i> AGENDA</p><h2>À venir aujourd’hui</h2></div><a href="#activities">Tout voir <span>→</span></a></div><div className="activity-list">{activities.length > 0 ? activities.map((activity) => <article className="activity-row" key={activity.time}><time>{activity.time}</time><span className={`avatar avatar-${activity.color}`}>{activity.initials}</span><div><small>{activity.kind}</small><h3>{activity.title}</h3><p>{activity.detail}</p></div><span className="row-arrow">↗</span></article>) : <p className="dashboard-empty">Aucune activité à venir.</p>}</div><p className="calendar-note"><i /> Synchronisé avec Google Agenda</p></section>
+              <section className="panel activity-panel" id="activities"><div className="section-heading"><div><p className="section-index">01 <i>·</i> AGENDA</p><h2>À venir aujourd’hui</h2></div><a href="#activities">Tout voir <span>→</span></a></div><div className="activity-list">{activities.length > 0 ? activities.map((activity) => <article className="activity-row" key={activity.time}><time>{activity.time}</time><span className={`avatar avatar-${activity.color}`}>{activity.initials}</span><div><small>{activity.kind}</small><h3>{activity.title}</h3><p>{activity.detail}</p></div><span className="row-arrow">↗</span></article>) : <p className="dashboard-empty">Aucune activité à venir.</p>}</div><p className="calendar-note"><i /> Seules les activités sélectionnées sont envoyées à Google Agenda.</p></section>
 
               <section className="panel actions-panel" id="actions"><div className="section-heading"><div><p className="section-index">02 <i>·</i> À SUIVRE</p><h2>Tes prochaines actions</h2></div><span className="count-badge">{metrics[3].value}</span></div><div className="action-list">{actions.length > 0 ? actions.map((action, index) => <article className="action-row" key={action.title}><span className={`action-check${index === 0 ? " action-check-alert" : ""}`} /><div><h3>{action.title}</h3><time>{action.due}</time></div><small className={index === 0 ? "action-tag action-tag-alert" : "action-tag"}>{action.tag}</small></article>) : <p className="dashboard-empty">Aucune action en attente.</p>}</div><a className="all-actions-link" href="#actions">Voir toutes les actions <span>→</span></a></section>
             </div>
@@ -130,7 +132,7 @@ export default async function Home() {
 
             <section className="panel projects-panel" id="projects"><div className="section-heading"><div><p className="section-index">04 <i>·</i> PROJETS</p><h2>Opportunités actives</h2></div><Link href="/projects">Tous les projets <span>→</span></Link></div><div className="project-summary-list">{projects.length > 0 ? projects.map((project) => <div className="project-summary-item" key={project.name}><strong>{project.name}</strong><span>{project.location}</span><em>{project.progress}%</em></div>) : <p className="dashboard-empty">Aucun projet actif.</p>}</div></section>
           </div>
-          <footer className="dashboard-footer"><b>ELICCIR CRM</b><span>{databaseMode ? "DONNÉES SYNCHRONISÉES" : "BASE DE DONNÉES INDISPONIBLE"}</span></footer>
+          <footer className="dashboard-footer"><b>MANTA CRM</b><span>{databaseMode ? "DONNÉES SYNCHRONISÉES" : "BASE DE DONNÉES INDISPONIBLE"}</span></footer>
       </main>
     </div>
   );

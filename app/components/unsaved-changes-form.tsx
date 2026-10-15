@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, MouseEvent as ReactMouseEvent, ReactNode } from "react";
 
 const UnsavedChangesContext = createContext<(formId: string, dirty: boolean) => void>(() => {});
 const warningMessage = "Des modifications ne sont pas enregistrées. Veux-tu quitter cette page sans les enregistrer ?";
@@ -106,6 +106,22 @@ type EditAction = (formData: FormData) => void | Promise<void>;
 type UnsavedChangesFormProps = Omit<ComponentProps<"form">, "action" | "onChange" | "onInput" | "onSubmit"> & {
   action: EditAction;
 };
+
+export function CancelEditButton({ className = "contact-cancel-link", children = "Annuler" }: {
+  className?: string;
+  children?: ReactNode;
+}) {
+  const cancel = (event: ReactMouseEvent<HTMLButtonElement>) => {
+    const form = event.currentTarget.form;
+    if (form) {
+      form.reset();
+      form.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    event.currentTarget.closest("details")?.removeAttribute("open");
+  };
+
+  return <button type="button" className={className} onClick={cancel}>{children}</button>;
+}
 
 function snapshot(form: HTMLFormElement) {
   return JSON.stringify(Array.from(new FormData(form).entries(), ([key, value]) => [

@@ -10,7 +10,9 @@ export function isTwoFactorActive() {
 }
 
 export async function createSession(userId: string) {
-  const token = await signSession(userId);
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { sessionVersion: true } });
+  if (!user) throw new Error("Unable to create a session for a missing user");
+  const token = await signSession(userId, user.sessionVersion);
 
   const cookieStore = await cookies();
   cookieStore.set(sessionCookie, token, {
@@ -34,7 +36,10 @@ export async function getCurrentUser() {
   try {
     const { payload } = await verifySession(token);
     if (typeof payload.userId !== "string") return null;
-    return prisma.user.findUnique({ where: { id: payload.userId } });
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) return null;
+    const tokenVersion = typeof payload.sessionVersion === "number" ? payload.sessionVersion : 0;
+    return tokenVersion === user.sessionVersion ? user : null;
   } catch {
     return null;
   }
@@ -46,7 +51,7 @@ export async function authenticate(username: string, password: string, code: str
     ? await provisionAdmin()
     : await prisma.user.findUnique({ where: { username } });
 
-  if (!user || !user.active || user.username !== username || !(await bcrypt.compare(password, user.passwordHash))) return false;
+  if (!user || !user.active || user.mustChangePassword || user.username !== username || !(await bcrypt.compare(password, user.passwordHash))) return false;
   if (!isTwoFactorActive()) return true;
 
   try {
@@ -71,6 +76,9 @@ async function provisionAdmin() {
       data: {
         passwordHash: await bcrypt.hash(password, 12),
         prenom: configuredFirstName || existing.prenom,
+        mustChangePassword: false,
+        passwordSetupTokenHash: null,
+        passwordSetupExpiresAt: null,
         twoFactorSecret,
         role: "admin",
         active: true,

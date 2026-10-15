@@ -23,7 +23,7 @@ export function BirthdateAgeFields({ initialDate }: BirthdateAgeFieldsProps) {
   const age = calculateAge(birthdate);
 
   return <>
-    <label>Date de naissance<input name="dateNaissance" type="date" value={birthdate} onChange={(event) => setBirthdate(event.target.value)} /></label>
-    <label>Âge calculé<input value={age === null ? "" : `${age} ans`} readOnly placeholder="Calculé depuis la date de naissance" /></label>
+    <label><span className="field-title">Date de naissance</span><input name="dateNaissance" type="date" value={birthdate} onChange={(event) => setBirthdate(event.target.value)} /></label>
+    <label><span className="field-title">Âge calculé</span><input value={age === null ? "" : `${age} ans`} readOnly placeholder="Calculé depuis la date de naissance" /></label>
   </>;
 }

@@ -4,16 +4,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
-    <title>Guide d’utilisation · Eliccir CRM PROD 1.1.0</title>
+    <title>Guide d’utilisation · MANTA CRM PROD 1.1.16</title>
     <style>
       :root { color-scheme: light; --ink: #25332b; --muted: #647168; --green: #1f3c32; --line: #e1e5df; --paper: #fff; --canvas: #f3f5f1; --accent: #d9e383; }
       * { box-sizing: border-box; }
       body { background: var(--canvas); color: var(--ink); font: 16px/1.65 "Avenir Next", Avenir, sans-serif; margin: 0; }
       .guide-topbar { align-items: center; background: var(--green); color: #f4f3ec; display: flex; justify-content: space-between; padding: 14px max(20px, calc((100% - 980px) / 2)); }
       .guide-brand { align-items: center; display: flex; font-weight: 700; gap: 10px; }
-      .guide-mark { align-items: center; background: var(--accent); border-radius: 3px 10px 3px 10px; color: var(--green); display: inline-flex; font: 22px Georgia, serif; height: 38px; justify-content: center; width: 38px; }
+      .guide-logo { display: block; height: auto; max-width: min(180px, 42vw); width: 100%; }
       .guide-return { border: 1px solid rgba(217, 227, 131, .45); border-radius: 4px; color: #edf3b5; font-size: 13px; padding: 7px 11px; }
       .guide-return:hover { background: rgba(217, 227, 131, .12); }
+      .release-notes { border-bottom: 1px solid var(--line); margin-bottom: 30px; padding-bottom: 20px; }
+      .release-notes h2 { border: 0; font-size: 25px; margin: 0 0 12px; padding: 0; }
+      .release-notes ul { display: grid; gap: 12px; margin: 0; padding-left: 20px; }
+      .release-notes li { padding-left: 3px; }
+      .release-notes p { margin: 3px 0 0; }
       main { background: var(--paper); border: 1px solid var(--line); margin: 28px auto 64px; max-width: 980px; padding: clamp(22px, 5vw, 58px); width: calc(100% - 32px); }
       h1, h2, h3 { color: var(--green); font-family: Georgia, "Times New Roman", serif; font-weight: 500; line-height: 1.25; }
       h1 { border-bottom: 1px solid var(--line); font-size: 34px; padding-bottom: 18px; }
@@ -34,14 +39,14 @@
   </head>
   <body>
     <header class="guide-topbar">
-      <div class="guide-brand"><span class="guide-mark">E</span><span>Eliccir CRM · Guide PROD 1.1.0</span></div>
-      <a class="guide-return" href="/">Retour à Eliccir CRM</a>
+      <div class="guide-brand"><img class="guide-logo" src="/manta-logo.png" alt="MANTA Development"><span>MANTA CRM · Guide PROD 1.1.16</span></div>
+      <a class="guide-return" href="/">Retour à MANTA CRM</a>
     </header>
-    <main><h1>Guide d’utilisation — Eliccir CRM PROD 1.1.0</h1>
-<p><strong>Version du guide :</strong> 1.1.0<br>
+    <main><section class="release-notes"><h2>Nouveautés de la version 1.1.16</h2><ul><li><strong>Nouvelle identité MANTA</strong><p>Le CRM adopte le nom et le logo MANTA dans la navigation, les pages de connexion et le guide utilisateur.</p></li><li><strong>Contacts et comptes utilisateur enrichis</strong><p>Les fiches contacts et utilisateurs proposent des informations de profil plus complètes. Les comptes disposent aussi d’un parcours sécurisé pour définir ou réinitialiser un mot de passe.</p></li><li><strong>Projets et biens immobiliers enrichis</strong><p>Les projets et biens prennent en charge les coordonnées, les budgets et des galeries privées de photos. Les fiches contacts incluent également des informations de profil et des liens vers les réseaux sociaux.</p></li><li><strong>Activités synchronisées avec Google Agenda</strong><p>Les activités et prochaines actions peuvent préciser la date, l’heure et la durée, puis être synchronisées séparément avec l’agenda Google de leur responsable.</p></li><li><strong>Test Google Agenda sans créer d’activité</strong><p>Quand ton agenda Google est connecté, tu peux créer un événement de test temporaire directement depuis la rubrique Activités, sans ajouter d’activité au CRM. Un lien permet de l’ouvrir et de le supprimer après vérification.</p></li><li><strong>Guide utilisateur et annonces de version</strong><p>Le guide affiche la version publiée et ses nouveautés. Lors d’une nouvelle version PROD, un e-mail récapitulatif est envoyé aux utilisateurs actifs disposant d’une adresse e-mail.</p></li></ul></section><h1>Guide d’utilisation — MANTA CRM PROD 1.1.16</h1>
+<p><strong>Version du guide :</strong> 1.1.16<br>
 <strong>Plateforme :</strong> PROD<br><strong>Adresse :</strong> <a href="https://crm-eliccir-production.up.railway.app">https://crm-eliccir-production.up.railway.app</a><br><strong>Public concerné :</strong> administrateurs, direction, opérations commerciales et membres de l’équipe</p>
 <blockquote>
-<p>Ce guide décrit les fonctions présentes dans PROD 1.1.0. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.</p>
+<p>Ce guide décrit les fonctions présentes dans PROD 1.1.16. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.</p>
 </blockquote>
 <h2>Table des matières</h2>
 <ol>
@@ -65,8 +70,8 @@
 <li><a href="#18-support-et-proc%C3%A9dure-de-remont%C3%A9e-dincidents">Support et procédure de remontée d’incidents</a></li>
 </ol>
 <h2>1. Présentation générale du système</h2>
-<p>Eliccir CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.</p>
-<p>L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. À la rédaction du guide, PROD est en <strong>v1.1.0</strong>.</p>
+<p>MANTA CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.</p>
+<p>L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. Cette édition du guide correspond à <strong>v1.1.16</strong>.</p>
 <p>L’interface est organisée autour d’un tableau de bord et de pages de gestion dédiées. Les données affichées dépendent du contenu réel de la base ; les messages « Aucun… » indiquent qu’aucun enregistrement correspondant n’existe.</p>
 <h2>2. Mission et objectifs du CRM</h2>
 <p>Le CRM a pour objectif de centraliser le suivi commercial et immobilier :</p>

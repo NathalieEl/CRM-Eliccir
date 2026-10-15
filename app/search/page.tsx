@@ -164,9 +164,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord">
-          <span className="brand-mark">E</span>
-          <span className="brand-name">Eliccir<small>CRM</small></span>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord">
+          <span className="brand-mark">M</span>
+          <span className="brand-name">MANTA<small>CRM</small></span>
         </Link>
         <Link className="contacts-back" href="/">← Tableau de bord</Link>
       </header>

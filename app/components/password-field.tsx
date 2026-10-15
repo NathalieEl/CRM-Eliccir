@@ -15,7 +15,7 @@ export function PasswordField({ name, label, placeholder, autoComplete, minLengt
 
   return (
     <label className="password-field">
-      {label}
+      <span className="field-title">{label}</span>
       <span className="password-input-wrap">
         <input name={name} type={visible ? "text" : "password"} minLength={minLength} placeholder={placeholder} autoComplete={autoComplete} required />
         <button

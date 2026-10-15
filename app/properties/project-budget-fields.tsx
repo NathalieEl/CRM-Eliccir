@@ -98,7 +98,7 @@ export function ProjectBudgetFields(props: ProjectBudgetFieldsProps) {
   return (
     <div className="project-budget-fields">
       <div className="property-fields-grid">
-        <label>Devise de saisie<select name="projectBudgetCurrency" value={currency} disabled={amountValue !== null && rates === null} onChange={(event) => handleCurrencyChange(event.target.value as BudgetCurrency)}>
+        <label><span className="field-title">Devise de saisie</span><select name="projectBudgetCurrency" value={currency} disabled={amountValue !== null && rates === null} onChange={(event) => handleCurrencyChange(event.target.value as BudgetCurrency)}>
           {currencies.map((item) => <option value={item} key={item}>{item}</option>)}
         </select></label>
         {currencies.map((item) => {
@@ -109,7 +109,7 @@ export function ProjectBudgetFields(props: ProjectBudgetFieldsProps) {
               ? ""
               : formatNumberWithThousands(displayAmounts[item], 2);
           const label = item === "USD" ? "Montant US$" : item === "EUR" ? "Montant Euro" : "Montant IDR";
-          return <label key={item}>{isSource ? `Budget du projet (${item})` : label}<input
+          return <label key={item}><span className="field-title">{isSource ? `Budget du projet (${item})` : label}</span><input
             aria-label={label}
             type="text"
             inputMode="decimal"

@@ -9,8 +9,8 @@ function getAuthSecret() {
   return new TextEncoder().encode(secret);
 }
 
-export async function signSession(userId: string) {
-  return new SignJWT({ userId })
+export async function signSession(userId: string, sessionVersion = 0) {
+  return new SignJWT({ userId, sessionVersion })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${sessionDuration}s`)

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteEntreprise, linkContactToEntreprise, unlinkContactFromEntreprise, updateEntreprise } from "@/app/companies/actions";
 import { CompanyFields } from "@/app/companies/company-fields";
-import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
+import { CancelEditButton, UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
 import { formatLegacyBudget } from "@/lib/number-format";
@@ -73,7 +73,7 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
   return (
     <main className="contacts-screen">
       <header className="contacts-topbar">
-        <Link className="contacts-brand" href="/" aria-label="Eliccir CRM, tableau de bord"><span className="brand-mark">E</span><span className="brand-name">Eliccir<small>CRM</small></span></Link>
+        <Link className="contacts-brand" href="/" aria-label="MANTA CRM, tableau de bord"><span className="brand-mark">M</span><span className="brand-name">MANTA<small>CRM</small></span></Link>
         <Link className="contacts-back" href="/companies">← Entreprises</Link>
       </header>
       <div className="contacts-content company-profile-page">
@@ -88,16 +88,16 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
         <section className="contacts-create-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">01 · COORDONNÉES</p><h2>Informations de l’entreprise</h2></div></div>
           <dl className="company-profile-summary">
-            <dt>E-mail</dt><dd>{entreprise.email || "—"}</dd>
-            <dt>Téléphone</dt><dd>{entreprise.telephone || "—"}</dd>
-            <dt>Site web</dt><dd>{entreprise.siteWeb ? <a href={entreprise.siteWeb} target="_blank" rel="noreferrer">{entreprise.siteWeb}</a> : "—"}</dd>
-            <dt>Secteur</dt><dd>{entreprise.secteur || "—"}</dd>
-            <dt>Adresse</dt><dd>{entreprise.adresse || "—"}</dd>
-            <dt>Ville</dt><dd>{entreprise.ville || "—"}</dd>
-            <dt>Département</dt><dd>{entreprise.departement || "—"}</dd>
-            <dt>Pays</dt><dd>{entreprise.pays || "—"}</dd>
-            <dt>Créée le</dt><dd>{formatDate(entreprise.createdAt)}</dd>
-            <dt>Modifiée le</dt><dd>{formatDate(entreprise.updatedAt)}</dd>
+            <dt><span className="field-title">E-mail</span></dt><dd>{entreprise.email || "—"}</dd>
+            <dt><span className="field-title">Téléphone</span></dt><dd>{entreprise.telephone || "—"}</dd>
+            <dt><span className="field-title">Site web</span></dt><dd>{entreprise.siteWeb ? <a href={entreprise.siteWeb} target="_blank" rel="noreferrer">{entreprise.siteWeb}</a> : "—"}</dd>
+            <dt><span className="field-title">Secteur</span></dt><dd>{entreprise.secteur || "—"}</dd>
+            <dt><span className="field-title">Adresse</span></dt><dd>{entreprise.adresse || "—"}</dd>
+            <dt><span className="field-title">Ville</span></dt><dd>{entreprise.ville || "—"}</dd>
+            <dt><span className="field-title">Département</span></dt><dd>{entreprise.departement || "—"}</dd>
+            <dt><span className="field-title">Pays</span></dt><dd>{entreprise.pays || "—"}</dd>
+            <dt><span className="field-title">Créée le</span></dt><dd>{formatDate(entreprise.createdAt)}</dd>
+            <dt><span className="field-title">Modifiée le</span></dt><dd>{formatDate(entreprise.updatedAt)}</dd>
           </dl>
         </section>
 
@@ -113,7 +113,7 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
         <section className="contacts-list-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">03 · RELATIONS</p><h2>Contacts rattachés</h2></div><span className="contacts-list-count">{entreprise.contacts.length}</span></div>
           {entreprise.contacts.length ? <div className="contacts-records-wrap"><table className="contacts-records contacts-data-table company-profile-table company-contacts-data-table"><thead><tr><th>CONTACT</th><th>POSTE</th><th>SERVICE</th><th>TYPE</th><th>DÉBUT</th><th>FIN</th><th>GESTION</th></tr></thead><tbody>{entreprise.contacts.map(({ contact, poste, service, type, dateDebut, dateFin }) => <tr key={contact.id}><td data-label="Contact"><b>{contactName(contact)}</b><small>{contact.email || "Aucun e-mail"}</small></td><td data-label="Poste">{poste || "—"}</td><td data-label="Service">{service || "—"}</td><td data-label="Type">{type}</td><td data-label="Début">{formatDate(dateDebut)}</td><td data-label="Fin">{formatDate(dateFin)}</td><td data-label="Gestion">{canWrite ? <form action={unlinkContactFromEntreprise} className="company-unlink-row"><input type="hidden" name="entrepriseId" value={entreprise.id} /><input type="hidden" name="contactId" value={contact.id} /><label><input name="confirmed" type="checkbox" value="yes" required /> Confirmer</label><button type="submit">Détacher</button></form> : "—"}</td></tr>)}</tbody></table></div> : <p className="contacts-empty">Aucun contact rattaché.</p>}
-          {canWrite ? <UnsavedChangesForm action={linkContactToEntreprise} className="company-link-form company-link-form-full"><input type="hidden" name="entrepriseId" value={entreprise.id} /><label>Ajouter un contact<select name="contactId" required defaultValue=""><option value="" disabled>Choisir un contact</option>{availableContacts.map((contact) => <option key={contact.id} value={contact.id}>{contactName(contact)}{contact.email ? ` · ${contact.email}` : ""}</option>)}</select></label><label>Poste dans l’entreprise<input name="poste" maxLength={120} placeholder="Consultant, conseiller…" /></label><Link className="contact-cancel-link" href={`/companies/${entreprise.id}`}>Annuler</Link><button className="contact-primary-button" type="submit">Rattacher le contact</button></UnsavedChangesForm> : null}
+          {canWrite ? <UnsavedChangesForm action={linkContactToEntreprise} className="company-link-form company-link-form-full"><input type="hidden" name="entrepriseId" value={entreprise.id} /><label><span className="field-title">Ajouter un contact</span><select name="contactId" required defaultValue=""><option value="" disabled>Choisir un contact</option>{availableContacts.map((contact) => <option key={contact.id} value={contact.id}>{contactName(contact)}{contact.email ? ` · ${contact.email}` : ""}</option>)}</select></label><label><span className="field-title">Poste dans l’entreprise</span><input name="poste" maxLength={120} placeholder="Consultant, conseiller…" /></label><CancelEditButton /><button className="contact-primary-button" type="submit">Rattacher le contact</button></UnsavedChangesForm> : null}
         </section>
 
         <section className="contacts-list-section profile-section">

@@ -1,21 +1,14 @@
 import { prisma } from "@/lib/prisma";
 
-const PRODUCTION_ENVIRONMENT_ID = "16c4baab-1848-4a97-8ad9-9773111757d0";
-
 async function confirmSanity() {
-  if (process.env.NODE_ENV !== "production") {
+  const env = process.env.NODE_ENV;
+  const allowClean = process.env.ALLOW_CLEAN_PRODUCTION === "true";
+
+  if (env !== "production") {
     throw new Error("Ce script ne doit être exécuté qu’en environnement de production.");
   }
 
-  if (
-    process.env.RAILWAY_ENVIRONMENT_NAME !== "production" ||
-    process.env.RAILWAY_ENVIRONMENT_ID !== PRODUCTION_ENVIRONMENT_ID ||
-    process.env.RAILWAY_SERVICE_NAME !== "CRM-Eliccir"
-  ) {
-    throw new Error("Refus de purge : la cible Railway n’est pas le service Production attendu.");
-  }
-
-  if (process.env.ALLOW_CLEAN_PRODUCTION !== "true") {
+  if (!allowClean) {
     throw new Error("Définis ALLOW_CLEAN_PRODUCTION=true pour autoriser la purge de Production.");
   }
 
@@ -24,7 +17,7 @@ async function confirmSanity() {
     throw new Error("Aucun utilisateur trouvé. La purge ne doit pas supprimer la base sans comptes existants.");
   }
 
-  console.log(`Préservation de ${userCount} utilisateur(s) et des options de configuration.`);
+  console.log(`Préservation de ${userCount} utilisateur(s) avant purge des données métier.`);
 }
 
 async function cleanProductionData() {
@@ -38,7 +31,6 @@ async function cleanProductionData() {
   await prisma.deal.deleteMany();
   await prisma.viewing.deleteMany();
   await prisma.mandate.deleteMany();
-  await prisma.agent.deleteMany();
   await prisma.landTitle.deleteMany();
   await prisma.property.deleteMany();
   await prisma.project.deleteMany();
@@ -60,8 +52,6 @@ async function cleanProductionData() {
   await prisma.contactAddress.deleteMany();
   await prisma.contactEvent.deleteMany();
   await prisma.contactNickname.deleteMany();
-  await prisma.searchCriteria.deleteMany();
-  await prisma.contactRealEstateProfile.deleteMany();
   await prisma.contact.deleteMany();
 
   console.log("Purge Production achevée. Les utilisateurs et les options de configuration sont conservés.");

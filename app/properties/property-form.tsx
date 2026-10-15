@@ -110,7 +110,7 @@ function SelectField({ label, name, value, options, required = false }: {
   required?: boolean;
 }) {
   return (
-    <label>{label}<select name={name} defaultValue={value} required={required}>
+    <label><span className="field-title">{label}</span><select name={name} defaultValue={value} required={required}>
       {!required ? <option value="">Non renseigné</option> : null}
       {options.map((option) => <option value={option} key={option}>{labels[option] ?? option}</option>)}
     </select></label>
@@ -118,7 +118,7 @@ function SelectField({ label, name, value, options, required = false }: {
 }
 
 function BooleanField({ label, name, value }: { label: string; name: string; value: boolean | null | undefined }) {
-  return <label>{label}<select name={name} defaultValue={value === null || value === undefined ? "" : String(value)}><option value="">Non renseigné</option><option value="true">Oui</option><option value="false">Non</option></select></label>;
+  return <label><span className="field-title">{label}</span><select name={name} defaultValue={value === null || value === undefined ? "" : String(value)}><option value="">Non renseigné</option><option value="true">Oui</option><option value="false">Non</option></select></label>;
 }
 
 function CheckField({ label, name, checked }: { label: string; name: string; checked: boolean }) {
@@ -136,37 +136,37 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">01 · IDENTIFICATION</p><h2>Informations générales</h2></div></div>
         <div className="property-fields-grid">
-          <label>Référence du projet<input name="reference" defaultValue={property?.reference ?? ""} required minLength={2} maxLength={80} /></label>
-          <label>Nom du projet<input name="title" defaultValue={property?.title ?? ""} required minLength={2} maxLength={200} /></label>
+          <label><span className="field-title">Référence du projet</span><input name="reference" defaultValue={property?.reference ?? ""} required minLength={2} maxLength={80} /></label>
+          <label><span className="field-title">Nom du projet</span><input name="title" defaultValue={property?.title ?? ""} required minLength={2} maxLength={200} /></label>
           <SelectField label="Type de projet" name="type" value={property?.type ?? "PROJECT"} options={propertyTypes} required />
           <SelectField label="Statut" name="status" value={property?.status ?? "AVAILABLE"} options={propertyStatuses} required />
           <SelectField label="État" name="condition" value={property?.condition ?? ""} options={propertyConditions} />
-          <label>Année de construction<input name="yearBuilt" type="number" step="1" defaultValue={displayValue(property?.yearBuilt)} /></label>
-          <label>Année de rénovation<input name="yearRenovated" type="number" step="1" defaultValue={displayValue(property?.yearRenovated)} /></label>
-          <label>Propriétaire<select name="ownerId" defaultValue={property?.ownerId ?? ""}><option value="">Non renseigné</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
-          <label>Entreprise<select name="entrepriseId" defaultValue={property?.entrepriseId ?? ""}><option value="">Non renseignée</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-          <label>Pays<input name="country" defaultValue={property?.country ?? ""} maxLength={80} /></label>
-          <label>Statut du projet<input name="projectStatus" defaultValue={property?.projectStatus ?? "En cours"} maxLength={40} /></label>
-          <label>Progression du projet (%)<input name="projectProgression" type="number" min="0" max="100" step="1" defaultValue={displayValue(property?.projectProgression ?? 0)} /></label>
-          <label className="property-field-wide">Description<textarea name="description" rows={5} defaultValue={property?.description ?? ""} /></label>
+          <label><span className="field-title">Année de construction</span><input name="yearBuilt" type="number" step="1" defaultValue={displayValue(property?.yearBuilt)} /></label>
+          <label><span className="field-title">Année de rénovation</span><input name="yearRenovated" type="number" step="1" defaultValue={displayValue(property?.yearRenovated)} /></label>
+          <label><span className="field-title">Propriétaire</span><select name="ownerId" defaultValue={property?.ownerId ?? ""}><option value="">Non renseigné</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
+          <label><span className="field-title">Entreprise</span><select name="entrepriseId" defaultValue={property?.entrepriseId ?? ""}><option value="">Non renseignée</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
+          <label><span className="field-title">Pays</span><input name="country" defaultValue={property?.country ?? ""} maxLength={80} /></label>
+          <label><span className="field-title">Statut du projet</span><input name="projectStatus" defaultValue={property?.projectStatus ?? "En cours"} maxLength={40} /></label>
+          <label><span className="field-title">Progression du projet (%)</span><input name="projectProgression" type="number" min="0" max="100" step="1" defaultValue={displayValue(property?.projectProgression ?? 0)} /></label>
+          <label className="property-field-wide"><span className="field-title">Description</span><textarea name="description" rows={5} defaultValue={property?.description ?? ""} /></label>
         </div>
       </section>
 
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">02 · LOCALISATION</p><h2>Adresse et accès</h2></div></div>
         <div className="property-fields-grid">
-          <label className="property-field-wide">Adresse<input name="address" defaultValue={property?.address ?? ""} /></label>
-          <label>Quartier<input name="neighborhood" defaultValue={property?.neighborhood ?? ""} /></label>
-          <label>Kecamatan / district<input name="kecamatan" defaultValue={property?.kecamatan ?? ""} /></label>
-          <label>Kabupaten / ville<input name="kabupaten" defaultValue={property?.kabupaten ?? ""} /></label>
-          <label>Province<input name="province" defaultValue={property?.province ?? ""} /></label>
-          <label>Code postal<input name="postalCode" defaultValue={property?.postalCode ?? ""} /></label>
+          <label className="property-field-wide"><span className="field-title">Adresse</span><input name="address" defaultValue={property?.address ?? ""} /></label>
+          <label><span className="field-title">Quartier</span><input name="neighborhood" defaultValue={property?.neighborhood ?? ""} /></label>
+          <label><span className="field-title">Kecamatan / district</span><input name="kecamatan" defaultValue={property?.kecamatan ?? ""} /></label>
+          <label><span className="field-title">Kabupaten / ville</span><input name="kabupaten" defaultValue={property?.kabupaten ?? ""} /></label>
+          <label><span className="field-title">Province</span><input name="province" defaultValue={property?.province ?? ""} /></label>
+          <label><span className="field-title">Code postal</span><input name="postalCode" defaultValue={property?.postalCode ?? ""} /></label>
           <ProjectCoordinateFields initialLatitude={displayValue(property?.latitude)} initialLongitude={displayValue(property?.longitude)} />
-          <label>Distance de l’aéroport (km)<input name="distanceAirportKm" type="number" min="0" step="any" defaultValue={displayValue(property?.distanceAirportKm)} /></label>
-          <label>Distance de la plage (km)<input name="distanceBeachKm" type="number" min="0" step="any" defaultValue={displayValue(property?.distanceBeachKm)} /></label>
-          <label>Largeur de la voie d’accès (m)<input name="accessRoadWidthM" type="number" min="0" step="any" defaultValue={displayValue(property?.accessRoadWidthM)} /></label>
-          <label>Type de voie d’accès<input name="accessRoadType" defaultValue={property?.accessRoadType ?? ""} /></label>
-          <label>Vues<textarea name="views" rows={3} placeholder="Une valeur par ligne" defaultValue={property?.views.join("\n") ?? ""} /></label>
+          <label><span className="field-title">Distance de l’aéroport (km)</span><input name="distanceAirportKm" type="number" min="0" step="any" defaultValue={displayValue(property?.distanceAirportKm)} /></label>
+          <label><span className="field-title">Distance de la plage (km)</span><input name="distanceBeachKm" type="number" min="0" step="any" defaultValue={displayValue(property?.distanceBeachKm)} /></label>
+          <label><span className="field-title">Largeur de la voie d’accès (m)</span><input name="accessRoadWidthM" type="number" min="0" step="any" defaultValue={displayValue(property?.accessRoadWidthM)} /></label>
+          <label><span className="field-title">Type de voie d’accès</span><input name="accessRoadType" defaultValue={property?.accessRoadType ?? ""} /></label>
+          <label><span className="field-title">Vues</span><textarea name="views" rows={3} placeholder="Une valeur par ligne" defaultValue={property?.views.join("\n") ?? ""} /></label>
           <BooleanField label="Risque d’inondation" name="floodRisk" value={property?.floodRisk} />
         </div>
       </section>
@@ -174,36 +174,36 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">03 · CARACTÉRISTIQUES</p><h2>Surfaces et équipements</h2></div></div>
         <div className="property-fields-grid">
-          <label>Surface du terrain (m²)<input name="landAreaSqm" type="number" min="0" step="any" defaultValue={displayValue(property?.landAreaSqm)} /></label>
-          <label>Surface bâtie (m²)<input name="buildingAreaSqm" type="number" min="0" step="any" defaultValue={displayValue(property?.buildingAreaSqm)} /></label>
-          <label>Chambres<input name="bedrooms" type="number" min="0" step="1" defaultValue={displayValue(property?.bedrooms)} /></label>
-          <label>Salles de bains<input name="bathrooms" type="number" min="0" step="1" defaultValue={displayValue(property?.bathrooms)} /></label>
-          <label>Étages<input name="floors" type="number" min="0" step="1" defaultValue={displayValue(property?.floors)} /></label>
-          <label>Places de parking<input name="parkingSpaces" type="number" min="0" step="1" defaultValue={displayValue(property?.parkingSpaces)} /></label>
+          <label><span className="field-title">Surface du terrain (m²)</span><input name="landAreaSqm" type="number" min="0" step="any" defaultValue={displayValue(property?.landAreaSqm)} /></label>
+          <label><span className="field-title">Surface bâtie (m²)</span><input name="buildingAreaSqm" type="number" min="0" step="any" defaultValue={displayValue(property?.buildingAreaSqm)} /></label>
+          <label><span className="field-title">Chambres</span><input name="bedrooms" type="number" min="0" step="1" defaultValue={displayValue(property?.bedrooms)} /></label>
+          <label><span className="field-title">Salles de bains</span><input name="bathrooms" type="number" min="0" step="1" defaultValue={displayValue(property?.bathrooms)} /></label>
+          <label><span className="field-title">Étages</span><input name="floors" type="number" min="0" step="1" defaultValue={displayValue(property?.floors)} /></label>
+          <label><span className="field-title">Places de parking</span><input name="parkingSpaces" type="number" min="0" step="1" defaultValue={displayValue(property?.parkingSpaces)} /></label>
           <SelectField label="Mobilier" name="furnishing" value={property?.furnishing ?? ""} options={furnishings} />
           <CheckField label="Piscine" name="hasPool" checked={property?.hasPool ?? false} />
           <CheckField label="Jardin" name="hasGarden" checked={property?.hasGarden ?? false} />
-          <label className="property-field-wide">Équipements<textarea name="amenities" rows={4} placeholder="Un équipement par ligne" defaultValue={property?.amenities.join("\n") ?? ""} /></label>
+          <label className="property-field-wide"><span className="field-title">Équipements</span><textarea name="amenities" rows={4} placeholder="Un équipement par ligne" defaultValue={property?.amenities.join("\n") ?? ""} /></label>
         </div>
       </section>
 
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">04 · RÉSEAUX ET SERVICES</p><h2>Raccordements et personnel</h2></div></div>
         <div className="property-fields-grid">
-          <label>Puissance électrique (VA)<input name="electricityVA" type="number" min="0" step="1" defaultValue={displayValue(property?.electricityVA)} /></label>
+          <label><span className="field-title">Puissance électrique (VA)</span><input name="electricityVA" type="number" min="0" step="1" defaultValue={displayValue(property?.electricityVA)} /></label>
           <SelectField label="Source d’eau" name="waterSource" value={property?.waterSource ?? ""} options={waterSources} />
-          <label>Assainissement<input name="sanitation" defaultValue={property?.sanitation ?? ""} /></label>
-          <label>Fournisseur Internet<input name="internetProvider" defaultValue={property?.internetProvider ?? ""} /></label>
-          <label>Personnel inclus<textarea name="staffIncluded" rows={3} placeholder="Une fonction par ligne" defaultValue={property?.staffIncluded.join("\n") ?? ""} /></label>
+          <label><span className="field-title">Assainissement</span><input name="sanitation" defaultValue={property?.sanitation ?? ""} /></label>
+          <label><span className="field-title">Fournisseur Internet</span><input name="internetProvider" defaultValue={property?.internetProvider ?? ""} /></label>
+          <label><span className="field-title">Personnel inclus</span><textarea name="staffIncluded" rows={3} placeholder="Une fonction par ligne" defaultValue={property?.staffIncluded.join("\n") ?? ""} /></label>
         </div>
       </section>
 
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">05 · INVESTISSEMENT</p><h2>Gestion locative et rendement</h2></div></div>
         <div className="property-fields-grid">
-          <label>Société de gestion<input name="managementCompany" defaultValue={property?.managementCompany ?? ""} /></label>
-          <label>Rendement estimé (%)<input name="estimatedYieldPct" type="number" step="any" defaultValue={displayValue(property?.estimatedYieldPct)} /></label>
-          <label>Taux d’occupation (%)<input name="occupancyRatePct" type="number" step="any" defaultValue={displayValue(property?.occupancyRatePct)} /></label>
+          <label><span className="field-title">Société de gestion</span><input name="managementCompany" defaultValue={property?.managementCompany ?? ""} /></label>
+          <label><span className="field-title">Rendement estimé (%)</span><input name="estimatedYieldPct" type="number" step="any" defaultValue={displayValue(property?.estimatedYieldPct)} /></label>
+          <label><span className="field-title">Taux d’occupation (%)</span><input name="occupancyRatePct" type="number" step="any" defaultValue={displayValue(property?.occupancyRatePct)} /></label>
         </div>
       </section>
 
@@ -230,32 +230,32 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
           <SelectField label="Permis de construire" name="buildingPermit" value={property?.buildingPermit ?? ""} options={buildingPermitStatuses} />
           <CheckField label="Contentieux en cours" name="hasLitigation" checked={property?.hasLitigation ?? false} />
           <CheckField label="Hypothèque / hak tanggungan" name="hasMortgageLien" checked={property?.hasMortgageLien ?? false} />
-          <label>Frais Banjar mensuels<input name="banjarFeesMonthly" type="number" min="0" step="any" defaultValue={displayValue(property?.banjarFeesMonthly)} /></label>
+          <label><span className="field-title">Frais Banjar mensuels</span><input name="banjarFeesMonthly" type="number" min="0" step="any" defaultValue={displayValue(property?.banjarFeesMonthly)} /></label>
           <BooleanField label="Éligible aux étrangers" name="foreignerEligible" value={property?.foreignerEligible} />
-          <label className="property-field-wide">Détail de l’éligibilité<input name="foreignerEligibleNote" defaultValue={property?.foreignerEligibleNote ?? ""} /></label>
+          <label className="property-field-wide"><span className="field-title">Détail de l’éligibilité</span><input name="foreignerEligibleNote" defaultValue={property?.foreignerEligibleNote ?? ""} /></label>
         </div>
       </section>
 
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">08 · TITRE FONCIER</p><h2>Certificat et droits fonciers</h2></div></div>
-        {landTitle ? <><input type="hidden" name="landTitleId" value={landTitle.id} /><div className="property-system-fields"><label>Identifiant du titre<input value={landTitle.id} readOnly /></label><label>Bien rattaché<input value={landTitle.propertyId} readOnly /></label></div><label className="property-delete-document"><input type="checkbox" name="deleteLandTitle" />Supprimer le titre foncier et ses informations</label></> : null}
+        {landTitle ? <><input type="hidden" name="landTitleId" value={landTitle.id} /><div className="property-system-fields"><label><span className="field-title">Identifiant du titre</span><input value={landTitle.id} readOnly /></label><label><span className="field-title">Bien rattaché</span><input value={landTitle.propertyId} readOnly /></label></div><label className="property-delete-document"><input type="checkbox" name="deleteLandTitle" />Supprimer le titre foncier et ses informations</label></> : null}
         <div className="property-fields-grid">
           <SelectField label="Type de droit" name="rightType" value={landTitle?.rightType ?? ""} options={landRightTypes} />
-          <label>Numéro du certificat<input name="certificateNumber" defaultValue={landTitle?.certificateNumber ?? ""} /></label>
-          <label>NIB<input name="nib" defaultValue={landTitle?.nib ?? ""} /></label>
-          <label>Nom du titulaire<input name="holderName" defaultValue={landTitle?.holderName ?? ""} /></label>
+          <label><span className="field-title">Numéro du certificat</span><input name="certificateNumber" defaultValue={landTitle?.certificateNumber ?? ""} /></label>
+          <label><span className="field-title">NIB</span><input name="nib" defaultValue={landTitle?.nib ?? ""} /></label>
+          <label><span className="field-title">Nom du titulaire</span><input name="holderName" defaultValue={landTitle?.holderName ?? ""} /></label>
           <SelectField label="Structure de détention" name="holdingStructure" value={landTitle?.holdingStructure ?? ""} options={holdingStructures} />
           <CheckField label="Vérifié auprès du BPN" name="verifiedWithBpn" checked={landTitle?.verifiedWithBpn ?? false} />
-          <label>Date de vérification<input name="verifiedAt" type="date" defaultValue={dateValue(landTitle?.verifiedAt)} /></label>
-          <label>Date d’expiration du droit<input name="expiryDate" type="date" defaultValue={dateValue(landTitle?.expiryDate)} /></label>
-          <label>Années restantes<input name="remainingYears" type="number" min="0" step="any" defaultValue={displayValue(landTitle?.remainingYears)} /></label>
+          <label><span className="field-title">Date de vérification</span><input name="verifiedAt" type="date" defaultValue={dateValue(landTitle?.verifiedAt)} /></label>
+          <label><span className="field-title">Date d’expiration du droit</span><input name="expiryDate" type="date" defaultValue={dateValue(landTitle?.expiryDate)} /></label>
+          <label><span className="field-title">Années restantes</span><input name="remainingYears" type="number" min="0" step="any" defaultValue={displayValue(landTitle?.remainingYears)} /></label>
           <BooleanField label="Prolongation possible" name="extensionPossible" value={landTitle?.extensionPossible} />
-          <label>Coût de prolongation<input name="extensionCost" type="number" min="0" step="any" defaultValue={displayValue(landTitle?.extensionCost)} /></label>
-          <label>Début du bail<input name="leaseStartDate" type="date" defaultValue={dateValue(landTitle?.leaseStartDate)} /></label>
-          <label>Fin du bail<input name="leaseEndDate" type="date" defaultValue={dateValue(landTitle?.leaseEndDate)} /></label>
+          <label><span className="field-title">Coût de prolongation</span><input name="extensionCost" type="number" min="0" step="any" defaultValue={displayValue(landTitle?.extensionCost)} /></label>
+          <label><span className="field-title">Début du bail</span><input name="leaseStartDate" type="date" defaultValue={dateValue(landTitle?.leaseStartDate)} /></label>
+          <label><span className="field-title">Fin du bail</span><input name="leaseEndDate" type="date" defaultValue={dateValue(landTitle?.leaseEndDate)} /></label>
           <BooleanField label="Option de renouvellement" name="renewalOption" value={landTitle?.renewalOption} />
-          <label>Nom du bailleur<input name="lessorName" defaultValue={landTitle?.lessorName ?? ""} /></label>
-          <label className="property-field-wide">Notes sur le titre<textarea name="landTitleNotes" rows={4} defaultValue={landTitle?.notes ?? ""} /></label>
+          <label><span className="field-title">Nom du bailleur</span><input name="lessorName" defaultValue={landTitle?.lessorName ?? ""} /></label>
+          <label className="property-field-wide"><span className="field-title">Notes sur le titre</span><textarea name="landTitleNotes" rows={4} defaultValue={landTitle?.notes ?? ""} /></label>
         </div>
       </section>
 
@@ -263,14 +263,14 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
         <div className="contacts-section-heading"><div><p className="section-index">09 · DOCUMENTS</p><h2>Documents du bien</h2></div><span className="contacts-list-count">{property?.documents.length ?? 0}</span></div>
         {(property?.documents ?? []).map((document) => <div className="property-document-row" key={document.id}>
           <input type="hidden" name="documentId" value={document.id} />
-          <div className="property-system-fields"><label>Identifiant<input value={document.id} readOnly /></label><label>Bien rattaché<input value={document.propertyId ?? "—"} readOnly /></label><label>Créé le<input value={displayDate(document.createdAt)} readOnly /></label></div>
+          <div className="property-system-fields"><label><span className="field-title">Identifiant</span><input value={document.id} readOnly /></label><label><span className="field-title">Bien rattaché</span><input value={document.propertyId ?? "—"} readOnly /></label><label><span className="field-title">Créé le</span><input value={displayDate(document.createdAt)} readOnly /></label></div>
           <div className="property-fields-grid">
             <SelectField label="Type de document" name="documentType" value={document.type} options={documentTypes} required />
-            <label>Nom<input name="documentName" defaultValue={document.name} required maxLength={200} /></label>
-            <label>URL<input name="documentUrl" type="url" defaultValue={document.url ?? ""} /></label>
-            <label>Délivré le<input name="documentIssuedAt" type="date" defaultValue={dateValue(document.issuedAt)} /></label>
-            <label>Expire le<input name="documentExpiresAt" type="date" defaultValue={dateValue(document.expiresAt)} /></label>
-            <label>Dossier associé<select name="documentDealId" defaultValue={document.dealId ?? ""}><option value="">Aucun</option>{(property?.deals ?? []).map((deal) => <option value={deal.id} key={deal.id}>{deal.id} · {labels[deal.stage] ?? deal.stage}</option>)}</select></label>
+            <label><span className="field-title">Nom</span><input name="documentName" defaultValue={document.name} required maxLength={200} /></label>
+            <label><span className="field-title">URL</span><input name="documentUrl" type="url" defaultValue={document.url ?? ""} /></label>
+            <label><span className="field-title">Délivré le</span><input name="documentIssuedAt" type="date" defaultValue={dateValue(document.issuedAt)} /></label>
+            <label><span className="field-title">Expire le</span><input name="documentExpiresAt" type="date" defaultValue={dateValue(document.expiresAt)} /></label>
+            <label><span className="field-title">Dossier associé</span><select name="documentDealId" defaultValue={document.dealId ?? ""}><option value="">Aucun</option>{(property?.deals ?? []).map((deal) => <option value={deal.id} key={deal.id}>{deal.id} · {labels[deal.stage] ?? deal.stage}</option>)}</select></label>
           </div>
           <label className="property-delete-document"><input type="checkbox" name="deleteDocumentId" value={document.id} />Supprimer ce document</label>
         </div>)}
@@ -278,11 +278,11 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
           <input type="hidden" name="documentId" value="" />
           <div className="property-fields-grid">
             <SelectField label="Type de document" name="documentType" value="" options={documentTypes} />
-            <label>Nom<input name="documentName" maxLength={200} /></label>
-            <label>URL<input name="documentUrl" type="url" /></label>
-            <label>Délivré le<input name="documentIssuedAt" type="date" /></label>
-            <label>Expire le<input name="documentExpiresAt" type="date" /></label>
-            <label>Dossier associé<select name="documentDealId" defaultValue=""><option value="">Aucun</option>{(property?.deals ?? []).map((deal) => <option value={deal.id} key={deal.id}>{deal.id} · {labels[deal.stage] ?? deal.stage}</option>)}</select></label>
+            <label><span className="field-title">Nom</span><input name="documentName" maxLength={200} /></label>
+            <label><span className="field-title">URL</span><input name="documentUrl" type="url" /></label>
+            <label><span className="field-title">Délivré le</span><input name="documentIssuedAt" type="date" /></label>
+            <label><span className="field-title">Expire le</span><input name="documentExpiresAt" type="date" /></label>
+            <label><span className="field-title">Dossier associé</span><select name="documentDealId" defaultValue=""><option value="">Aucun</option>{(property?.deals ?? []).map((deal) => <option value={deal.id} key={deal.id}>{deal.id} · {labels[deal.stage] ?? deal.stage}</option>)}</select></label>
           </div>
         </div>
       </section>
@@ -299,10 +299,10 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       {property ? <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">11 · SYSTÈME</p><h2>Informations système</h2></div></div>
         <div className="property-system-fields">
-          <label>Identifiant<input value={property.id} readOnly /></label>
-          {property.legacyProjectId ? <label>Ancien identifiant projet<input value={property.legacyProjectId} readOnly /></label> : null}
-          <label>Créé le<input value={displayDate(property.createdAt)} readOnly /></label>
-          <label>Modifié le<input value={displayDate(property.updatedAt)} readOnly /></label>
+          <label><span className="field-title">Identifiant</span><input value={property.id} readOnly /></label>
+          {property.legacyProjectId ? <label><span className="field-title">Ancien identifiant projet</span><input value={property.legacyProjectId} readOnly /></label> : null}
+          <label><span className="field-title">Créé le</span><input value={displayDate(property.createdAt)} readOnly /></label>
+          <label><span className="field-title">Modifié le</span><input value={displayDate(property.updatedAt)} readOnly /></label>
         </div>
       </section> : null}
 
