@@ -82,5 +82,23 @@
       "title": "Guide utilisateur et annonces de version",
       "text": "Le guide affiche la version publiée et ses nouveautés. Lors d’une nouvelle version PROD, un e-mail récapitulatif est envoyé aux utilisateurs actifs disposant d’une adresse e-mail."
     }
+  ],
+  "1.1.17": [
+    {
+      "title": "Connexion plus simple",
+      "text": "Les noms d’utilisateur ne distinguent plus les majuscules des minuscules. Les mots de passe restent sensibles à la casse."
+    },
+    {
+      "title": "Sélecteurs de pays améliorés",
+      "text": "Les pays se choisissent dans une liste défilante. France et Indonésie apparaissent en premier, puis les autres pays par ordre alphabétique dans les formulaires concernés."
+    },
+    {
+      "title": "Formulaires plus lisibles sur petit écran",
+      "text": "Les libellés des boutons s’adaptent à la largeur disponible et se replient au lieu d’être coupés."
+    },
+    {
+      "title": "Logo MANTA affiché une seule fois",
+      "text": "Le logo reste au-dessus de la colonne du menu. Les en-têtes des pages ne le répètent plus."
+    }
   ]
 }

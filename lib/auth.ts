@@ -9,6 +9,17 @@ export function isTwoFactorActive() {
   return process.env.TWO_FACTOR_STATUS?.trim().toLowerCase() === "active";
 }
 
+export function usernamesMatch(first: string | null | undefined, second: string | null | undefined) {
+  const normalizedFirst = first?.trim().toLowerCase();
+  return Boolean(normalizedFirst && normalizedFirst === second?.trim().toLowerCase());
+}
+
+export async function findUserByUsername(username: string) {
+  return prisma.user.findFirst({
+    where: { username: { equals: username.trim(), mode: "insensitive" } },
+  });
+}
+
 export async function createSession(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { sessionVersion: true } });
   if (!user) throw new Error("Unable to create a session for a missing user");
@@ -47,11 +58,11 @@ export async function getCurrentUser() {
 
 export async function authenticate(username: string, password: string, code: string) {
   const configuredUsername = process.env.ADMIN_USERNAME?.trim();
-  const user = username === configuredUsername
+  const user = usernamesMatch(username, configuredUsername)
     ? await provisionAdmin()
-    : await prisma.user.findUnique({ where: { username } });
+    : await findUserByUsername(username);
 
-  if (!user || !user.active || user.mustChangePassword || user.username !== username || !(await bcrypt.compare(password, user.passwordHash))) return false;
+  if (!user || !user.active || user.mustChangePassword || !usernamesMatch(user.username, username) || !(await bcrypt.compare(password, user.passwordHash))) return false;
   if (!isTwoFactorActive()) return true;
 
   try {
@@ -68,7 +79,7 @@ async function provisionAdmin() {
   const configuredFirstName = process.env.ADMIN_FIRST_NAME?.trim();
   if (!username || !password || (isTwoFactorActive() && !configuredTwoFactorSecret)) return null;
 
-  const existing = await prisma.user.findUnique({ where: { username } });
+  const existing = await findUserByUsername(username);
   const twoFactorSecret = configuredTwoFactorSecret ?? existing?.twoFactorSecret ?? generateSecret();
   if (existing) {
     return prisma.user.update({

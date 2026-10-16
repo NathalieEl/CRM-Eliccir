@@ -5,7 +5,7 @@ import { randomBytes } from "node:crypto";
 import { generateSecret } from "otplib";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { isTwoFactorActive, requireAdmin } from "@/lib/auth";
+import { findUserByUsername, isTwoFactorActive, requireAdmin, usernamesMatch } from "@/lib/auth";
 import type { UserRole } from "@/lib/permissions";
 import { recordAudit } from "@/lib/audit";
 import { createPasswordSetupToken, getPasswordSetupUrl } from "@/lib/password-setup";
@@ -20,7 +20,7 @@ function readRole(value: FormDataEntryValue | null): UserRole {
 
 async function issuePasswordSetupLink(userId: string, actor: { id: string; username: string }) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (user?.username === process.env.ADMIN_USERNAME?.trim()) return "admin-managed" as const;
+  if (usernamesMatch(user?.username, process.env.ADMIN_USERNAME)) return "admin-managed" as const;
   if (!user?.email) return "email-missing" as const;
 
   const { token, tokenHash, expiresAt } = createPasswordSetupToken();
@@ -74,7 +74,7 @@ export async function createUser(formData: FormData) {
     redirect("/users?error=invalid");
   }
 
-  const existing = await prisma.user.findUnique({ where: { username } });
+  const existing = await findUserByUsername(username);
   if (existing) redirect("/users?error=exists");
 
   const twoFactorSecret = generateSecret();

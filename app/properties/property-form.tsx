@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CountrySelect } from "@/app/components/country-select";
 import { UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import { ProjectBudgetFields } from "@/app/properties/project-budget-fields";
 import { ProjectCoordinateFields } from "@/app/properties/project-coordinate-fields";
@@ -145,7 +146,7 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
           <label><span className="field-title">Année de rénovation</span><input name="yearRenovated" type="number" step="1" defaultValue={displayValue(property?.yearRenovated)} /></label>
           <label><span className="field-title">Propriétaire</span><select name="ownerId" defaultValue={property?.ownerId ?? ""}><option value="">Non renseigné</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
           <label><span className="field-title">Entreprise</span><select name="entrepriseId" defaultValue={property?.entrepriseId ?? ""}><option value="">Non renseignée</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
-          <label><span className="field-title">Pays</span><input name="country" defaultValue={property?.country ?? ""} maxLength={80} /></label>
+          <label><span className="field-title">Pays</span><CountrySelect name="country" value={property?.country} /></label>
           <label><span className="field-title">Statut du projet</span><input name="projectStatus" defaultValue={property?.projectStatus ?? "En cours"} maxLength={40} /></label>
           <label><span className="field-title">Progression du projet (%)</span><input name="projectProgression" type="number" min="0" max="100" step="1" defaultValue={displayValue(property?.projectProgression ?? 0)} /></label>
           <label className="property-field-wide"><span className="field-title">Description</span><textarea name="description" rows={5} defaultValue={property?.description ?? ""} /></label>

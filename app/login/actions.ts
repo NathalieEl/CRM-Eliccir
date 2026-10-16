@@ -1,8 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { authenticate, clearSession, createSession, isTwoFactorActive } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { authenticate, clearSession, createSession, findUserByUsername, isTwoFactorActive } from "@/lib/auth";
 
 export async function login(formData: FormData) {
   const username = String(formData.get("username") ?? "").trim();
@@ -22,7 +21,7 @@ export async function login(formData: FormData) {
   }
 
   if (!valid) redirect("/login?error=invalid");
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await findUserByUsername(username);
   if (!user || user.mustChangePassword) redirect("/login?error=invalid");
   await createSession(user.id);
 
