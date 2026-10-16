@@ -57,6 +57,8 @@ Le CRM est un outil de suivi. Il ne remplace pas les documents juridiques, compt
 3. Après connexion, le tableau de bord s’affiche. Le menu principal est situé à droite sur ordinateur.
 4. Pour terminer ta session, utilise **Se déconnecter** dans le menu.
 
+Le logo MANTA est affiché au-dessus de la colonne du menu; il n’est pas répété dans les en-têtes des pages.
+
 Le badge près du logo indique l’environnement, la version et le build. Avant de saisir des données, vérifie qu’il affiche **PROD**. Si le badge indique **DEV**, tu es sur l’environnement de test : ne l’utilise pas pour enregistrer des données métier de production.
 
 La session expire au bout d’environ huit heures. Il faut alors se reconnecter.

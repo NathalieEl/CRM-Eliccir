@@ -75,6 +75,10 @@
     {
       "title": "Formulaires plus lisibles sur petit écran",
       "text": "Les libellés des boutons s’adaptent à la largeur disponible et se replient au lieu d’être coupés."
+    },
+    {
+      "title": "Logo MANTA affiché une seule fois",
+      "text": "Le logo reste au-dessus de la colonne du menu. Les en-têtes des pages ne le répètent plus."
     }
   ]
 }

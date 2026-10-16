@@ -167,6 +167,7 @@ h2 { color: #29372f; font-family: Georgia, "Times New Roman", serif; font-size: 
 .contacts-screen .section-index { color: #637168; font-size: 10px; }
 .contacts-topbar { align-items: center; background: #fff; border-bottom: 1px solid var(--line); display: flex; height: 64px; justify-content: space-between; padding: 0 max(24px, calc((100vw - 1160px) / 2)); }
 .contacts-brand { align-items: center; display: flex; gap: 10px; }
+.contacts-brand, .auth-screen .auth-brand { display: none; }
 .contacts-brand .brand-name { color: #25332b; }
 .contacts-brand .brand-name small { color: #78877d; }
 .contacts-back { color: var(--green); font-size: 13px; font-weight: 600; }
