@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createUser, deleteUser, resetTwoFactor, sendUserPasswordSetupLink, updateUser } from "@/app/users/actions";
-import { isTwoFactorActive, requireAdmin } from "@/lib/auth";
+import { isTwoFactorActive, requireAdmin, usernamesMatch } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CancelEditButton, UnsavedChangesForm } from "@/app/components/unsaved-changes-form";
 import { hasPermission, roleDefinitions, roleLabels, type UserRole } from "@/lib/permissions";
@@ -92,7 +92,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                         <div className="profile-form-actions"><CancelEditButton /><button className="contact-primary-button" type="submit">Enregistrer</button></div>
                       </UnsavedChangesForm>
                     </details>
-                    {user.username === configuredAdminUsername ? <span className="support-privacy-note">Mot de passe géré dans Railway</span> : <form action={sendUserPasswordSetupLink} className="user-resend-setup-form"><input type="hidden" name="id" value={user.id} /><button type="submit">Envoyer un lien mot de passe</button></form>}
+                    {usernamesMatch(user.username, configuredAdminUsername) ? <span className="support-privacy-note">Mot de passe géré dans Railway</span> : <form action={sendUserPasswordSetupLink} className="user-resend-setup-form"><input type="hidden" name="id" value={user.id} /><button type="submit">Envoyer un lien mot de passe</button></form>}
                     {twoFactorActive ? <details><summary>Réinitialiser 2FA</summary><form action={resetTwoFactor} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la réinitialisation</label><button type="submit">Générer un nouveau secret</button></form></details> : null}
                     <details><summary className="user-delete-button">Supprimer</summary><form action={deleteUser} className="user-delete-form"><input type="hidden" name="id" value={user.id} /><label><input name="confirmed" value="yes" type="checkbox" required /> Confirmer la suppression</label><button type="submit">Supprimer définitivement</button></form></details>
                   </div></td>

@@ -1,4 +1,5 @@
 import type { Entreprise } from "@/app/generated/prisma/client";
+import { CountrySelect } from "@/app/components/country-select";
 
 type CompanyFieldsValues = Pick<
   Entreprise,
@@ -16,7 +17,7 @@ export function CompanyFields({ entreprise }: { entreprise?: CompanyFieldsValues
       <label><span className="field-title">Adresse</span><input name="adresse" defaultValue={entreprise?.adresse ?? ""} maxLength={160} /></label>
       <label><span className="field-title">Ville</span><input name="ville" defaultValue={entreprise?.ville ?? ""} maxLength={80} /></label>
       <label><span className="field-title">Département</span><input name="departement" defaultValue={entreprise?.departement ?? ""} maxLength={20} /></label>
-      <label><span className="field-title">Pays</span><input name="pays" defaultValue={entreprise?.pays ?? ""} maxLength={80} /></label>
+      <label><span className="field-title">Pays</span><CountrySelect name="pays" value={entreprise?.pays} /></label>
     </>
   );
 }
