@@ -62,5 +62,19 @@
       "title": "Test Google Agenda sans créer d’activité",
       "text": "Quand ton agenda Google est connecté, tu peux créer un événement de test temporaire directement depuis la rubrique Activités, sans ajouter d’activité au CRM. Un lien permet de l’ouvrir et de le supprimer après vérification."
     }
+  ],
+  "1.1.17": [
+    {
+      "title": "Connexion plus simple",
+      "text": "Les noms d’utilisateur ne distinguent plus les majuscules des minuscules. Les mots de passe restent sensibles à la casse."
+    },
+    {
+      "title": "Sélecteurs de pays améliorés",
+      "text": "Les pays se choisissent dans une liste défilante. France et Indonésie apparaissent en premier, puis les autres pays par ordre alphabétique dans les formulaires concernés."
+    },
+    {
+      "title": "Formulaires plus lisibles sur petit écran",
+      "text": "Les libellés des boutons s’adaptent à la largeur disponible et se replient au lieu d’être coupés."
+    }
   ]
 }

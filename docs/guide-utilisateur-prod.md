@@ -63,16 +63,21 @@ La session expire au bout d’environ huit heures. Il faut alors se reconnecter.
 
 ## 4. Connexion, mot de passe et double authentification
 
+### Nom d’utilisateur
+
+Le nom d’utilisateur ne distingue pas les majuscules des minuscules : `Sophie.Martin`, `sophie.martin` et `SOPHIE.MARTIN` désignent le même compte. Cette règle ne s’applique pas au mot de passe.
+
 ### Mot de passe
 
 - Utilise le nom d’utilisateur et le mot de passe qui t’ont été communiqués par l’administrateur.
+- Le mot de passe reste sensible aux majuscules et aux minuscules; saisis-le exactement comme il a été défini.
 - Le CRM ne présente pas de procédure de réinitialisation en libre-service. En cas d’oubli, demande à un administrateur de modifier le mot de passe dans **Utilisateurs**.
 - Lors de la création d’un compte, le mot de passe temporaire doit contenir au moins huit caractères. Change-le selon les règles internes de sécurité dès que la procédure de l’équipe le permet.
 - Ne partage jamais ton mot de passe avec le support ou dans une capture d’écran.
 
 ### Double authentification (2FA)
 
-Dans la configuration PROD vérifiée pour la version 1.1.0, `TWO_FACTOR_STATUS` n’est pas configuré : le 2FA est donc **en sommeil**, et l’écran de connexion demande uniquement le nom d’utilisateur et le mot de passe.
+Dans la configuration PROD de cette release, `TWO_FACTOR_STATUS` n’est pas activé : le 2FA est donc **en sommeil**, et l’écran de connexion demande uniquement le nom d’utilisateur et le mot de passe.
 
 Le code sait demander un code TOTP à six chiffres lorsque `TWO_FACTOR_STATUS` est défini sur `Active` et que les secrets nécessaires sont configurés. Cette activation relève d’une décision et d’une opération d’administration, pas d’un réglage individuel de l’utilisateur.
 
@@ -82,7 +87,7 @@ Si le 2FA est activé ultérieurement, ajoute le secret fourni par l’administr
 
 Les droits sont attribués au compte par un administrateur.
 
-| Profil affiché | Droits dans PROD 1.1.0 |
+| Profil affiché | Droits dans PROD {{RELEASE_VERSION}} |
 |---|---|
 | Administrateur (`admin`) | Lecture et écriture du CRM; gestion des utilisateurs; maintenance des options; accès au journal d’audit. |
 | Direction (`management`) | Lecture et écriture des données CRM. Pas de gestion des utilisateurs, de la maintenance ou du journal d’audit. |
@@ -106,7 +111,7 @@ Le tableau de bord est la page **Dashboard**. Il présente :
 
 Les sections vides affichent un message, par exemple **Aucune activité à venir**, **Aucune action en attente**, **Aucun contact enregistré** ou **Aucun projet actif**. Ces messages ne sont pas des données et n’ajoutent aucun enregistrement à la base.
 
-**À propos du calendrier :** le tableau de bord affiche une mention de synchronisation avec Google Agenda. Dans la version 1.1.0, cette mention est un texte d’interface ; aucune synchronisation Google Agenda configurable n’est intégrée au CRM. Ne t’y fie pas pour vérifier qu’un rendez-vous a été transmis à Google.
+**Google Agenda :** la connexion est disponible en DEV pour les tests. Elle reste désactivée en PROD tant qu’un client OAuth propre à PROD n’a pas été configuré. N’active pas la synchronisation depuis PROD jusque-là.
 
 ## 7. Gestion des contacts
 
@@ -114,7 +119,7 @@ Ouvre **Contacts** pour consulter le carnet. La liste comprend une recherche par
 
 ### Créer un contact
 
-Dans **Contacts**, utilise **Ajouter un contact**. Le prénom et le nom sont obligatoires. Les autres renseignements peuvent être laissés vides s’ils sont inconnus : titre, profil et type d’investisseur, niveau d’investissement, e-mail, téléphone, entreprise, secteur, ville, date de naissance et genre.
+Dans **Contacts**, utilise **Ajouter un contact**. Le prénom et le nom sont obligatoires. Les autres renseignements peuvent être laissés vides s’ils sont inconnus : titre, profil et type d’investisseur, niveau d’investissement, e-mail, téléphone, entreprise, secteur, ville, pays, date de naissance et genre. Le pays se choisit dans une liste défilante; France et Indonésie sont proposés en premier, puis les autres pays sont classés par ordre alphabétique.
 
 Le contact est créé après validation du formulaire. Une adresse e-mail déjà utilisée par un autre contact est refusée.
 
@@ -151,6 +156,8 @@ Dans l’interface, **Projets** correspond au suivi de biens et projets immobili
 ### Créer et modifier un projet
 
 Dans **Projets**, utilise **Ajouter un projet**. La référence, le nom, le type et le statut sont requis. Les champs numériques, dates, listes et coordonnées doivent respecter leur format. Enregistre le formulaire en bas de page.
+
+Le pays se choisit dans une liste défilante. France et Indonésie apparaissent en premier, suivis des autres pays par ordre alphabétique. Le même sélecteur est utilisé pour les pays des contacts, adresses, entreprises et projets.
 
 Pour modifier un projet, ouvre sa fiche, change les champs nécessaires puis **Enregistrer le projet**. Une référence déjà utilisée ne peut pas être réutilisée.
 
@@ -198,19 +205,19 @@ Si une recherche ne retourne rien, vérifie l’orthographe, retire les filtres 
 
 ## 12. Lecture des indicateurs et analytics
 
-PROD 1.1.0 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :
+PROD {{RELEASE_VERSION}} ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :
 
 - **Contacts suivis** : nombre total de contacts; le complément indique les nouveaux contacts du mois.
 - **Projets actifs** : nombre de fiches immobilières dont le statut n’est pas `SOLD`.
 - **Activités à venir** : activités dont la date est maintenant ou dans le futur.
-- **Actions en attente** : actions dont le statut n’est pas **Terminée**. Dans le code 1.1.0, cela peut aussi inclure une action **Annulée**; vérifie la liste détaillée avant d’interpréter le chiffre.
+- **Actions en attente** : actions dont le statut n’est pas **Terminée**. Cela peut aussi inclure une action **Annulée**; vérifie la liste détaillée avant d’interpréter le chiffre.
 - **En retard** : actions non terminées avec une échéance antérieure à l’heure actuelle.
 
 Les indicateurs se recalculent à partir des données enregistrées. Les compteurs affichant `0` ou `00` signifient qu’aucun enregistrement correspondant n’a été trouvé selon ces règles.
 
 ## 13. Les rapports
 
-Il n’existe pas de rubrique **Rapports**, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.1.0. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.
+Il n’existe pas de rubrique **Rapports**, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD {{RELEASE_VERSION}}. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.
 
 Pour transmettre une information, utilise les données visibles dans les fiches et respecte les règles internes de confidentialité. Ne considère pas une capture d’écran comme un rapport officiel ou un export exhaustif.
 
@@ -261,13 +268,13 @@ En cas de doute, annule l’opération et demande à un administrateur avant de 
 - Avant une suppression, vérifie les relations et lis le message de confirmation.
 - Utilise le journal d’audit pour rechercher les opérations récentes d’administration si tu es administrateur.
 - Le menu Maintenance modifie les valeurs proposées dans certains menus déroulants : réserve cette fonction aux administrateurs.
-- La mention Google Agenda du tableau de bord n’est pas la preuve d’une synchronisation réelle dans la version 1.1.0.
+- Google Agenda n’est pas connecté en PROD dans cette release; les options de synchronisation sont indisponibles dans cet environnement.
 
 ## 17. Dépannage et erreurs fréquentes
 
 | Symptôme | Vérification / action |
 |---|---|
-| Identifiants invalides | Vérifie le nom d’utilisateur et le mot de passe; respecte les majuscules/minuscules. Après plusieurs échecs, demande à l’administrateur de vérifier que le compte est actif. |
+| Identifiants invalides | Le nom d’utilisateur n’est pas sensible à la casse, mais le mot de passe l’est. Après plusieurs échecs, demande à l’administrateur de vérifier que le compte est actif. |
 | Code 2FA demandé ou refusé | Le 2FA est en sommeil dans la configuration PROD vérifiée. Si l’écran le demande après un changement de configuration, utilise le code à six chiffres de l’application associée au bon compte; vérifie l’heure automatique du téléphone. Ne partage pas le secret. |
 | Page inaccessible ou message base de données inaccessible | Recharge la page une fois. Si l’erreur persiste, note l’heure, la page et le message puis contacte le support. Ne modifie pas la configuration PostgreSQL toi-même. |
 | Aucune donnée ou aucun résultat | Vérifie la recherche et les filtres. Les compteurs et listes reflètent la base réelle; un état vide ne signifie pas nécessairement une panne. |
@@ -290,7 +297,7 @@ Si le formulaire est inaccessible ou si l’envoi reste en attente, adresse le p
 Fournis les informations suivantes :
 
 1. Environnement : **PROD**.
-2. Version et build affichés près du logo (pour cette release : `v1.1.0`, puis le SHA court du build actif).
+2. Version et build affichés près du logo (pour cette release : `v{{RELEASE_VERSION}}`, puis le SHA court du build actif).
 3. Date et heure avec fuseau horaire.
 4. Page concernée et action effectuée juste avant l’erreur.
 5. Message d’erreur exact et étapes permettant de reproduire le problème.
