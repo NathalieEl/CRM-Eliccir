@@ -22,12 +22,14 @@ type PropertyFormProps = {
   property?: PropertyRecord;
   contacts: { id: string; prenom: string | null; nom: string }[];
   entreprises: { id: string; nom: string }[];
+  landParcels?: { id: string; title: string }[];
   submitLabel: string;
   cancelHref: string;
   editable?: boolean;
+  showProjectName?: boolean;
 };
 
-const propertyTypes = ["PROJECT", "VILLA", "HOUSE", "APARTMENT", "LAND", "COMMERCIAL", "BUILDING", "WAREHOUSE", "GUESTHOUSE_HOTEL"];
+const propertyTypes = ["PROJECT", "VILLA", "HOUSE", "APARTMENT", "LAND", "LOT", "COMMERCIAL", "BUILDING", "WAREHOUSE", "GUESTHOUSE_HOTEL"];
 const propertyStatuses = ["AVAILABLE", "UNDER_OFFER", "SOLD", "RENTED", "WITHDRAWN"];
 const propertyConditions = ["NEW", "GOOD", "TO_RENOVATE", "OFF_PLAN"];
 const furnishings = ["FURNISHED", "SEMI_FURNISHED", "UNFURNISHED"];
@@ -44,6 +46,7 @@ const labels: Record<string, string> = {
   HOUSE: "Maison",
   APARTMENT: "Appartement",
   LAND: "Terrain",
+  LOT: "Lot",
   COMMERCIAL: "Local commercial",
   BUILDING: "Bâtiment",
   WAREHOUSE: "Entrepôt",
@@ -126,7 +129,7 @@ function CheckField({ label, name, checked }: { label: string; name: string; che
   return <label className="property-checkbox"><input type="checkbox" name={name} defaultChecked={checked} />{label}</label>;
 }
 
-export function PropertyForm({ action, property, contacts, entreprises, submitLabel, cancelHref, editable = true }: PropertyFormProps) {
+export function PropertyForm({ action, property, contacts, entreprises, landParcels = [], submitLabel, cancelHref, editable = true, showProjectName = false }: PropertyFormProps) {
   const landTitle = property?.landTitle;
 
   return (
@@ -137,9 +140,10 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
       <section className="contacts-create-section profile-section">
         <div className="contacts-section-heading"><div><p className="section-index">01 · IDENTIFICATION</p><h2>Informations générales</h2></div></div>
         <div className="property-fields-grid">
-          <label><span className="field-title">Référence du projet</span><input name="reference" defaultValue={property?.reference ?? ""} required minLength={2} maxLength={80} /></label>
-          <label><span className="field-title">Nom du projet</span><input name="title" defaultValue={property?.title ?? ""} required minLength={2} maxLength={200} /></label>
-          <SelectField label="Type de projet" name="type" value={property?.type ?? "PROJECT"} options={propertyTypes} required />
+          {showProjectName ? <label><span className="field-title">Nom du projet</span><input name="projectName" required minLength={2} maxLength={200} placeholder="Ex. Résidence familiale" /></label> : null}
+          <label><span className="field-title">Référence du bien</span><input name="reference" defaultValue={property?.reference ?? ""} required minLength={2} maxLength={80} /></label>
+          <label><span className="field-title">Nom du bien</span><input name="title" defaultValue={property?.title ?? ""} required minLength={2} maxLength={200} /></label>
+          <SelectField label="Type de bien" name="type" value={property?.type ?? (showProjectName ? "LAND" : "PROJECT")} options={showProjectName ? ["LAND"] : propertyTypes} required />
           <SelectField label="Statut" name="status" value={property?.status ?? "AVAILABLE"} options={propertyStatuses} required />
           <SelectField label="État" name="condition" value={property?.condition ?? ""} options={propertyConditions} />
           <label><span className="field-title">Année de construction</span><input name="yearBuilt" type="number" step="1" defaultValue={displayValue(property?.yearBuilt)} /></label>
@@ -147,6 +151,12 @@ export function PropertyForm({ action, property, contacts, entreprises, submitLa
           <label><span className="field-title">Propriétaire</span><select name="ownerId" defaultValue={property?.ownerId ?? ""}><option value="">Non renseigné</option>{contacts.map((contact) => <option key={contact.id} value={contact.id}>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</option>)}</select></label>
           <label><span className="field-title">Entreprise</span><select name="entrepriseId" defaultValue={property?.entrepriseId ?? ""}><option value="">Non renseignée</option>{entreprises.map((entreprise) => <option key={entreprise.id} value={entreprise.id}>{entreprise.nom}</option>)}</select></label>
           <label><span className="field-title">Pays</span><CountrySelect name="country" value={property?.country} /></label>
+          {property && !showProjectName ? (
+            <label><span className="field-title">Terrain de rattachement</span><select name="landParcelId" defaultValue={property.landParcelId ?? ""}>
+              <option value="">Aucun terrain associé</option>
+              {landParcels.filter((parcel) => parcel.id !== property.id).map((parcel) => <option key={parcel.id} value={parcel.id}>{parcel.title}</option>)}
+            </select></label>
+          ) : null}
           <label><span className="field-title">Statut du projet</span><input name="projectStatus" defaultValue={property?.projectStatus ?? "En cours"} maxLength={40} /></label>
           <label><span className="field-title">Progression du projet (%)</span><input name="projectProgression" type="number" min="0" max="100" step="1" defaultValue={displayValue(property?.projectProgression ?? 0)} /></label>
           <label className="property-field-wide"><span className="field-title">Description</span><textarea name="description" rows={5} defaultValue={property?.description ?? ""} /></label>

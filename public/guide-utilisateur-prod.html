@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
-    <title>Guide d’utilisation · MANTA CRM PROD 1.1.17</title>
+    <title>Guide d’utilisation · MANTA CRM PROD 1.1.18</title>
     <style>
       :root { color-scheme: light; --ink: #25332b; --muted: #647168; --green: #1f3c32; --line: #e1e5df; --paper: #fff; --canvas: #f3f5f1; --accent: #d9e383; }
       * { box-sizing: border-box; }
@@ -39,14 +39,14 @@
   </head>
   <body>
     <header class="guide-topbar">
-      <div class="guide-brand"><img class="guide-logo" src="/manta-logo.png" alt="MANTA Development"><span>MANTA CRM · Guide PROD 1.1.17</span></div>
+      <div class="guide-brand"><img class="guide-logo" src="/manta-logo.png" alt="MANTA Development"><span>MANTA CRM · Guide PROD 1.1.18</span></div>
       <a class="guide-return" href="/">Retour à MANTA CRM</a>
     </header>
-    <main><section class="release-notes"><h2>Nouveautés de la version 1.1.17</h2><ul><li><strong>Connexion plus simple</strong><p>Les noms d’utilisateur ne distinguent plus les majuscules des minuscules. Les mots de passe restent sensibles à la casse.</p></li><li><strong>Sélecteurs de pays améliorés</strong><p>Les pays se choisissent dans une liste défilante. France et Indonésie apparaissent en premier, puis les autres pays par ordre alphabétique dans les formulaires concernés.</p></li><li><strong>Formulaires plus lisibles sur petit écran</strong><p>Les libellés des boutons s’adaptent à la largeur disponible et se replient au lieu d’être coupés.</p></li><li><strong>Logo MANTA affiché une seule fois</strong><p>Le logo reste au-dessus de la colonne du menu. Les en-têtes des pages ne le répètent plus.</p></li></ul></section><h1>Guide d’utilisation — MANTA CRM PROD 1.1.17</h1>
-<p><strong>Version du guide :</strong> 1.1.17<br>
+    <main><section class="release-notes"><h2>Nouveautés de la version 1.1.18</h2><ul><li><strong>Projets multi-terrains et biens associés</strong><p>Un projet peut regrouper plusieurs terrains. Chaque terrain peut être vendu seul ou contenir plusieurs lots, villas, appartements ou autres biens, chacun rattaché à un seul terrain. Les fiches déjà présentes restent autonomes et ne sont pas reclassées automatiquement.</p></li></ul></section><h1>Guide d’utilisation — MANTA CRM PROD 1.1.18</h1>
+<p><strong>Version du guide :</strong> 1.1.18<br>
 <strong>Plateforme :</strong> PROD<br><strong>Adresse :</strong> <a href="https://crm-eliccir-production.up.railway.app">https://crm-eliccir-production.up.railway.app</a><br><strong>Public concerné :</strong> administrateurs, direction, opérations commerciales et membres de l’équipe</p>
 <blockquote>
-<p>Ce guide décrit les fonctions présentes dans PROD 1.1.17. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.</p>
+<p>Ce guide décrit les fonctions présentes dans PROD 1.1.18. Les options marquées comme indisponibles ne doivent pas être considérées comme faisant partie du produit.</p>
 </blockquote>
 <h2>Table des matières</h2>
 <ol>
@@ -71,7 +71,7 @@
 </ol>
 <h2>1. Présentation générale du système</h2>
 <p>MANTA CRM est une application web sécurisée de gestion de contacts, d’entreprises, de projets immobiliers, d’activités et d’actions commerciales. Les données sont consultées depuis le navigateur et enregistrées dans la base de données PROD.</p>
-<p>L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. Cette édition du guide correspond à <strong>v1.1.17</strong>.</p>
+<p>L’instance PROD est accessible à l’adresse indiquée en tête du guide. Les mises à jour de l’application sont identifiées par une version SemVer et un identifiant de build, visibles à côté du logo. Cette édition du guide correspond à <strong>v1.1.18</strong>.</p>
 <p>L’interface est organisée autour d’un tableau de bord et de pages de gestion dédiées. Les données affichées dépendent du contenu réel de la base ; les messages « Aucun… » indiquent qu’aucun enregistrement correspondant n’existe.</p>
 <h2>2. Mission et objectifs du CRM</h2>
 <p>Le CRM a pour objectif de centraliser le suivi commercial et immobilier :</p>
@@ -116,7 +116,7 @@
 <thead>
 <tr>
 <th>Profil affiché</th>
-<th>Droits dans PROD 1.1.17</th>
+<th>Droits dans PROD 1.1.18</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -184,6 +184,7 @@
 <h3>Créer et modifier un projet</h3>
 <p>Dans <strong>Projets</strong>, utilise <strong>Ajouter un projet</strong>. La référence, le nom, le type et le statut sont requis. Les champs numériques, dates, listes et coordonnées doivent respecter leur format. Enregistre le formulaire en bas de page.</p>
 <p>Le pays se choisit dans une liste défilante. France et Indonésie apparaissent en premier, suivis des autres pays par ordre alphabétique. Le même sélecteur est utilisé pour les pays des contacts, adresses, entreprises et projets.</p>
+<p>Un projet peut contenir plusieurs terrains. À sa création, ajoute son premier terrain; il peut être vendu seul, sans construction. Dans sa fiche, la section <strong>Terrains et biens</strong> permet ensuite d’ajouter d’autres terrains ou des biens dérivés. Chaque lot, villa, appartement, bâtiment ou autre bien dérivé doit être rattaché à un seul terrain du même projet. Un terrain peut ne contenir aucun bien dérivé ou en contenir plusieurs.</p>
 <p>Pour modifier un projet, ouvre sa fiche, change les champs nécessaires puis <strong>Enregistrer le projet</strong>. Une référence déjà utilisée ne peut pas être réutilisée.</p>
 <h3>Photos et localisation sur carte</h3>
 <p>Dans <strong>Photos du projet</strong>, tu peux ajouter jusqu’à 20 images JPEG, PNG ou WebP de 10 Mo maximum chacune. Le CRM les redimensionne et les convertit en WebP avant de les stocker. Tu peux ensuite modifier leur légende, définir la photo principale, changer leur ordre ou les supprimer.</p>
@@ -210,7 +211,7 @@
 <p>Certaines listes ont leur propre recherche : les contacts permettent aussi de filtrer par secteur et ville; les projets et entreprises acceptent également une recherche locale.</p>
 <p>Si une recherche ne retourne rien, vérifie l’orthographe, retire les filtres et réessaie avec un terme plus court.</p>
 <h2>12. Lecture des indicateurs et analytics</h2>
-<p>PROD 1.1.17 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :</p>
+<p>PROD 1.1.18 ne possède pas de module analytique avancé. Les indicateurs présents sont des compteurs du tableau de bord :</p>
 <ul>
 <li><strong>Contacts suivis</strong> : nombre total de contacts; le complément indique les nouveaux contacts du mois.</li>
 <li><strong>Projets actifs</strong> : nombre de fiches immobilières dont le statut n’est pas <code>SOLD</code>.</li>
@@ -220,7 +221,7 @@
 </ul>
 <p>Les indicateurs se recalculent à partir des données enregistrées. Les compteurs affichant <code>0</code> ou <code>00</code> signifient qu’aucun enregistrement correspondant n’a été trouvé selon ces règles.</p>
 <h2>13. Les rapports</h2>
-<p>Il n’existe pas de rubrique <strong>Rapports</strong>, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.1.17. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.</p>
+<p>Il n’existe pas de rubrique <strong>Rapports</strong>, de générateur de rapport ni de fonction d’export PDF/CSV dans PROD 1.1.18. Le tableau de bord fournit les compteurs décrits au chapitre précédent; la Recherche globale aide à retrouver les enregistrements, mais ne produit pas de rapport téléchargeable.</p>
 <p>Pour transmettre une information, utilise les données visibles dans les fiches et respecte les règles internes de confidentialité. Ne considère pas une capture d’écran comme un rapport officiel ou un export exhaustif.</p>
 <h2>14. Création, modification et suppression des données</h2>
 <h3>Création</h3>
@@ -319,7 +320,7 @@
 <p>Fournis les informations suivantes :</p>
 <ol>
 <li>Environnement : <strong>PROD</strong>.</li>
-<li>Version et build affichés près du logo (pour cette release : <code>v1.1.17</code>, puis le SHA court du build actif).</li>
+<li>Version et build affichés près du logo (pour cette release : <code>v1.1.18</code>, puis le SHA court du build actif).</li>
 <li>Date et heure avec fuseau horaire.</li>
 <li>Page concernée et action effectuée juste avant l’erreur.</li>
 <li>Message d’erreur exact et étapes permettant de reproduire le problème.</li>

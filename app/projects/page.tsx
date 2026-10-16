@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, requirePermission } from "@/lib/permissions";
-import { formatCurrencyAmount, formatLegacyBudget } from "@/lib/number-format";
+import { formatLegacyBudget } from "@/lib/number-format";
 import type { Prisma } from "@/app/generated/prisma/client";
 
-type ProjectRecord = Prisma.PropertyGetPayload<{ include: { entreprise: true } }>;
+type ProjectRecord = Prisma.ProjectGetPayload<{ include: { entreprise: true; property: true; assets: true } }>;
+
+function projectAssets(project: ProjectRecord) {
+  return [...new Map([...(project.property ? [project.property] : []), ...project.assets].map((property) => [property.id, property])).values()];
+}
 
 type ProjectsPageProps = {
   searchParams: Promise<{ error?: string; notice?: string; q?: string }>;
@@ -16,7 +20,6 @@ const errors: Record<string, string> = {
   "not-found": "Ce projet n’existe plus. Actualise la liste.",
 };
 
-import { deleteProperty } from "@/app/properties/actions";
 const notices: Record<string, string> = {
   created: "Le projet a été créé.",
   updated: "Les modifications ont été enregistrées.",
@@ -33,14 +36,14 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   let projects: ProjectRecord[] = [];
 
   try {
-    projects = await prisma.property.findMany({ include: { entreprise: true }, orderBy: { updatedAt: "desc" } });
+    projects = await prisma.project.findMany({ include: { entreprise: true, property: true, assets: true }, orderBy: { updatedAt: "desc" } });
   } catch {
     databaseAvailable = false;
   }
 
   const filteredProjects = searchQuery
     ? projects.filter((project) => {
-        const haystack = [project.title, project.reference, project.entreprise?.nom ?? "", project.country ?? "", project.kabupaten ?? "", project.province ?? "", project.projectStatus ?? "", project.projectBudget ?? "", project.type, project.status]
+        const haystack = [project.nom, project.entreprise?.nom ?? "", project.pays ?? "", project.ville ?? "", project.statut, project.budget ?? "", ...projectAssets(project).flatMap((asset) => [asset.title, asset.reference, asset.type, asset.status, asset.country ?? "", asset.kabupaten ?? "", asset.province ?? ""])]
           .join(" ")
           .toLowerCase();
         return haystack.includes(searchQuery.toLowerCase());
@@ -104,36 +107,29 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               ) : (
                 <div className="contacts-records-wrap">
                   <table className="contacts-records contacts-data-table projects-data-table">
-                    <thead><tr><th>PROJET</th><th>ENTREPRISE</th><th>LOCALISATION</th><th>STATUT</th><th>PROGRESSION</th><th>BUDGET</th><th>GESTION</th></tr></thead>
+                    <thead><tr><th>PROJET</th><th>ENTREPRISE</th><th>LOCALISATION</th><th>STATUT</th><th>PROGRESSION</th><th>BUDGET</th><th>TERRAINS / BIENS</th><th>GESTION</th></tr></thead>
                     <tbody>
                       {filteredProjects.map((project) => (
-                        <tr key={project.id}>
-                          <td data-label="Projet">
-                            <b><Link href={`/projects/${project.id}`}>{project.title}</Link></b>
-                            <small>{project.reference}</small>
-                          </td>
+                        (() => {
+                          const assets = projectAssets(project);
+                          const firstAsset = assets.find((asset) => asset.type === "LAND") ?? assets[0];
+                          const landCount = assets.filter((asset) => asset.type === "LAND").length;
+                          const unitCount = assets.length - landCount;
+                          return <tr key={project.id}>
+                          <td data-label="Projet"><b>{firstAsset ? <Link href={`/projects/${firstAsset.id}`}>{project.nom}</Link> : project.nom}</b>{firstAsset ? <small>{firstAsset.title}</small> : null}</td>
                           <td data-label="Entreprise">{project.entreprise?.nom || "—"}</td>
-                          <td data-label="Localisation">{[project.neighborhood, project.kabupaten, project.province, project.country].filter(Boolean).join(" · ") || "—"}</td>
-                          <td data-label="Statut"><span className="status-pill status-active"><i />{project.projectStatus || project.status}</span></td>
-                          <td data-label="Progression">{project.projectProgression === null ? "—" : `${project.projectProgression}%`}</td>
-                          <td data-label="Budget">{project.projectBudgetAmount !== null && project.projectBudgetCurrency
-                            ? formatCurrencyAmount(project.projectBudgetAmount.toString(), project.projectBudgetCurrency)
-                            : formatLegacyBudget(project.projectBudget)}</td>
+                          <td data-label="Localisation">{[project.ville, project.pays].filter(Boolean).join(" · ") || "—"}</td>
+                          <td data-label="Statut"><span className="status-pill status-active"><i />{project.statut}</span></td>
+                          <td data-label="Progression">{`${project.progression}%`}</td>
+                          <td data-label="Budget">{formatLegacyBudget(project.budget)}</td>
+                          <td data-label="Terrains / biens">{landCount} terrain{landCount === 1 ? "" : "s"} · {unitCount} bien{unitCount === 1 ? "" : "s"}</td>
                           <td data-label="Gestion">
                             <div className="contact-row-actions">
-                              <Link className="contact-profile-link" href={`/projects/${project.id}`}>{canWrite ? "Modifier" : "Voir"}</Link>
-                              {canWrite ? <details className="contact-delete-details">
-                                <summary>Supprimer</summary>
-                                <form action={deleteProperty} className="contact-delete-form">
-                                  <input type="hidden" name="id" value={project.id} />
-                                  <p>Supprime aussi les titres, documents, mandats, dossiers et visites liés.</p>
-                                  <label><input type="checkbox" name="confirmed" value="yes" required /> Confirmer la suppression</label>
-                                  <button type="submit">Supprimer le projet</button>
-                                </form>
-                              </details> : null}
+                              {firstAsset ? <Link className="contact-profile-link" href={`/projects/${firstAsset.id}`}>{canWrite ? "Ouvrir" : "Voir"}</Link> : <span className="support-privacy-note">Aucun bien</span>}
                             </div>
                           </td>
-                        </tr>
+                        </tr>;
+                        })()
                       ))}
                     </tbody>
                   </table>

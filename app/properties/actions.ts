@@ -8,7 +8,8 @@ import { recordAudit } from "@/lib/audit";
 import { convertBudgetAmounts, formatCurrencyAmount } from "@/lib/number-format";
 import type { Prisma } from "@/app/generated/prisma/client";
 
-const propertyTypes = ["PROJECT", "VILLA", "HOUSE", "APARTMENT", "LAND", "COMMERCIAL", "BUILDING", "WAREHOUSE", "GUESTHOUSE_HOTEL"] as const;
+const propertyTypes = ["PROJECT", "VILLA", "HOUSE", "APARTMENT", "LAND", "LOT", "COMMERCIAL", "BUILDING", "WAREHOUSE", "GUESTHOUSE_HOTEL"] as const;
+const projectAssetTypes = ["LAND", "LOT", "VILLA", "HOUSE", "APARTMENT", "COMMERCIAL", "BUILDING", "WAREHOUSE", "GUESTHOUSE_HOTEL"] as const;
 const propertyStatuses = ["AVAILABLE", "UNDER_OFFER", "SOLD", "RENTED", "WITHDRAWN"] as const;
 const propertyConditions = ["NEW", "GOOD", "TO_RENOVATE", "OFF_PLAN"] as const;
 const furnishings = ["FURNISHED", "SEMI_FURNISHED", "UNFURNISHED"] as const;
@@ -146,6 +147,7 @@ function parseProperty(formData: FormData) {
   const title = field(formData, "title");
   const ownerId = field(formData, "ownerId");
   const entrepriseId = field(formData, "entrepriseId");
+  const landParcelId = field(formData, "landParcelId");
   const country = field(formData, "country");
   const projectStatus = field(formData, "projectStatus");
   const legacyProjectBudget = field(formData, "projectBudget");
@@ -164,7 +166,7 @@ function parseProperty(formData: FormData) {
   if (hasBudgetRates && (!completeBudgetRates || !projectBudgetRateDate)) return null;
   if (projectBudgetAmount !== null && (projectBudgetAmount < 0 || !projectBudgetCurrency)) return null;
   if ((numbers.latitude !== null && numbers.latitude !== undefined && Math.abs(numbers.latitude) > 90) || (numbers.longitude !== null && numbers.longitude !== undefined && Math.abs(numbers.longitude) > 180)) return null;
-  if (reference.length < 2 || reference.length > 80 || title.length < 2 || title.length > 200 || ownerId.length > 64 || entrepriseId.length > 64 || country.length > 80 || projectStatus.length > 40 || legacyProjectBudget.length > 80 || (numbers.projectProgression !== null && numbers.projectProgression !== undefined && (numbers.projectProgression < 0 || numbers.projectProgression > 100))) return null;
+  if (reference.length < 2 || reference.length > 80 || title.length < 2 || title.length > 200 || ownerId.length > 64 || entrepriseId.length > 64 || landParcelId.length > 64 || country.length > 80 || projectStatus.length > 40 || legacyProjectBudget.length > 80 || (numbers.projectProgression !== null && numbers.projectProgression !== undefined && (numbers.projectProgression < 0 || numbers.projectProgression > 100))) return null;
 
   const ratesForCalculation = completeBudgetRates && projectBudgetRateEurUsd !== null && projectBudgetRateEurIdr !== null && projectBudgetRateUsdIdr !== null
     ? { eurUsd: projectBudgetRateEurUsd, eurIdr: projectBudgetRateEurIdr, usdIdr: projectBudgetRateUsdIdr }
@@ -184,6 +186,7 @@ function parseProperty(formData: FormData) {
     ...numbers,
     ownerId: ownerId || null,
     entrepriseId: entrepriseId || null,
+    landParcelId: landParcelId || null,
     country: country || null,
     projectStatus: projectStatus || null,
     projectBudget: projectBudget || null,
@@ -263,25 +266,26 @@ export async function createProperty(formData: FormData) {
   const user = await requirePermission("crm.write");
   const parsed = parseProperty(formData);
   const documents = parseDocuments(formData);
+  const projectName = field(formData, "projectName");
   if (!parsed || !documents) redirect("/projects/new?error=invalid");
+  if (projectName.length < 2 || projectName.length > 200 || parsed.property.type !== "LAND") redirect("/projects/new?error=first-land-required");
 
   let createdId = "";
   try {
     await prisma.$transaction(async (transaction) => {
-      const property = await transaction.property.create({ data: parsed.property });
-      createdId = property.id;
-      const legacyProject = await transaction.project.create({
+      const project = await transaction.project.create({
         data: {
-          entrepriseId: property.entrepriseId,
-          nom: property.title,
-          pays: property.country,
-          ville: property.kabupaten,
-          statut: property.projectStatus || "En cours",
-          budget: property.projectBudget,
-          progression: property.projectProgression ?? 0,
+          entrepriseId: parsed.property.entrepriseId,
+          nom: projectName,
+          pays: parsed.property.country,
+          ville: parsed.property.kabupaten,
+          statut: parsed.property.projectStatus || "En cours",
+          budget: parsed.property.projectBudget,
+          progression: parsed.property.projectProgression ?? 0,
         },
       });
-      await transaction.property.update({ where: { id: property.id }, data: { legacyProjectId: legacyProject.id } });
+      const property = await transaction.property.create({ data: { ...parsed.property, projectId: project.id } });
+      createdId = property.id;
       if (parsed.landTitle) await transaction.landTitle.create({ data: { ...parsed.landTitle, propertyId: property.id } });
       for (const document of documents) {
         if (document.id || document.dealId) throw new Error("Related document references are not allowed when creating a property");
@@ -309,6 +313,92 @@ export async function createProperty(formData: FormData) {
   redirect(`/projects/${createdId}?notice=created`);
 }
 
+export async function createProjectAsset(formData: FormData) {
+  const user = await requirePermission("crm.write");
+  const projectId = field(formData, "projectId");
+  const returnPropertyId = field(formData, "returnPropertyId");
+  const reference = field(formData, "reference");
+  const title = field(formData, "title");
+  const type = enumValue(formData, "type", projectAssetTypes, true);
+  const status = enumValue(formData, "status", propertyStatuses, true);
+  const requestedLandParcelId = field(formData, "landParcelId");
+
+  if (!projectId || !returnPropertyId || projectId.length > 64 || returnPropertyId.length > 64 || reference.length < 2 || reference.length > 80 || title.length < 2 || title.length > 200 || !type || !status) {
+    redirect(`/projects/${returnPropertyId}?error=asset-invalid`);
+  }
+  if ((type === "LAND" && requestedLandParcelId) || (type !== "LAND" && !requestedLandParcelId)) {
+    redirect(`/projects/${returnPropertyId}?error=asset-land-required`);
+  }
+
+  const [project, anchor] = await Promise.all([
+    prisma.project.findUnique({ where: { id: projectId }, select: { id: true } }),
+    prisma.property.findFirst({
+      where: { id: returnPropertyId, OR: [{ projectId }, { legacyProjectId: projectId }] },
+      select: { id: true },
+    }),
+  ]);
+  if (!project || !anchor) redirect("/projects?error=not-found");
+
+  if (requestedLandParcelId) {
+    const landParcel = await prisma.property.findFirst({
+      where: {
+        id: requestedLandParcelId,
+        type: "LAND",
+        OR: [{ projectId }, { legacyProjectId: projectId }],
+      },
+      select: { id: true },
+    });
+    if (!landParcel) redirect(`/projects/${returnPropertyId}?error=asset-land-required`);
+  }
+
+  try {
+    const property = await prisma.property.create({
+      data: {
+        reference,
+        title,
+        type,
+        status,
+        projectId,
+        landParcelId: requestedLandParcelId || null,
+        views: [],
+        amenities: [],
+        staffIncluded: [],
+      },
+      select: { id: true },
+    });
+    await recordAudit({ actorId: user.id, actorUsername: user.username, action: "created", entity: "property", entityId: property.id, details: `projectId=${projectId}; type=${type}; reference=${reference}` });
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === "P2002") {
+      redirect(`/projects/${returnPropertyId}?error=reference-exists`);
+    }
+    throw error;
+  }
+
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${returnPropertyId}`);
+  redirect(`/projects/${returnPropertyId}?notice=asset-created`);
+}
+
+export async function updateProjectGroupName(formData: FormData) {
+  const user = await requirePermission("crm.write");
+  const projectId = field(formData, "projectId");
+  const returnPropertyId = field(formData, "returnPropertyId");
+  const projectName = field(formData, "projectName");
+  if (!projectId || !returnPropertyId || projectName.length < 2 || projectName.length > 200) redirect("/projects?error=invalid");
+
+  const [project, anchor] = await Promise.all([
+    prisma.project.findUnique({ where: { id: projectId }, select: { id: true } }),
+    prisma.property.findFirst({ where: { id: returnPropertyId, OR: [{ projectId }, { legacyProjectId: projectId }] }, select: { id: true } }),
+  ]);
+  if (!project || !anchor) redirect("/projects?error=not-found");
+
+  await prisma.project.update({ where: { id: projectId }, data: { nom: projectName } });
+  await recordAudit({ actorId: user.id, actorUsername: user.username, action: "updated", entity: "project", entityId: projectId, details: "field=nom" });
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${returnPropertyId}`);
+  redirect(`/projects/${returnPropertyId}?notice=project-name-updated`);
+}
+
 export async function updateProperty(formData: FormData) {
   const user = await requirePermission("crm.write");
   const id = field(formData, "id");
@@ -318,9 +408,31 @@ export async function updateProperty(formData: FormData) {
   if (!id || id.length > 64) redirect("/projects?error=not-found");
   if (!parsed || !documents) redirect(`/projects/${id}?error=invalid`);
 
+  const structure = await prisma.property.findUnique({
+    where: { id },
+    select: { projectId: true, legacyProjectId: true, landParcelId: true, derivedProperties: { select: { id: true } } },
+  });
+  if (!structure) redirect("/projects?error=not-found");
+  if (parsed.property.type === "LAND" && parsed.property.landParcelId) redirect(`/projects/${id}?error=asset-land-required`);
+  if (structure.landParcelId && parsed.property.type !== "LAND" && !parsed.property.landParcelId) redirect(`/projects/${id}?error=asset-land-required`);
+  if (structure.landParcelId && parsed.property.type === "LAND") redirect(`/projects/${id}?error=asset-land-required`);
+  if (structure.derivedProperties.length && parsed.property.type !== "LAND") redirect(`/projects/${id}?error=land-has-assets`);
+  if (parsed.property.landParcelId) {
+    const projectId = structure.projectId ?? structure.legacyProjectId;
+    const landParcel = projectId ? await prisma.property.findFirst({
+      where: {
+        id: parsed.property.landParcelId,
+        type: "LAND",
+        OR: [{ projectId }, { legacyProjectId: projectId }],
+      },
+      select: { id: true },
+    }) : null;
+    if (!landParcel) redirect(`/projects/${id}?error=asset-land-required`);
+  }
+
   try {
     await prisma.$transaction(async (transaction) => {
-      const current = await transaction.property.findUnique({ where: { id }, select: { legacyProjectId: true } });
+      const current = await transaction.property.findUnique({ where: { id }, select: { legacyProjectId: true, projectId: true } });
       await transaction.property.update({ where: { id }, data: parsed.property });
       const legacyProjectData = {
         entrepriseId: parsed.property.entrepriseId,
@@ -333,7 +445,7 @@ export async function updateProperty(formData: FormData) {
       };
       if (current?.legacyProjectId) {
         await transaction.project.update({ where: { id: current.legacyProjectId }, data: legacyProjectData });
-      } else {
+      } else if (!current?.projectId) {
         const legacyProject = await transaction.project.create({ data: legacyProjectData });
         await transaction.property.update({ where: { id }, data: { legacyProjectId: legacyProject.id } });
       }

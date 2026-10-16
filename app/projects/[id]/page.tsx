@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { updateProperty } from "@/app/properties/actions";
 import { PropertyForm } from "@/app/properties/property-form";
+import { ProjectAssetsSection } from "@/app/projects/project-assets-section";
 import { deleteProjectPhoto, moveProjectPhoto, setProjectCoverPhoto, updateProjectPhotoCaption, uploadProjectPhoto } from "@/app/projects/photo-actions";
 import { isProjectPhotoStorageConfigured } from "@/lib/project-photo-storage";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +12,8 @@ import { hasPermission, requirePermission } from "@/lib/permissions";
 const notices: Record<string, string> = {
   created: "Le projet a été créé.",
   updated: "Les modifications ont été enregistrées.",
+  "asset-created": "Le terrain ou bien a été ajouté au projet.",
+  "project-name-updated": "Le nom du projet a été mis à jour.",
 };
 
 const errors: Record<string, string> = {
@@ -18,6 +21,9 @@ const errors: Record<string, string> = {
   "reference-exists": "Cette référence de projet existe déjà.",
   "not-found": "Ce projet n’existe plus.",
   "confirm-delete": "Confirme la suppression du projet.",
+  "asset-invalid": "Vérifie la référence, le nom, le type et le statut du bien.",
+  "asset-land-required": "Choisis un terrain de ce projet pour rattacher ce bien.",
+  "land-has-assets": "Ce terrain contient des biens rattachés et ne peut pas changer de type.",
 };
 
 const photoNotices: Record<string, string> = {
@@ -71,6 +77,25 @@ export default async function ProjectProfilePage({ params, searchParams }: {
     if (legacyProject?.property) redirect(`/projects/${legacyProject.property.id}`);
     notFound();
   }
+  const projectId = property.projectId ?? property.legacyProjectId;
+  const projectGroup = projectId ? await prisma.project.findUnique({
+    where: { id: projectId },
+    select: {
+      id: true,
+      nom: true,
+      contacts: { where: { interesse: true }, include: { contact: true } },
+      property: {
+        select: { id: true, reference: true, title: true, type: true, status: true, landParcelId: true, landParcel: { select: { id: true, title: true } } },
+      },
+      assets: {
+        select: { id: true, reference: true, title: true, type: true, status: true, landParcelId: true, landParcel: { select: { id: true, title: true } } },
+      },
+    },
+  }) : null;
+  const projectAssets = projectGroup
+    ? [...new Map([...(projectGroup.property ? [projectGroup.property] : []), ...projectGroup.assets].map((asset) => [asset.id, asset])).values()]
+    : [];
+  const projectContacts = projectGroup?.contacts ?? property.legacyProject?.contacts ?? [];
   const reorderablePhotos = property.photos.filter((photo) => !photo.isCover);
 
   return (
@@ -97,8 +122,10 @@ export default async function ProjectProfilePage({ params, searchParams }: {
 
         <section className="contacts-create-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">01 · FICHE COMPLÈTE</p><h2>{canWrite ? "Modifier toutes les informations" : "Toutes les informations"}</h2></div></div>
-          <PropertyForm action={updateProperty} property={property} contacts={contacts} entreprises={entreprises} submitLabel="Enregistrer le projet" cancelHref="/projects" editable={canWrite} />
+          <PropertyForm action={updateProperty} property={property} contacts={contacts} entreprises={entreprises} landParcels={projectAssets.filter((asset) => asset.type === "LAND")} submitLabel="Enregistrer le projet" cancelHref="/projects" editable={canWrite} />
         </section>
+
+        {projectGroup ? <ProjectAssetsSection projectId={projectGroup.id} returnPropertyId={property.id} projectName={projectGroup.nom} assets={projectAssets} editable={canWrite} /> : null}
 
         <section className="contacts-create-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">PHOTOS</p><h2>Photos du projet</h2></div><span className="contacts-total">{property.photos.length}<small>PHOTOS</small></span></div>
@@ -153,9 +180,9 @@ export default async function ProjectProfilePage({ params, searchParams }: {
 
         <section className="contacts-create-section profile-section">
           <div className="contacts-section-heading"><div><p className="section-index">10 · CONTACTS</p><h2>Personnes intéressées</h2></div></div>
-          {property.legacyProject?.contacts.length ? (
+          {projectContacts.length ? (
             <div className="contact-note-list">
-              {property.legacyProject.contacts.map(({ contact }) => (
+              {projectContacts.map(({ contact }) => (
                 <article className="contact-note-item" key={contact.id}>
                   <Link href={`/contacts/${contact.id}`}><b>{[contact.prenom, contact.nom].filter(Boolean).join(" ")}</b></Link>
                   <p>{[contact.email, contact.telephone].filter(Boolean).join(" · ") || "Contact du CRM"}</p>

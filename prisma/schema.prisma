@@ -24,6 +24,7 @@ enum PropertyType {
   HOUSE
   APARTMENT
   LAND
+  LOT
   COMMERCIAL
   BUILDING
   WAREHOUSE
@@ -295,7 +296,8 @@ model Project {
   progression Int      @default(0)
   entreprise  Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
   contacts ContactProject[]
-  property Property?
+  property Property? @relation("LegacyProjectProperty")
+  assets Property[] @relation("ProjectAssets")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -673,6 +675,8 @@ model Property {
   projectProgression  Int?
   entrepriseId         String?
   legacyProjectId String?        @unique
+  projectId      String?
+  landParcelId   String?
   description   String?
   type          PropertyType
   status        PropertyStatus   @default(AVAILABLE)
@@ -683,7 +687,10 @@ model Property {
   ownerId String?
   owner   Contact? @relation("PropertyOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   entreprise Entreprise? @relation(fields: [entrepriseId], references: [id], onDelete: SetNull)
-  legacyProject Project? @relation(fields: [legacyProjectId], references: [id], onDelete: SetNull)
+  legacyProject Project? @relation("LegacyProjectProperty", fields: [legacyProjectId], references: [id], onDelete: SetNull)
+  project Project? @relation("ProjectAssets", fields: [projectId], references: [id], onDelete: Restrict)
+  landParcel Property? @relation("PropertyLandParcel", fields: [landParcelId], references: [id], onDelete: Restrict)
+  derivedProperties Property[] @relation("PropertyLandParcel")
 
   address              String?
   kecamatan            String?
@@ -743,6 +750,8 @@ model Property {
   @@index([type])
   @@index([province, kabupaten])
   @@index([entrepriseId])
+  @@index([projectId])
+  @@index([landParcelId])
 }
 
 model PropertyPhoto {

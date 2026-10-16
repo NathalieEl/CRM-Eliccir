@@ -161,6 +161,8 @@ Dans **Projets**, utilise **Ajouter un projet**. La référence, le nom, le type
 
 Le pays se choisit dans une liste défilante. France et Indonésie apparaissent en premier, suivis des autres pays par ordre alphabétique. Le même sélecteur est utilisé pour les pays des contacts, adresses, entreprises et projets.
 
+Un projet peut contenir plusieurs terrains. À sa création, ajoute son premier terrain; il peut être vendu seul, sans construction. Dans sa fiche, la section **Terrains et biens** permet ensuite d’ajouter d’autres terrains ou des biens dérivés. Chaque lot, villa, appartement, bâtiment ou autre bien dérivé doit être rattaché à un seul terrain du même projet. Un terrain peut ne contenir aucun bien dérivé ou en contenir plusieurs.
+
 Pour modifier un projet, ouvre sa fiche, change les champs nécessaires puis **Enregistrer le projet**. Une référence déjà utilisée ne peut pas être réutilisée.
 
 ### Photos et localisation sur carte

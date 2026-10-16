@@ -23,10 +23,11 @@ export default async function NewProjectPage({ searchParams }: NewProjectPagePro
 				<Link className="contacts-back" href="/projects">← Projets</Link>
 			</header>
 			<div className="contacts-content property-profile-page">
-				<section className="contacts-title-row"><div><p className="section-index">ESPACE DE TRAVAIL · NOUVEAU PROJET</p><h1>Ajouter un projet</h1><p className="contacts-intro">Renseigne ses informations immobilières, foncières et financières.</p></div></section>
+				<section className="contacts-title-row"><div><p className="section-index">ESPACE DE TRAVAIL · NOUVEAU PROJET</p><h1>Ajouter un projet</h1><p className="contacts-intro">Crée le projet avec son premier terrain. Tu pourras ensuite ajouter d’autres terrains et les biens qui s’y trouvent.</p></div></section>
 				{params.error === "invalid" ? <p className="contacts-message contacts-message-error" role="alert">Vérifie les champs, les dates et les valeurs numériques.</p> : null}
 				{params.error === "reference-exists" ? <p className="contacts-message contacts-message-error" role="alert">Cette référence de projet existe déjà.</p> : null}
-				<PropertyForm action={createProperty} contacts={contacts} entreprises={entreprises} submitLabel="Créer le projet" cancelHref="/projects" />
+				{params.error === "first-land-required" ? <p className="contacts-message contacts-message-error" role="alert">Un projet doit commencer par un terrain. Les biens se créent ensuite dans ce projet et sont rattachés à un terrain unique.</p> : null}
+				<PropertyForm action={createProperty} contacts={contacts} entreprises={entreprises} submitLabel="Créer le projet et son terrain" cancelHref="/projects" showProjectName />
 			</div>
 		</main>
 	);

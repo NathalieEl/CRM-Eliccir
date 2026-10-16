@@ -80,5 +80,11 @@
       "title": "Logo MANTA affiché une seule fois",
       "text": "Le logo reste au-dessus de la colonne du menu. Les en-têtes des pages ne le répètent plus."
     }
+  ],
+  "1.1.18": [
+    {
+      "title": "Projets multi-terrains et biens associés",
+      "text": "Un projet peut regrouper plusieurs terrains. Chaque terrain peut être vendu seul ou contenir plusieurs lots, villas, appartements ou autres biens, chacun rattaché à un seul terrain. Les fiches déjà présentes restent autonomes et ne sont pas reclassées automatiquement."
+    }
   ]
 }
